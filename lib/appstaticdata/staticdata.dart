@@ -38,7 +38,7 @@ Decoration boxDecorationn = BoxDecoration(
 
 
 // *****************************************
-ColorNotifire? notifire;
+ColorNotifire? notifire = ColorNotifire();
 
 
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'appstaticdata/routes.dart';
+import 'appstaticdata/staticdata.dart';
 
 
 void main() async {
@@ -36,7 +37,8 @@ class MyApp extends StatelessWidget {
           fontFamily: "Gilroy",
           dividerColor: Colors.transparent,
           colorScheme: ColorScheme.fromSwatch().copyWith(
-            primary: const Color(0xFF0059E7),
+            primary: const Color(0xFF15BB00),
+            surface: notifire!.getbgcolor,
           )
         )
       ),

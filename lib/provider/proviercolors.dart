@@ -14,6 +14,7 @@ class ColorNotifire with ChangeNotifier {
   }
 
   get getIsDark => isDark;
+  get getMainColor => isDark ? darkmainColor : mainColor;
   get getprimerycolor => isDark ? darkPrimeryColor : primeryColor;
   get getbgcolor => isDark ? darkbgcolor : bgcolor;
   get getbordercolor => isDark ? darkbordercolor : bordercolor;

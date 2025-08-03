@@ -1,7 +1,6 @@
 
 import 'package:aesd/appstaticdata/routes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 
@@ -21,25 +20,46 @@ class _SplashScreenState extends State<SplashScreen> {
 
     super.initState();
 
-     Future.delayed(const Duration(seconds: 3),() {
+     Future.delayed(const Duration(seconds: 4),() {
 
-       Get.offAllNamed(Routes.homepage);
+       Get.offAllNamed(Routes.auth);
 
     },);
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SvgPicture.asset("assets/applogo.svg",height: 50,width: 50,),
-              const SizedBox(width: 12,),
-              SvgPicture.asset("assets/Buzz..svg",height: 30,width: 40,),
-            ],
+          Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/images/bg-1.jpg"),
+                fit: BoxFit.cover
+              )
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white70,
+                    Colors.white10
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter
+                )
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.center,
+            child: Image.asset(
+              "assets/icons/launcher_icon.png",
+              height: 150,
+              width: 150,
+            ),
           )
         ],
       ),

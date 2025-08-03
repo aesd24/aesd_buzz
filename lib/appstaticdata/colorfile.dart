@@ -9,6 +9,8 @@ Color darkPrimeryColor = const Color(0xff293226);
 Color bgcolor = const Color(0xfff2f5f2);
 Color darkbgcolor = const Color(0xff1f251d);
 
+Color mainColor = const Color(0xff3ae700);
+Color darkmainColor = const Color(0xff0e7900);
 
 Color bordercolor =  Colors.grey.shade200;
 Color darkbordercolor =  const Color(0xff313f2a);
