@@ -58,6 +58,10 @@ dependencies:
   datepicker_dropdown: ^0.1.7
   dropdown_button2: ^2.1.4
   font_awesome_flutter: ^10.8.0
+  shared_preferences: ^2.5.3
+  flutter_secure_storage: ^9.2.4
+  dio: ^5.8.0+1
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

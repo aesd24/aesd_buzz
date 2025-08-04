@@ -14,7 +14,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
 
-  var selected =0;
+  var selected = 0;
   @override
   initState()  {
 
@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
        Get.offAllNamed(Routes.auth);
 
-    },);
+    });
   }
   @override
   Widget build(BuildContext context) {

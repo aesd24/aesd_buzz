@@ -1,3 +1,4 @@
+import 'package:aesd/appstaticdata/dictionnary.dart';
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/containers.dart';
 import 'package:aesd/components/fields.dart';
@@ -15,9 +16,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  String accountType = "0";
   final _formKey = GlobalKey<FormState>();
-  bool terms = false;
 
   // controllers
   final _nameController = TextEditingController();
@@ -26,57 +25,134 @@ class _RegisterPageState extends State<RegisterPage> {
   final _addressController = TextEditingController();
   final _passwordController = TextEditingController();
   final _passwordConfirmController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _managerController = TextEditingController();
+
+  bool terms = false;
+  String? _call;
+  String accountType = Dictionnary.faithFul.code;
 
   @override
   Widget build(BuildContext context) {
     return authContainer(
       title: "Inscription",
-      subtitle: "Ajoutez vos informations pour créer votre compte",
+      subtitle: "Remplissez les champs pour créer votre compte",
       child: Form(
         key: _formKey,
         child: Column(
           children: [
+            // types de comptes
             CustomDropdownButton(
               label: "Type de compte",
-              value: "0",
+              value: accountType,
+              validate: true,
+              prefix: cusIcon(FontAwesomeIcons.userTie),
               onChanged: (value) {
-                print(value);
                 if (value != null) {
                   setState(() {
                     accountType = value;
                   });
                 }
               },
-              items: List.generate(3, (index) {
-                return DropdownMenuItem(value: index.toString(), child: Text("type $index"));
+              items: List.generate(Dictionnary.accountTypes.length, (index) {
+                final accountType = Dictionnary.accountTypes[index];
+                return DropdownMenuItem(
+                  value: accountType.code, child: Text(accountType.name)
+                );
               })
             ),
+
+            if (accountType == Dictionnary.servant.code)
+              CustomDropdownButton(
+                  label: "Quel est votre appel ?",
+                  value: _call ?? "",
+                  validate: true,
+                  prefix: cusIcon(Icons.wb_sunny),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() {
+                        _call = value;
+                      });
+                    }
+                  },
+                  items: List.generate(Dictionnary.servantCalls.length, (index) {
+                    final call = Dictionnary.servantCalls[index];
+                    return DropdownMenuItem(
+                      value: call.code, child: Text(call.name)
+                    );
+                  })
+              ),
+
             CustomFormTextField(
               controller: _nameController,
               label: "Nom & prénoms",
-              prefix: cusIcon(FontAwesomeIcons.solidUser)
+              prefix: cusIcon(FontAwesomeIcons.solidUser),
+              validate: true,
             ),
-            CustomFormTextField(
+
+            EmailField(
               controller: _emailController,
               label: "Adresse e-mail",
-              prefix: cusIcon(FontAwesomeIcons.at)
+              validate: true,
             ),
-            CustomFormTextField(
-              controller: _phoneController,
-              label: "Numéro de téléphone",
-              prefix: cusIcon(FontAwesomeIcons.phone)
-            ),
+
+            PhoneField(controller: _phoneController, validate: true),
+
             CustomFormTextField(
               controller: _addressController,
               label: "Adresse",
-              prefix: cusIcon(FontAwesomeIcons.locationDot)
+              prefix: cusIcon(FontAwesomeIcons.locationDot),
+              validate: true,
             ),
+
+            if (accountType == Dictionnary.singer.code)
+              ...[
+                CustomFormTextField(
+                  controller: _managerController,
+                  label: "Manager",
+                  prefix: cusIcon(FontAwesomeIcons.userTie),
+                  validate: true,
+                ),
+
+                MultilineField(
+                  controller: _descriptionController,
+                  label: "Description"
+                ),
+              ],
+
             PasswordField(
               controller: _passwordController,
+              validator: (value) {
+                if (value.toString().length < 8) {
+                  return "Entrez un mot de passe d'au moins 8 caractères";
+                }
+
+                if (!RegExp("[0-9]+").hasMatch(value!)) {
+                  return "Le mot de passe doit contenir au moins un chiffre";
+                }
+
+                if (!RegExp("[A-Z]+").hasMatch(value)) {
+                  return "Le mot de passe doit contenir au moins une majuscule";
+                }
+
+                if (RegExp('[ ]+').hasMatch(value)) {
+                  return "Le mot de passe ne doit pas contenir d'espace";
+                }
+                return null;
+              },
+              validate: true
             ),
+
             PasswordField(
               controller: _passwordConfirmController,
-              label: "Confirmer le mot de passe"
+              label: "Confirmer le mot de passe",
+              validator: (value) {
+                if (value != _passwordController.text) {
+                  return "Les mots de passe ne correspondent pas";
+                }
+                return null;
+              },
+              validate: true,
             ),
 
             // termes et conditions
@@ -137,7 +213,11 @@ class _RegisterPageState extends State<RegisterPage> {
             CustomElevatedButton(
               text: "Continuer",
               icon: cusIcon(FontAwesomeIcons.arrowRight, color: Colors.white),
-              onPressed: () async {},
+              onPressed: () {
+                if (_formKey.currentState!.validate()){
+                  print("Formulaire valide !");
+                }
+              },
             ),
           ],
         ),

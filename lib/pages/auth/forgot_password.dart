@@ -26,36 +26,34 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(15),
-        child: Expanded(
-          child: authContainer(
-            title: "Mot de passe oublié",
-            subtitle: "Entrez votre email, nous ferons des vérification et vous pourrez modifier votre mot de passe",
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 15),
-                  child: Center(
-                    child: SvgPicture.asset(
-                      "assets/illustrations/forgot-password.svg",
-                      height: 180,
-                      width: 160
-                    )
-                  ),
-                ),
-                CustomFormTextField(
-                  label: "Adresse email",
-                  prefix: cusIcon(FontAwesomeIcons.at)
-                ),
-                CustomElevatedButton(
-                  text: "Continuer",
-                  icon: cusFaIcon(
-                    FontAwesomeIcons.arrowRightLong,
-                    color: Colors.white
+        child: authContainer(
+          title: "Mot de passe oublié",
+          subtitle: "Entrez votre email, nous ferons des vérification et vous pourrez modifier votre mot de passe",
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 15),
+                child: Center(
+                  child: SvgPicture.asset(
+                    "assets/illustrations/forgot-password.svg",
+                    height: 180,
+                    width: 160
                   )
+                ),
+              ),
+              CustomFormTextField(
+                label: "Adresse email",
+                prefix: cusIcon(FontAwesomeIcons.at)
+              ),
+              CustomElevatedButton(
+                text: "Continuer",
+                icon: cusFaIcon(
+                  FontAwesomeIcons.arrowRightLong,
+                  color: Colors.white
                 )
-              ]
-            )
-          ),
+              )
+            ]
+          )
         ),
       ),
     );
