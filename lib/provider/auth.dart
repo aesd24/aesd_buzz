@@ -6,31 +6,40 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class Auth extends ChangeNotifier {
+  late UserCreate _creationSchem;
+  UserCreate get creationSchema => _creationSchem;
+
+  void setCreationSchema(UserCreate schema) {
+    _creationSchem = schema;
+    notifyListeners();
+  }
+
   // Token d'accès
   final UnExpiredCache _unExpiredCache = UnExpiredCache();
   final request = AuthRequest();
 
-  Future login({required UserLogin data}) async {
-    final response = await request.login(data: data.getFormData());
+  Future login(UserLogin data) async {
+    final response = await request.login(data: await data.getFormData());
     if (response.statusCode == 200) {
       setToken(
         type: response.data['token_type'],
         token: response.data['access_token']
       );
+      return true;
     } else {
       throw const HttpException(
         'Informations de connexion érronées. Rééssayez'
       );
     }
   }
-  // Création du formulaire pour l'envoie des fichiers
-  Future register({required UserCreate data}) async {
+
+  Future register() async {
     // envoie de la requête et le résultat est stocké dans la variable "response"
-    final response = await request.register(data: data.getFormData());
-    print(response.data);
+    print(await _creationSchem.email);
+    final response = await request.register(data: await _creationSchem.getFormData());
 
     if (response.statusCode == 201) {
-      return response;
+      return true;
     } else {
       String message = "";
       if (response.data['errors'] != null) {

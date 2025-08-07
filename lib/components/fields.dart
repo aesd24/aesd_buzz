@@ -126,6 +126,7 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
           hintStyle: mediumGreyTextStyle,
           prefixIcon: widget.prefix,
         ),
+        value: widget.value,
         icon: cusIcon(FontAwesomeIcons.sort),
         validator: (value) {
           if (widget.validate) {
@@ -213,6 +214,7 @@ class _EmailFieldState extends State<EmailField> {
   @override
   Widget build(BuildContext context) {
     return CustomFormTextField(
+      controller: widget.controller,
       label: widget.label ?? "Adresse email",
       prefix: cusIcon(FontAwesomeIcons.at),
       type: TextInputType.emailAddress,

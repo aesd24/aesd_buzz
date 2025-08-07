@@ -1,4 +1,8 @@
+import 'package:aesd/provider/auth.dart';
 import 'package:aesd/provider/proviercolors.dart';
+import 'package:aesd/services/message.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -6,27 +10,122 @@ import 'package:provider/provider.dart';
 import 'appstaticdata/routes.dart';
 import 'appstaticdata/staticdata.dart';
 
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+}
+
+class OpenedByNotificationResponse {
+  OpenedByNotificationResponse({
+    required this.response,
+    required this.notification,
+  });
+
+  bool response;
+  RemoteMessage? notification;
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<MyApp> createState() => _MyAppState();
+}
 
+class _MyAppState extends State<MyApp> {
+
+  final scaffoldMessengerKey = MessageService.getScaffoldMessengerKey();
+
+  void _checkInitialMessage() async {
+    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    if (initialMessage != null) {
+      _handleMessage(initialMessage);
+    }
+  }
+
+  void _handleMessage(RemoteMessage message) async {
+    /*if (message.data.containsKey('id')) {
+      switch (message.data['type']) {
+        case 'post':
+          Get.toNamed(AppRoutes.postDetail, arguments: int.parse(message.data['id']));
+          break;
+        case 'event':
+          Get.toNamed(AppRoutes.eventDetail, arguments: int.parse(message.data['id']));
+          break;
+        case 'ceremony':
+          Get.toNamed(AppRoutes.ceremonyDetail, arguments: int.parse(message.data['id']));
+          break;
+        default:
+          break;
+      }
+    }*/
+  }
+
+  Future loadUser() async {
+    /*try {
+      await Provider.of<User>(context, listen: false).getUserData();
+    } catch (e) {
+      NavigationService.pushReplacementNamed(AppRoutes.login);
+      e.printError();
+    }*/
+  }
+
+  OpenedByNotificationResponse appOpenedByNotification() {
+    bool openedByNotification = false;
+    RemoteMessage? notification;
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      openedByNotification = true;
+      notification = message;
+    });
+    return OpenedByNotificationResponse(
+        response: openedByNotification,
+        notification: notification
+    );
+  }
+
+  void initApp() async {
+    await loadUser().then((value) {
+      /*var user = Provider.of<User>(context, listen: false).user;
+
+      if (user == null) {
+        NavigationService.pushReplacementNamed(AppRoutes.login);
+      } else {
+        OpenedByNotificationResponse openedByNotif = appOpenedByNotification();
+        if (openedByNotif.response) {
+          _handleMessage(openedByNotif.notification!);
+        } else {
+          NavigationService.pushReplacementNamed(AppRoutes.home);
+        }
+      }*/
+      _checkInitialMessage();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initApp();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create:  (context) => ColorNotifire()),
+        ChangeNotifierProvider(create:  (context) => Auth()),
       ],
       child: GetMaterialApp(
         locale: const Locale('fr', 'FR'),
         translations: AppTranslations(),
         scrollBehavior: MyCustomScrollBehavior(),
         debugShowCheckedModeBanner: false,
+        scaffoldMessengerKey: scaffoldMessengerKey,
         initialRoute: Routes.initial,
         getPages: getPage,
         title: 'Buzz.',
@@ -43,9 +142,9 @@ class MyApp extends StatelessWidget {
         )
       ),
     );
-
   }
 }
+
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   @override

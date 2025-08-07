@@ -5,7 +5,7 @@ const int maxImageSize = 20;
 const int maxVideoSize = 300;
 const int divider = 1048576;
 
-Future<Map<String, dynamic>> verifyImageSize(File file) async {
+Future<VerificationResult> verifyImageSize(File file) async {
   int length = await file.length();
   bool result = true;
 
@@ -13,7 +13,10 @@ Future<Map<String, dynamic>> verifyImageSize(File file) async {
   if ((length / divider) > maxImageSize) {
     result = false;
   }
-  return {'result': result, 'length': (length / divider).toStringAsFixed(2)};
+  return VerificationResult(
+    isGood: result,
+    length: (length / divider).toStringAsFixed(2)
+  );
 }
 
 Future<VerificationResult> verifyVideoSize(File file) async {

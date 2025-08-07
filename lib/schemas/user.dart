@@ -3,30 +3,30 @@ import 'package:aesd/appstaticdata/dictionnary.dart';
 import 'package:dio/dio.dart';
 
 class UserCreate {
-  final String name;
-  final String email;
-  final String phone;
-  final String adress;
-  final String accountType;
-  final String password;
-  final String passwordConfirmation;
-  final bool terms;
+  final String? name;
+  final String? email;
+  final String? phone;
+  final String? adress;
+  final String? accountType;
+  final String? password;
+  final String? passwordConfirmation;
+  final bool? terms;
   final String? description;
   final String? call;
   final String? manager;
-  final File? idPicture;
-  final File? idCardRecto;
-  final File? idCardVerso;
+  late File? idPicture;
+  late File? idCardRecto;
+  late File? idCardVerso;
 
-  const UserCreate({
-    required this.name,
-    required this.email,
-    required this.phone,
-    required this.adress,
-    required this.accountType,
-    required this.password,
-    required this.passwordConfirmation,
-    required this.terms,
+  UserCreate({
+    this.name,
+    this.email,
+    this.phone,
+    this.adress,
+    this.accountType,
+    this.password,
+    this.passwordConfirmation,
+    this.terms,
     this.description,
     this.call,
     this.manager,

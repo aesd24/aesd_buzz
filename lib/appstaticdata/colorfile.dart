@@ -34,7 +34,7 @@ Color themgrey = const Color(0xffa9ada8);
 Color themblack = const Color(0xff000000);
 
 Color themblackgrey = const Color(0xff7c837b);
-Color themlitegrey = const Color(0xff7c827b);
+Color themlitegrey = const Color(0xffc2c9c2);
 
 Color notibackcolor = Colors.grey.shade100;
 Color darkbackcolor = Colors.white12;

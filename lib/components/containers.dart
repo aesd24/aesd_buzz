@@ -9,8 +9,8 @@ Widget authContainer({
   return Container(
     padding: EdgeInsets.all(20),
     decoration: BoxDecoration(
-        color: notifire!.getprimerycolor,
-        borderRadius: const BorderRadius.all(Radius.circular(37))
+      color: notifire!.getprimerycolor,
+      borderRadius: const BorderRadius.all(Radius.circular(37))
     ),
     child: SingleChildScrollView(
       child: Column(

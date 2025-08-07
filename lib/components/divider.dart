@@ -13,13 +13,15 @@ Widget textDivider(String text) {
         const SizedBox(
           width: 5,
         ),
-        SizedBox(
-            width: 40,
-            child: Divider(
-              color: notifire!.getMainText,
-              height: 20,
-              thickness: 1,
-            )),
+        Container(
+          margin: EdgeInsets.symmetric(vertical: 5),
+          width: 40,
+          height: 3,
+          decoration: BoxDecoration(
+              color: notifire!.getTextColor1,
+              borderRadius: BorderRadius.circular(10)
+          ),
+        )
       ],
     ),
   );

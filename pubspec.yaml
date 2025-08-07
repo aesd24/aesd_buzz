@@ -62,6 +62,10 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   dio: ^5.8.0+1
   image_picker: ^1.1.2
+  loading_overlay: ^0.4.3
+  firebase_core: ^3.13.0
+  firebase_messaging: ^15.2.5
+  device_info_plus: ^9.0.0
 
 dev_dependencies:
   flutter_test:

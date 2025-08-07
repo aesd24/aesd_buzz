@@ -1,5 +1,4 @@
 import 'package:aesd/functions/formatteurs.dart';
-import 'package:aesd/models/question_model.dart';
 import 'package:flutter/material.dart';
 
 class QuizModel {
