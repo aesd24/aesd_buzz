@@ -1,12 +1,57 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/components/icon.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+class ButtonType {
+  final Widget? icon;
+  final Color foreColor;
+  final Color backColor;
+  final Color iconColor;
+
+  const ButtonType({
+    required this.icon,
+    required this.foreColor,
+    required this.backColor,
+    required this.iconColor,
+  });
+
+  static final ButtonType success = ButtonType(
+    icon: cusFaIcon(FontAwesomeIcons.check),
+    foreColor: Colors.white,
+    backColor: notifire!.success,
+    iconColor: Colors.white,
+  );
+
+  static final ButtonType warning = ButtonType(
+    icon: cusFaIcon(FontAwesomeIcons.triangleExclamation),
+    foreColor: Colors.white,
+    backColor: notifire!.warning,
+    iconColor: Colors.white,
+  );
+
+  static final ButtonType error = ButtonType(
+    icon: cusFaIcon(FontAwesomeIcons.circleXmark),
+    foreColor: Colors.white,
+    backColor: notifire!.danger,
+    iconColor: Colors.white,
+  );
+
+  static final ButtonType info = ButtonType(
+    foreColor: Colors.white,
+    backColor: notifire!.info,
+    iconColor: Colors.white,
+    icon: null,
+  );
+}
+
+// elevated button
 class CustomElevatedButton extends StatefulWidget {
   const CustomElevatedButton({
     super.key,
     required this.text,
     required this.icon,
-    this.onPressed
+    this.onPressed,
   });
 
   final String text;
@@ -27,7 +72,7 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
         onPressed: widget.onPressed,
         style: ButtonStyle(
           shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(24))
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           ),
           backgroundColor: WidgetStatePropertyAll(appMainColor),
           overlayColor: WidgetStatePropertyAll(Colors.white38),
@@ -40,6 +85,46 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
         ),
         icon: widget.icon,
         iconAlignment: IconAlignment.end,
+      ),
+    );
+  }
+}
+
+// text button
+class CustomTextButton extends StatefulWidget {
+  CustomTextButton({
+    super.key,
+    this.onPressed,
+    required this.label,
+    this.icon,
+    this.type,
+  });
+
+  final void Function()? onPressed;
+  final String label;
+  Widget? icon;
+  ButtonType? type;
+
+  @override
+  State<CustomTextButton> createState() => _CustomTextButtonState();
+}
+
+class _CustomTextButtonState extends State<CustomTextButton> {
+  @override
+  Widget build(BuildContext context) {
+    widget.type ??= ButtonType.info;
+    return TextButton.icon(
+      icon: widget.type?.icon ?? widget.icon,
+      iconAlignment: IconAlignment.end,
+      onPressed: widget.onPressed,
+      label: Text(widget.label),
+      style: ButtonStyle(
+        backgroundColor: WidgetStatePropertyAll(widget.type?.backColor),
+        iconColor: WidgetStatePropertyAll(widget.type?.iconColor),
+        foregroundColor: WidgetStatePropertyAll(widget.type?.foreColor),
+        fixedSize: WidgetStatePropertyAll(Size.fromHeight(34)),
+        overlayColor: WidgetStatePropertyAll(Colors.white38),
+        elevation: WidgetStatePropertyAll(0),
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
-import 'package:aesd/pages/auth/login.dart';
-import 'package:aesd/pages/auth/register.dart';
+import 'package:aesd/pages/auth/login_register/login.dart';
+import 'package:aesd/pages/auth/login_register/register.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:loading_overlay/loading_overlay.dart';

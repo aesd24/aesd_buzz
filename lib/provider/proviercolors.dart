@@ -32,4 +32,9 @@ class ColorNotifire with ChangeNotifier {
   Color get getfiltextcolors => isDark ? darkfilcolor : filtexcolor;
   Color get getdolorcolors => isDark ? darkdolorcolor : dolorcolor;
   Color get getmaintext => isDark ? themblack1 : themgrey1;
+
+  Color get success => !isDark ? Colors.green : Colors.green.shade800;
+  Color get danger => !isDark ? Colors.red : Colors.red.shade800;
+  Color get warning => !isDark ? Colors.amber : Colors.amber.shade800;
+  Color get info => !isDark ? Colors.teal : Colors.teal.shade800;
 }

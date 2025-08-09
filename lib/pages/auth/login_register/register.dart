@@ -9,6 +9,7 @@ import 'package:aesd/components/divider.dart';
 import 'package:aesd/components/fields.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/image_container.dart';
+import 'package:aesd/components/modal.dart';
 import 'package:aesd/functions/camera_functions.dart';
 import 'package:aesd/functions/file_functions.dart';
 import 'package:aesd/provider/auth.dart';
@@ -119,6 +120,17 @@ class _RegisterPageState extends State<RegisterPage> {
             "Inscription reussi. Connectez-vous...",
           );
           widget.reInitCallBack!();
+          showModal(
+            context: context,
+            dialog: CustomDialog(
+              title: "Verification !",
+              content:
+              "Votre compte sera soumis à une vérification avant "
+              "de vous donner les permissions complètes. "
+              "Pour l'instant vous ne pourrez faire que les "
+              "actions d'un fidèle",
+            ),
+          );
         }
       });
     } on HttpException catch (e) {
@@ -195,9 +207,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       FontAwesomeIcons.arrowRight,
                       color: Colors.white,
                     ),
-                    onPressed: () async {
-                      _handleRegister();
-                    },
+                    onPressed: () async => await _handleRegister(),
                   ),
                 ),
               ],
@@ -273,20 +283,6 @@ class _RegisterPageState extends State<RegisterPage> {
           prefix: cusIcon(FontAwesomeIcons.locationDot),
           validate: true,
         ),
-
-        if (accountType == Dictionnary.singer.code) ...[
-          CustomFormTextField(
-            controller: _managerController,
-            label: "Manager",
-            prefix: cusIcon(FontAwesomeIcons.userTie),
-            validate: true,
-          ),
-
-          MultilineField(
-            controller: _descriptionController,
-            label: "Description",
-          ),
-        ],
 
         PasswordField(
           controller: _passwordController,
