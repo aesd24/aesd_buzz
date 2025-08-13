@@ -24,6 +24,11 @@ class AuthRequest extends DioClient {
     return client.post('logout');
   }
 
+  Future getUserData() async {
+    final client = await getApiClient();
+    return await client.get('user_auth_infos');
+  }
+
   Future forgotPassword({required String user_info}) async {
     final client = await getApiClient();
     return await client.post('password/forgot', data: {'user_info': user_info});

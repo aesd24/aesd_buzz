@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:aesd/models/user_model.dart';
 import 'package:aesd/requests/auth_request.dart';
 import 'package:aesd/schemas/user.dart';
 import 'package:aesd/services/un_expired_cache.dart';
@@ -6,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class Auth extends ChangeNotifier {
+  UserModel? user;
   late UserCreate _creationSchem;
   UserCreate get creationSchema => _creationSchem;
 
@@ -23,12 +25,12 @@ class Auth extends ChangeNotifier {
     if (response.statusCode == 200) {
       setToken(
         type: response.data['token_type'],
-        token: response.data['access_token']
+        token: response.data['access_token'],
       );
       return true;
     } else {
       throw const HttpException(
-        'Informations de connexion érronées. Rééssayez'
+        'Informations de connexion érronées. Rééssayez',
       );
     }
   }
@@ -36,7 +38,9 @@ class Auth extends ChangeNotifier {
   Future register() async {
     // envoie de la requête et le résultat est stocké dans la variable "response"
     print(await _creationSchem.email);
-    final response = await request.register(data: await _creationSchem.getFormData());
+    final response = await request.register(
+      data: await _creationSchem.getFormData(),
+    );
 
     if (response.statusCode == 201) {
       return true;
@@ -51,6 +55,22 @@ class Auth extends ChangeNotifier {
     }
   }
 
+  Future<void> logout() async {
+    _unExpiredCache.remove("access_token");
+  }
+
+  Future getUserData() async {
+    var response = await request.getUserData();
+    if (response.statusCode == 200) {
+      user = UserModel.fromJson(response.data);
+    } else {
+      throw const HttpException(
+        "Impossible de récupérer les informations de l'utilisateur",
+      );
+    }
+    notifyListeners();
+  }
+
   // Enregistrer le token de l'utilisateur
   void setToken({required String type, required String token}) {
     ////print("$type $token");
@@ -58,18 +78,14 @@ class Auth extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> logout() async {
-    _unExpiredCache.remove("access_token");
-  }
-
   Future verifyOtp({required String otpCode}) async {
     var result = await request.verifyOtp(code: otpCode);
-    if (result.data["errors"] != null){
+    if (result.data["errors"] != null) {
       for (var error in result.data['errors']) {
         throw HttpException(error);
       }
     }
-    if (result.statusCode >= 400){
+    if (result.statusCode >= 400) {
       throw HttpException(result.data['message']);
     }
     return result;
@@ -82,7 +98,7 @@ class Auth extends ChangeNotifier {
         throw HttpException(error);
       }
     }
-    if (result.statusCode >= 400){
+    if (result.statusCode >= 400) {
       throw HttpException(result.data['message']);
     }
     return result;
@@ -91,12 +107,12 @@ class Auth extends ChangeNotifier {
   Future changePassword({
     required String email,
     required String newPassword,
-    required String newPasswordConfirmation
+    required String newPasswordConfirmation,
   }) async {
     final formData = FormData.fromMap({
       "email": email,
       "password": newPassword,
-      "password_confirmation": newPasswordConfirmation
+      "password_confirmation": newPasswordConfirmation,
     });
     final result = await request.changePassword(formData);
     if (result.data['errors'] != null) {
@@ -104,7 +120,7 @@ class Auth extends ChangeNotifier {
         throw HttpException(error);
       }
     }
-    if (result.statusCode >= 400){
+    if (result.statusCode >= 400) {
       throw HttpException(result.data['message']);
     }
     return result;
@@ -118,10 +134,17 @@ class Auth extends ChangeNotifier {
         throw HttpException(error);
       }
     }
-    if (result.statusCode >= 400){
+    if (result.statusCode >= 400) {
       throw HttpException(result.data['message']);
     }
     return result;
+  }
+
+  Future<bool> isLoggedIn() async {
+    if (user == null) {
+      await getUserData();
+    }
+    return true;
   }
 
   // Récupérer le token de l'utilisateur
