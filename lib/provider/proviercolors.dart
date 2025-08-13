@@ -13,22 +13,28 @@ class ColorNotifire with ChangeNotifier {
     notifyListeners();
   }
 
-  get getIsDark => isDark;
-  get getprimerycolor => isDark ? darkPrimeryColor : primeryColor;
-  get getbgcolor => isDark ? darkbgcolor : bgcolor;
-  get getbordercolor => isDark ? darkbordercolor : bordercolor;
-  get geticoncolor => isDark ? darkiconcolor : iconcolor;
-  get getcontiner => isDark ? darkcontinercolor : continercolor;
-  get getcontinershadow => isDark ? darkcontinercolo1r : continercolo1r;
+  bool get getIsDark => isDark;
+  Color get getMainColor => isDark ? darkmainColor : mainColor;
+  Color get getprimerycolor => isDark ? darkPrimeryColor : primeryColor;
+  Color get getbgcolor => isDark ? darkbgcolor : bgcolor;
+  Color get getbordercolor => isDark ? darkbordercolor : bordercolor;
+  Color get geticoncolor => isDark ? darkiconcolor : iconcolor;
+  Color get getcontiner => isDark ? darkcontinercolor : continercolor;
+  Color get getcontinershadow => isDark ? darkcontinercolo1r : continercolo1r;
 
-  get getTextColor1 => isDark ? textwhite : textdark;
-  get getMainText => isDark ? themgrey : themblack;
-  get getMaingey => isDark ? themblackgrey : themlitegrey;
+  Color get getTextColor1 => isDark ? textwhite : textdark;
+  Color get getMainText => isDark ? themgrey : themblack;
+  Color get getMaingey => isDark ? themblackgrey : themlitegrey;
 
-  get getbacknoticolor => isDark ? darkbackcolor : notibackcolor;
-  get getsubcolors => isDark ? darksubcolor : notisubcolor;
-  get getbacktextcolors => isDark ? darktextcolor : backtextcolor;
-  get getfiltextcolors => isDark ? darkfilcolor : filtexcolor;
-  get getdolorcolors => isDark ? darkdolorcolor : dolorcolor;
-  get getmaintext => isDark ? themblack1 : themgrey1;
+  Color get getbacknoticolor => isDark ? darkbackcolor : notibackcolor;
+  Color get getsubcolors => isDark ? darksubcolor : notisubcolor;
+  Color get getbacktextcolors => isDark ? darktextcolor : backtextcolor;
+  Color get getfiltextcolors => isDark ? darkfilcolor : filtexcolor;
+  Color get getdolorcolors => isDark ? darkdolorcolor : dolorcolor;
+  Color get getmaintext => isDark ? themblack1 : themgrey1;
+
+  Color get success => !isDark ? Colors.green : Colors.green.shade800;
+  Color get danger => !isDark ? Colors.red : Colors.red.shade800;
+  Color get warning => !isDark ? Colors.amber : Colors.amber.shade800;
+  Color get info => !isDark ? Colors.teal : Colors.teal.shade800;
 }
