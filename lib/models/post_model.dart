@@ -2,7 +2,7 @@ import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/modal.dart';
-import 'package:aesd/components/shimmers.dart';
+import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/functions/formatteurs.dart';
 import 'package:aesd/models/user_model.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
@@ -63,7 +63,7 @@ class PostModel {
                     fit: BoxFit.cover,
                     url: image!,
                     loadingBuilder: (context, progress) {
-                      return imageShimmerContainer(height: 200);
+                      return imageShimmerPlaceholder(height: 200);
                     },
                   ),
                 ),

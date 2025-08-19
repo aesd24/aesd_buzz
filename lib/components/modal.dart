@@ -1,7 +1,7 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/icon.dart';
-import 'package:aesd/components/shimmers.dart';
+import 'package:aesd/components/placeholders.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -152,7 +152,7 @@ Future<void> showImageModal(BuildContext context, {required String imageUrl}) {
                     padding: EdgeInsets.symmetric(horizontal: 15),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(15),
-                      child: imageShimmerContainer(height: 400)
+                      child: imageShimmerPlaceholder(height: 400)
                     ),
                   ),
               backgroundDecoration: BoxDecoration(

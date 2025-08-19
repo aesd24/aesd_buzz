@@ -1,9 +1,8 @@
 import 'dart:io';
 import 'package:aesd/appstaticdata/dictionnary.dart';
-import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/not_found.dart';
-import 'package:aesd/components/structure.dart';
+import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/models/post_model.dart';
 import 'package:aesd/models/user_model.dart';
 import 'package:aesd/pages/social/create_form.dart';
@@ -16,6 +15,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+
+import '../../../components/structure.dart';
 
 class PostList extends StatefulWidget {
   const PostList({super.key});
@@ -108,7 +109,7 @@ class _PostListState extends State<PostList> {
         Column(
           children: [
             Expanded(
-              child: Consumer<PostProvider>(
+              child: isLoading ? ListShimmerPlaceholder() : Consumer<PostProvider>(
                 builder: (context, provider, child) {
                   if (provider.posts.isEmpty) {
                     return notFoundTile(text: "Aucun post pour le moment");

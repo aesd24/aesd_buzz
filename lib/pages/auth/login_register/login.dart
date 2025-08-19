@@ -92,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
       String? token;
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        //token = await messaging.getToken();
+        token = await messaging.getToken();
         await _login(token);
       } else {
         MessageService.showWarningMessage(
