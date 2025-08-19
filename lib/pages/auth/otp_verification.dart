@@ -82,7 +82,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                   "Code de vérification envoyé à l'adresse :",
                   style: mediumBlackTextStyle.copyWith(
                     fontSize: 16,
-                    color: notifire!.getMainText,
+                    color: notifire.getMainText,
                   ),
                 ),
                 Padding(
@@ -109,13 +109,13 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
                   length: 4,
                   width: MediaQuery.of(context).size.width,
                   fieldWidth: 50,
-                  style: TextStyle(fontSize: 17, color: notifire!.getMainText),
+                  style: TextStyle(fontSize: 17, color: notifire.getMainText),
                   textFieldAlignment: MainAxisAlignment.spaceAround,
                   otpFieldStyle: OtpFieldStyle(
-                    backgroundColor: notifire!.getbgcolor,
-                    enabledBorderColor: notifire!.getbgcolor,
-                    disabledBorderColor: notifire!.getbgcolor,
-                    borderColor: notifire!.getbgcolor,
+                    backgroundColor: notifire.getbgcolor,
+                    enabledBorderColor: notifire.getbgcolor,
+                    disabledBorderColor: notifire.getbgcolor,
+                    borderColor: notifire.getbgcolor,
                   ),
                   onChanged: (value) {
                     code = value;

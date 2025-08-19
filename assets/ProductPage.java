@@ -60,7 +60,7 @@ class _ProductPageState extends State<ProductPage> {
           return Container(
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
-            color: notifire!.getbgcolor,
+            color: notifire.getbgcolor,
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
                 if (constraints.maxWidth < 600) {
@@ -207,7 +207,7 @@ Widget _buildcart(){
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.all(
               Radius.circular(12)),
-          color: notifire!.getcontiner,
+          color: notifire.getcontiner,
           boxShadow: boxShadow,
         ),
         child: Padding(
@@ -215,7 +215,7 @@ Widget _buildcart(){
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Shopping Cart",style: mainTextStyle.copyWith(color: notifire!.getMainText),),
+                Text("Shopping Cart",style: mainTextStyle.copyWith(color: notifire.getMainText),),
                 const SizedBox(height: 15,),
                 TextField(
                   decoration: InputDecoration(
@@ -231,7 +231,7 @@ Widget _buildcart(){
                   children: [
                     SvgPicture.asset("assets/shopping-cart.svg",width: 22,height: 22,color: appGreyColor,),
                     const SizedBox(width: 8,),
-                    Text("Cart List",style: mediumBlackTextStyle.copyWith(color: notifire!.getMainText),),
+                    Text("Cart List",style: mediumBlackTextStyle.copyWith(color: notifire.getMainText),),
                     const Spacer(),
                     Text("Clear",style: mediumBlackTextStyle.copyWith(color: appMainColor),),
                   ],
@@ -246,7 +246,7 @@ Widget _buildcart(){
                         const SizedBox(height: 40,),
                         Row(
                           children: [
-                            Expanded(child: Text("Roadster Men Navy Solid Round",style: mediumBlackTextStyle.copyWith(color: notifire!.getTextColor1),maxLines: 2,overflow: TextOverflow.ellipsis,)),
+                            Expanded(child: Text("Roadster Men Navy Solid Round",style: mediumBlackTextStyle.copyWith(color: notifire.getTextColor1),maxLines: 2,overflow: TextOverflow.ellipsis,)),
                             const Spacer(),
                             Container(
                               padding: const EdgeInsets.all(8),
@@ -312,7 +312,7 @@ Widget _buildcart(){
                                         },
                                         child: Text("+",style: mediumGreyTextStyle.copyWith( fontSize: 16),)),
                                     const SizedBox(width: 8,),
-                                    Text(counter.toString(),style: mediumBlackTextStyle.copyWith(fontSize: 18,color: notifire!.getTextColor1),),
+                                    Text(counter.toString(),style: mediumBlackTextStyle.copyWith(fontSize: 18,color: notifire.getTextColor1),),
                                     const SizedBox(width: 8,),
                                     InkWell(
                                         onTap: () {
@@ -326,7 +326,7 @@ Widget _buildcart(){
                                   ]),
                             ),
                             const Spacer(),
-                            Text("\$${index+1}9${index+2}",style: mediumBlackTextStyle.copyWith(color: notifire!.getTextColor1,fontSize: 18),)
+                            Text("\$${index+1}9${index+2}",style: mediumBlackTextStyle.copyWith(color: notifire.getTextColor1,fontSize: 18),)
                           ],
                         )
                       ],
@@ -340,7 +340,7 @@ Widget _buildcart(){
                   children: [
                     Text("Subtotal",style: mediumGreyTextStyle,),
                     const Spacer(),
-                    Text("\$400",style: mediumBlackTextStyle.copyWith(color: notifire!.getTextColor1),),
+                    Text("\$400",style: mediumBlackTextStyle.copyWith(color: notifire.getTextColor1),),
                   ],
                 ),
                 const SizedBox(height: 12,),
@@ -348,7 +348,7 @@ Widget _buildcart(){
                   children: [
                     Text("Text",style: mediumGreyTextStyle,),
                     const Spacer(),
-                    Text("\$400",style: mediumBlackTextStyle.copyWith(color: notifire!.getTextColor1),),
+                    Text("\$400",style: mediumBlackTextStyle.copyWith(color: notifire.getTextColor1),),
                   ],
                 ),
                 const SizedBox(height: 12,),
@@ -356,7 +356,7 @@ Widget _buildcart(){
                   children: [
                     Text("Discount",style: mediumGreyTextStyle,),
                     const Spacer(),
-                    Text("\$400",style: mediumBlackTextStyle.copyWith(color: notifire!.getTextColor1),),
+                    Text("\$400",style: mediumBlackTextStyle.copyWith(color: notifire.getTextColor1),),
                   ],
                 ),
                 Divider(height: 40,color: Colors.grey.withOpacity(0.3),),
@@ -364,7 +364,7 @@ Widget _buildcart(){
                   children: [
                     Text("Total",style: mediumGreyTextStyle.copyWith(fontSize: 16),),
                     const Spacer(),
-                    Text("\$400",style: mediumBlackTextStyle.copyWith(color: notifire!.getTextColor1,fontSize: 16),),
+                    Text("\$400",style: mediumBlackTextStyle.copyWith(color: notifire.getTextColor1,fontSize: 16),),
                   ],
                 ),
                 const SizedBox(height: 12,),
@@ -392,7 +392,7 @@ Widget _buildcart(){
                     decoration: BoxDecoration(
                       borderRadius: const BorderRadius.all(
                           Radius.circular(12)),
-                      color: notifire!.getcontiner,
+                      color: notifire.getcontiner,
                       boxShadow: boxShadow,
                     ),
                     child: Padding(
@@ -400,7 +400,7 @@ Widget _buildcart(){
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Category",style: mainTextStyle.copyWith(color: notifire!.getMainText),),
+                          Text("Category",style: mainTextStyle.copyWith(color: notifire.getMainText),),
                           const SizedBox(height: 10,),
                           SizedBox(
                             height: 80,
@@ -429,7 +429,7 @@ Widget _buildcart(){
                                       child:  Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text(category[index],style: mediumBlackTextStyle.copyWith(color: notifire!.getMainText),),
+                                          Text(category[index],style: mediumBlackTextStyle.copyWith(color: notifire.getMainText),),
                                           const SizedBox(height: 8,),
                                           Text("4${index}1${index+2} Product",style: mediumGreyTextStyle),
 
@@ -552,7 +552,7 @@ Widget _buildcart(){
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         PopupMenuButton(
-          color: notifire!.getcontiner,
+          color: notifire.getcontiner,
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(color: Colors.grey.shade300)),
@@ -610,7 +610,7 @@ Widget _buildcart(){
           style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: notifire!.getMainText),
+              color: notifire.getMainText),
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(
@@ -643,7 +643,7 @@ Widget _buildcart(){
                   style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: notifire!.getMainText),
+                      color: notifire.getMainText),
                   maxLines: 1,
                   softWrap: false,
                   overflow: TextOverflow.ellipsis,
@@ -665,7 +665,7 @@ Widget _buildcart(){
         icon,
         height: 15,
         width: 15,
-        color: notifire!.geticoncolor,
+        color: notifire.geticoncolor,
       )),
     );
   }
@@ -775,17 +775,17 @@ Widget _buildcart(){
       width: 136,
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(12)),
-        color: notifire!.getcontiner,
+        color: notifire.getcontiner,
         boxShadow: boxShadow,
       ),
       child: DropdownButtonFormField<String>(
         padding: const EdgeInsets.only(left: 10),
         value: selectedOption1,
-        dropdownColor: notifire!.getcontiner,
+        dropdownColor: notifire.getcontiner,
         items: dropdownOptions1.map((String option) {
           return DropdownMenuItem<String>(
             value: option,
-            child: Text(option, style: TextStyle(color: notifire!.getMainText)),
+            child: Text(option, style: TextStyle(color: notifire.getMainText)),
           );
         }).toList(),
         onChanged: (String? newValue) {
@@ -794,7 +794,7 @@ Widget _buildcart(){
           });
         },
         decoration: InputDecoration(
-          hintStyle: TextStyle(color: notifire!.getMainText, fontSize: 14),
+          hintStyle: TextStyle(color: notifire.getMainText, fontSize: 14),
           border: InputBorder.none,
         ),
       ),
@@ -812,7 +812,7 @@ Widget _buildcart(){
               height: 60,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(12)),
-                color: notifire!.getcontiner,
+                color: notifire.getcontiner,
                 boxShadow: boxShadow,
               ),
               child: size < 1000
@@ -834,15 +834,15 @@ Widget _buildcart(){
               height: 60,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(12)),
-                color: notifire!.getcontiner,
+                color: notifire.getcontiner,
                 boxShadow: boxShadow,
               ),
               child: TextField(
                 decoration: InputDecoration(
-                  hintStyle: TextStyle(color: notifire!.getMainText),
+                  hintStyle: TextStyle(color: notifire.getMainText),
                   hintText: 'Search...',
                   border: InputBorder.none,
-                  suffixIcon: Icon(Icons.search, color: notifire!.geticoncolor),
+                  suffixIcon: Icon(Icons.search, color: notifire.geticoncolor),
                 ),
               ),
             ),
@@ -865,7 +865,7 @@ Widget _buildcart(){
               height: 150,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(12)),
-                color: notifire!.getcontiner,
+                color: notifire.getcontiner,
                 boxShadow: boxShadow,
               ),
               child: Column(
@@ -927,7 +927,7 @@ Widget _buildcart(){
                             ),
                             Text(controller.prodectname[index],
                                 style: mainTextStyle.copyWith(
-                                    fontSize: 17, color: notifire!.getMainText),
+                                    fontSize: 17, color: notifire.getMainText),
                                 overflow: TextOverflow.ellipsis),
                             const SizedBox(
                               height: 3,

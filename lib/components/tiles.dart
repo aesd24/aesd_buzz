@@ -1,0 +1,81 @@
+import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/components/icon.dart';
+import 'package:aesd/functions/formatteurs.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+class UserTile extends StatelessWidget {
+  const UserTile({super.key, required this.name, this.photoUrl});
+
+  final String name;
+  final String? photoUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: 17,
+          backgroundColor: notifire.getMainColor,
+          backgroundImage: photoUrl != null ? NetworkImage(photoUrl!) : null,
+          child:
+              photoUrl != null
+                  ? null
+                  : cusFaIcon(
+                    FontAwesomeIcons.solidUser,
+                    color: notifire.getbgcolor,
+                  ),
+        ),
+        SizedBox(width: 10),
+        Text(name),
+      ],
+    );
+  }
+}
+
+Widget customTransactionTile(
+  BuildContext context, {
+  required String label,
+  required int amount,
+  required DateTime date,
+}) {
+  return Container(
+    margin: EdgeInsets.only(bottom: 10),
+    decoration: BoxDecoration(
+      border: Border.all(color: notifire.getmaintext),
+      borderRadius: BorderRadius.circular(15),
+    ),
+    child: ListTile(
+      leading: cusFaIcon(FontAwesomeIcons.rightLeft),
+      title: Text(
+        label,
+        style: Theme.of(
+          context,
+        ).textTheme.titleMedium!.copyWith(color: notifire.getTextColor1),
+      ),
+      subtitle: Row(
+        children: [
+          Text(
+            formatDate(date),
+            style: Theme.of(context).textTheme.labelMedium!.copyWith(
+              color: notifire.getMainText.withAlpha(150),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: CircleAvatar(
+              radius: 3,
+              backgroundColor: notifire.getMainText,
+            ),
+          ),
+          Text(
+            formatPrice(amount),
+            style: Theme.of(
+              context,
+            ).textTheme.labelMedium!.copyWith(color: notifire.danger),
+          ),
+        ],
+      ),
+    ),
+  );
+}

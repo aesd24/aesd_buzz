@@ -17,29 +17,29 @@ class ButtonType {
   });
 
   static final ButtonType success = ButtonType(
-    icon: cusFaIcon(FontAwesomeIcons.check),
+    icon: cusFaIcon(FontAwesomeIcons.check, color: Colors.white),
     foreColor: Colors.white,
-    backColor: notifire!.success,
+    backColor: notifire.success,
     iconColor: Colors.white,
   );
 
   static final ButtonType warning = ButtonType(
-    icon: cusFaIcon(FontAwesomeIcons.triangleExclamation),
+    icon: cusFaIcon(FontAwesomeIcons.triangleExclamation, color: Colors.white),
     foreColor: Colors.white,
-    backColor: notifire!.warning,
+    backColor: notifire.warning,
     iconColor: Colors.white,
   );
 
   static final ButtonType error = ButtonType(
-    icon: cusFaIcon(FontAwesomeIcons.circleXmark),
+    icon: cusFaIcon(FontAwesomeIcons.circleXmark, color: Colors.white),
     foreColor: Colors.white,
-    backColor: notifire!.danger,
+    backColor: notifire.danger,
     iconColor: Colors.white,
   );
 
   static final ButtonType info = ButtonType(
     foreColor: Colors.white,
-    backColor: notifire!.info,
+    backColor: notifire.info,
     iconColor: Colors.white,
     icon: null,
   );
@@ -50,12 +50,12 @@ class CustomElevatedButton extends StatefulWidget {
   const CustomElevatedButton({
     super.key,
     required this.text,
-    required this.icon,
+    this.icon,
     this.onPressed,
   });
 
   final String text;
-  final Widget icon;
+  final Widget? icon;
   final void Function()? onPressed;
 
   @override
@@ -114,7 +114,7 @@ class _CustomTextButtonState extends State<CustomTextButton> {
   Widget build(BuildContext context) {
     widget.type ??= ButtonType.info;
     return TextButton.icon(
-      icon: widget.type?.icon ?? widget.icon,
+      icon: widget.icon ?? widget.type?.icon,
       iconAlignment: IconAlignment.end,
       onPressed: widget.onPressed,
       label: Text(widget.label),
@@ -128,4 +128,22 @@ class _CustomTextButtonState extends State<CustomTextButton> {
       ),
     );
   }
+}
+
+Widget customActionButton(Widget icon, String text, {
+  void Function()? onPressed
+}) {
+  return GestureDetector(
+    onTap: onPressed,
+    child: Padding(
+      padding: const EdgeInsets.all(5),
+      child: Row(
+        children: [
+          icon,
+          SizedBox(width: 5),
+          Text(text),
+        ],
+      )
+    )
+  );
 }

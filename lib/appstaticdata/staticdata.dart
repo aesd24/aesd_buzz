@@ -27,7 +27,7 @@ List<BoxShadow>? boxShadow =  [
 
 Decoration boxDecorationn = BoxDecoration(
     borderRadius: const BorderRadius.all(Radius.circular(12)),
-    color: notifire!.getcontiner,
+    color: notifire.getcontiner,
     boxShadow: boxShadow,
 );
 
@@ -38,7 +38,7 @@ Decoration boxDecorationn = BoxDecoration(
 
 
 // *****************************************
-ColorNotifire? notifire = ColorNotifire();
+ColorNotifire notifire = ColorNotifire();
 
 
 

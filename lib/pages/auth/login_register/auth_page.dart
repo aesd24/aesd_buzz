@@ -47,7 +47,7 @@ class _AuthPageState extends State<AuthPage>
       ),
       isLoading: _isLoading,
       child: Scaffold(
-        backgroundColor: notifire!.getbgcolor,
+        backgroundColor: notifire.getbgcolor,
         body: SafeArea(
           child: Padding(
             padding: EdgeInsets.all(15),

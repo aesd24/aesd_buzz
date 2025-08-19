@@ -41,7 +41,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
         if (value.statusCode == 200){
           if (context.mounted){
             MessageService.showSuccessMessage("Modification effectué avec succès !");
-            Get.offAllNamed(Routes.login);
+            Get.offAllNamed(Routes.auth);
           }
         }
       });

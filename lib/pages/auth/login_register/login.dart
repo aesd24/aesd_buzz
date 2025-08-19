@@ -46,6 +46,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _login(String? token) async {
+    print("Djoorrr!!");
     try {
       widget.loadingCallBack!();
       final schemas = UserLogin(
@@ -60,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
       ) async {
         if (value) {
           MessageService.showSuccessMessage("Connexion reussi !");
-          await Provider.of<Auth>(context, listen: false).logout();
+          Get.toNamed(Routes.homepage);
         }
       });
     } on HttpException catch (e) {
@@ -91,15 +92,13 @@ class _LoginPageState extends State<LoginPage> {
       String? token;
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        token = await messaging.getToken();
+        //token = await messaging.getToken();
+        await _login(token);
       } else {
         MessageService.showWarningMessage(
           "La permission pour les notifications est requise. Rééssayez !",
         );
-        return;
       }
-
-      await _login(token);
     }
   }
 

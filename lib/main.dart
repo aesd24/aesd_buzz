@@ -1,11 +1,15 @@
 import 'package:aesd/provider/auth.dart';
+import 'package:aesd/provider/forum.dart';
+import 'package:aesd/provider/post.dart';
 import 'package:aesd/provider/proviercolors.dart';
 import 'package:aesd/services/message.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'appstaticdata/routes.dart';
 import 'appstaticdata/staticdata.dart';
@@ -28,6 +32,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await initializeDateFormatting('fr_FR', null);
+  await FastCachedImageConfig.init();
+
   runApp(const MyApp());
 }
 
@@ -39,11 +46,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   final scaffoldMessengerKey = MessageService.getScaffoldMessengerKey();
 
   void _checkInitialMessage() async {
-    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
       _handleMessage(initialMessage);
     }
@@ -84,8 +91,8 @@ class _MyAppState extends State<MyApp> {
       notification = message;
     });
     return OpenedByNotificationResponse(
-        response: openedByNotification,
-        notification: notification
+      response: openedByNotification,
+      notification: notification,
     );
   }
 
@@ -117,8 +124,10 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create:  (context) => ColorNotifire()),
-        ChangeNotifierProvider(create:  (context) => Auth()),
+        ChangeNotifierProvider(create: (context) => ColorNotifire()),
+        ChangeNotifierProvider(create: (context) => Auth()),
+        ChangeNotifierProvider(create: (context) => PostProvider()),
+        ChangeNotifierProvider(create: (context) => Forum()),
       ],
       child: GetMaterialApp(
         locale: const Locale('fr', 'FR'),
@@ -128,23 +137,24 @@ class _MyAppState extends State<MyApp> {
         scaffoldMessengerKey: scaffoldMessengerKey,
         initialRoute: Routes.initial,
         getPages: getPage,
-        title: 'Buzz.',
+        title: 'Aesd',
         theme: ThemeData(
+          brightness: notifire.isDark ? Brightness.dark : Brightness.light,
           splashColor: Colors.transparent,
           highlightColor: Colors.transparent,
           hoverColor: Colors.transparent,
           fontFamily: "Gilroy",
           dividerColor: Colors.transparent,
           colorScheme: ColorScheme.fromSwatch().copyWith(
+            brightness: notifire.isDark ? Brightness.dark : Brightness.light,
             primary: const Color(0xFF15BB00),
-            surface: notifire!.getbgcolor,
-          )
-        )
+            surface: notifire.getbgcolor,
+          ),
+        ),
       ),
     );
   }
 }
-
 
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   @override
@@ -157,11 +167,7 @@ class MyCustomScrollBehavior extends MaterialScrollBehavior {
 class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
-    'en_US': {
-      'enter_mail': 'Enter your email',
-    },
-    'ur_PK': {
-      'enter_mail': 'اپنا ای میل درج کریں۔',
-    }
+    'en_US': {'enter_mail': 'Enter your email'},
+    'ur_PK': {'enter_mail': 'اپنا ای میل درج کریں۔'},
   };
 }

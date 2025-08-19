@@ -120,17 +120,19 @@ class _RegisterPageState extends State<RegisterPage> {
             "Inscription reussi. Connectez-vous...",
           );
           widget.reInitCallBack!();
-          showModal(
-            context: context,
-            dialog: CustomDialog(
-              title: "Verification !",
-              content:
-              "Votre compte sera soumis à une vérification avant "
-              "de vous donner les permissions complètes. "
-              "Pour l'instant vous ne pourrez faire que les "
-              "actions d'un fidèle",
-            ),
-          );
+          if (accountType == Dictionnary.servant.code) {
+            showModal(
+              context: context,
+              dialog: CustomDialog(
+                title: "Verification !",
+                content:
+                "Votre compte sera soumis à une vérification avant "
+                "de vous donner les permissions complètes. "
+                "Pour l'instant vous ne pourrez faire que les "
+                "actions d'un fidèle",
+              ),
+            );
+          }
         }
       });
     } on HttpException catch (e) {
@@ -146,21 +148,6 @@ class _RegisterPageState extends State<RegisterPage> {
     } finally {
       widget.loadingCallBack!();
     }
-  }
-
-  FutureOr<File?> _pickImage() async {
-    File? pickedFile = await pickImage();
-    if (pickedFile != null) {
-      var result = await verifyImageSize(pickedFile);
-      if (result.isGood) {
-        return pickedFile;
-      } else {
-        throw Exception(
-          "Le fichier chargé est trop lourd : ${result.length}Mo",
-        );
-      }
-    }
-    return null;
   }
 
   @override
@@ -193,7 +180,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       },
                       style: ButtonStyle(
                         iconColor: WidgetStatePropertyAll(
-                          notifire!.geticoncolor,
+                          notifire.geticoncolor,
                         ),
                         fixedSize: WidgetStatePropertyAll(Size(60, 60)),
                       ),
@@ -386,7 +373,7 @@ class _RegisterPageState extends State<RegisterPage> {
           image: _schema.idPicture,
           onPressed: () async {
             try {
-              var pick = await _pickImage();
+              var pick = await pickImage();
               setState(() {
                 _schema.idPicture = pick;
               });
@@ -406,7 +393,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 label: "Recto de la carte d'identité",
                 onPressed: () async {
                   try {
-                    var pick = await _pickImage();
+                    var pick = await pickImage();
                     setState(() {
                       _schema.idCardRecto = pick;
                     });
@@ -421,7 +408,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 label: "Verso de la carte d'identité",
                 onPressed: () async {
                   try {
-                    var pick = await _pickImage();
+                    var pick = await pickImage();
                     setState(() {
                       _schema.idCardVerso = pick;
                     });
