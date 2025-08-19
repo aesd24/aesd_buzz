@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'file_functions.dart';
 
 FutureOr<File?> pickImage({bool camera = true}) async {

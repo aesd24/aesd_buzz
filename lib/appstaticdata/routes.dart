@@ -1,8 +1,6 @@
-// ignore_for_file: prefer_const_constructors
 import 'package:aesd/middleware/auth_middleware.dart';
 import 'package:aesd/pages/auth/login_register/auth_page.dart';
 import 'package:aesd/pages/auth/forgot_password.dart';
-import 'package:aesd/pages/auth/login_register/login.dart';
 import 'package:aesd/pages/auth/otp_verification.dart';
 import 'package:aesd/pages/auth/splash_screen.dart';
 import 'package:aesd/pages/auth/update_password.dart';

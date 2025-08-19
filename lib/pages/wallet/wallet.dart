@@ -1,7 +1,6 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/tiles.dart';
-import 'package:aesd/functions/formatteurs.dart';
 import 'package:aesd/pages/wallet/send.dart';
 import 'package:aesd/pages/wallet/transactions.dart';
 import 'package:aesd/pages/wallet/withdrawing.dart';

@@ -3,13 +3,11 @@ import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/modal.dart';
 import 'package:aesd/components/shimmers.dart';
-import 'package:aesd/components/tiles.dart';
 import 'package:aesd/functions/formatteurs.dart';
 import 'package:aesd/models/user_model.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:shimmer/shimmer.dart';
 
 class PostModel {
   late int id;

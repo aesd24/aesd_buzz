@@ -11,7 +11,6 @@ import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/image_container.dart';
 import 'package:aesd/components/modal.dart';
 import 'package:aesd/functions/camera_functions.dart';
-import 'package:aesd/functions/file_functions.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:aesd/schemas/user.dart';
 import 'package:aesd/services/message.dart';
