@@ -38,4 +38,5 @@ Future<File?> pickVideo({bool camera = false}) async {
   } catch (e) {
     e.printError();
   }
+  return null;
 }

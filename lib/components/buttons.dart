@@ -92,7 +92,7 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
 
 // text button
 class CustomTextButton extends StatefulWidget {
-  CustomTextButton({
+  const CustomTextButton({
     super.key,
     this.onPressed,
     required this.label,
@@ -102,8 +102,8 @@ class CustomTextButton extends StatefulWidget {
 
   final void Function()? onPressed;
   final String label;
-  Widget? icon;
-  ButtonType? type;
+  final Widget? icon;
+  final ButtonType? type;
 
   @override
   State<CustomTextButton> createState() => _CustomTextButtonState();
@@ -112,16 +112,16 @@ class CustomTextButton extends StatefulWidget {
 class _CustomTextButtonState extends State<CustomTextButton> {
   @override
   Widget build(BuildContext context) {
-    widget.type ??= ButtonType.info;
+    ButtonType type = widget.type ?? ButtonType.info;
     return TextButton.icon(
-      icon: widget.icon ?? widget.type?.icon,
+      icon: widget.icon ?? type.icon,
       iconAlignment: IconAlignment.end,
       onPressed: widget.onPressed,
       label: Text(widget.label),
       style: ButtonStyle(
-        backgroundColor: WidgetStatePropertyAll(widget.type?.backColor),
-        iconColor: WidgetStatePropertyAll(widget.type?.iconColor),
-        foregroundColor: WidgetStatePropertyAll(widget.type?.foreColor),
+        backgroundColor: WidgetStatePropertyAll(type.backColor),
+        iconColor: WidgetStatePropertyAll(type.iconColor),
+        foregroundColor: WidgetStatePropertyAll(type.foreColor),
         fixedSize: WidgetStatePropertyAll(Size.fromHeight(34)),
         overlayColor: WidgetStatePropertyAll(Colors.white38),
         elevation: WidgetStatePropertyAll(0),
