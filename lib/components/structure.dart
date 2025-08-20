@@ -13,7 +13,7 @@ IconButton customAppBarLeading() {
 
 Padding loadingBar() {
   return Padding(
-    padding: const EdgeInsets.only(bottom: 12),
+    padding: const EdgeInsets.symmetric(vertical: 10),
     child: SizedBox(height: 1.5, child: LinearProgressIndicator()),
   );
 }

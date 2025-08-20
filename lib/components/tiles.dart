@@ -1,6 +1,7 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/functions/formatteurs.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -17,7 +18,8 @@ class UserTile extends StatelessWidget {
         CircleAvatar(
           radius: 17,
           backgroundColor: notifire.getMainColor,
-          backgroundImage: photoUrl != null ? NetworkImage(photoUrl!) : null,
+          backgroundImage:
+              photoUrl != null ? FastCachedImageProvider(photoUrl!) : null,
           child:
               photoUrl != null
                   ? null

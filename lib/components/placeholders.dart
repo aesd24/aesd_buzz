@@ -10,7 +10,7 @@ Widget imageShimmerPlaceholder({
     baseColor: Colors.grey.withAlpha(150),
     highlightColor: Colors.white.withAlpha(50),
     enabled: true,
-    child: Container(color: Colors.grey, height: height, width: width),
+    child: _buildPlaceholderBox(height: height, width: width),
   );
 }
 
@@ -25,26 +25,24 @@ class _ListShimmerPlaceholderState extends State<ListShimmerPlaceholder> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.withAlpha(150),
-      highlightColor: Colors.white.withAlpha(50),
-      enabled: true,
-      child: Padding(
-        padding: EdgeInsets.all(10),
-        child: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
-          child: Column(
-            children: List.generate(10, (index) {
-              return Column(
+    return Padding(
+      padding: EdgeInsets.all(10),
+      child: SingleChildScrollView(
+        physics: NeverScrollableScrollPhysics(),
+        child: Column(
+          children: List.generate(10, (index) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildPlaceholderBox(height: 300, width: size.width),
-                  _buildPlaceholderBox(height: 100, width: size.width * .7),
-                  _buildPlaceholderBox(height: 40, width: size.width * .4),
+                  _buildPlaceholderBox(height: 170, width: size.width),
+                  _buildPlaceholderBox(height: 30, width: size.width * .6),
+                  _buildPlaceholderBox(height: 15, width: size.width * .25),
                 ],
-              );
-            }),
-          ),
+              ),
+            );
+          }),
         ),
       ),
     );
@@ -52,13 +50,18 @@ class _ListShimmerPlaceholderState extends State<ListShimmerPlaceholder> {
 }
 
 Widget _buildPlaceholderBox({required double height, required double width}) {
-  return Container(
-    height: height,
-    width: width,
-    margin: EdgeInsets.only(bottom: 10),
-    decoration: BoxDecoration(
+  return Shimmer.fromColors(
+    baseColor: Colors.grey.withAlpha(100),
+    highlightColor: Colors.grey.withAlpha(40),
+    enabled: true,
+    child: Container(
+      height: height,
+      width: width,
+      margin: EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
         color: notifire.getbgcolor,
-        borderRadius: BorderRadius.circular(15)
+        borderRadius: BorderRadius.circular(5)
+      ),
     ),
   );
 }

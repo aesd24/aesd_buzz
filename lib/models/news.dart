@@ -1,3 +1,7 @@
+import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/components/modal.dart';
+import 'package:aesd/components/placeholders.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class NewsModel {

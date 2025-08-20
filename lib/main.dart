@@ -1,4 +1,5 @@
 import 'package:aesd/provider/auth.dart';
+import 'package:aesd/provider/event.dart';
 import 'package:aesd/provider/forum.dart';
 import 'package:aesd/provider/post.dart';
 import 'package:aesd/provider/proviercolors.dart';
@@ -74,15 +75,6 @@ class _MyAppState extends State<MyApp> {
     }*/
   }
 
-  Future loadUser() async {
-    /*try {
-      await Provider.of<User>(context, listen: false).getUserData();
-    } catch (e) {
-      NavigationService.pushReplacementNamed(AppRoutes.login);
-      e.printError();
-    }*/
-  }
-
   OpenedByNotificationResponse appOpenedByNotification() {
     bool openedByNotification = false;
     RemoteMessage? notification;
@@ -96,28 +88,9 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  void initApp() async {
-    await loadUser().then((value) {
-      /*var user = Provider.of<User>(context, listen: false).user;
-
-      if (user == null) {
-        NavigationService.pushReplacementNamed(AppRoutes.login);
-      } else {
-        OpenedByNotificationResponse openedByNotif = appOpenedByNotification();
-        if (openedByNotif.response) {
-          _handleMessage(openedByNotif.notification!);
-        } else {
-          NavigationService.pushReplacementNamed(AppRoutes.home);
-        }
-      }*/
-      _checkInitialMessage();
-    });
-  }
-
   @override
   void initState() {
     super.initState();
-    initApp();
   }
 
   @override
@@ -128,6 +101,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => Auth()),
         ChangeNotifierProvider(create: (context) => PostProvider()),
         ChangeNotifierProvider(create: (context) => Forum()),
+        ChangeNotifierProvider(create: (context) => Event()),
       ],
       child: GetMaterialApp(
         locale: const Locale('fr', 'FR'),
