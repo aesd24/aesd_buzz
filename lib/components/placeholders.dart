@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
@@ -48,6 +50,32 @@ class _ListShimmerPlaceholderState extends State<ListShimmerPlaceholder> {
     );
   }
 }
+
+class CommentsPlaceholder extends StatefulWidget {
+  const CommentsPlaceholder({super.key});
+
+  @override
+  State<CommentsPlaceholder> createState() => _CommentsPlaceholderState();
+}
+
+class _CommentsPlaceholderState extends State<CommentsPlaceholder> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(10),
+      child: SingleChildScrollView(
+        physics: NeverScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: List.generate(10, (index) {
+            return _buildPlaceholderBox(height: 30, width: double.infinity);
+          }),
+        )
+      )
+    );
+  }
+}
+
 
 Widget _buildPlaceholderBox({required double height, required double width}) {
   return Shimmer.fromColors(

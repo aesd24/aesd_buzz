@@ -72,7 +72,7 @@ class _EventsListState extends State<EventsList> {
                       itemCount: provider.events.length,
                       itemBuilder: (context, index) {
                         var current = provider.events[index];
-                        return current.getWidget(context);
+                        return current.buildWidget(context);
                       },
                     ),
                   );

@@ -1,4 +1,5 @@
 import 'package:aesd/pages/social/event/list.dart';
+import 'package:aesd/pages/social/new/list.dart';
 import 'package:flutter/material.dart';
 import 'package:aesd/pages/social/posts/list.dart';
 
@@ -12,12 +13,12 @@ class SocialPage extends StatefulWidget {
 class _SocialPageState extends State<SocialPage> {
   String ElementsDisplayed = "post";
   final List _elements = [
-    "Evenement",
-    "Actualité",
+    "Evenements",
+    "Actualités",
     "Posts",
+    "Eglises",
     "Serviteurs",
-    "Chantres",
-    "Eglises"
+    "Chantres"
   ];
 
   @override
@@ -48,7 +49,7 @@ class _SocialPageState extends State<SocialPage> {
             child: TabBarView(
               children: [
                 EventsList(),
-                Placeholder(),
+                NewsList(),
                 PostList(),
                 Placeholder(),
                 Placeholder(),

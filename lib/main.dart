@@ -1,6 +1,7 @@
 import 'package:aesd/provider/auth.dart';
 import 'package:aesd/provider/event.dart';
 import 'package:aesd/provider/forum.dart';
+import 'package:aesd/provider/news.dart';
 import 'package:aesd/provider/post.dart';
 import 'package:aesd/provider/proviercolors.dart';
 import 'package:aesd/services/message.dart';
@@ -102,6 +103,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => PostProvider()),
         ChangeNotifierProvider(create: (context) => Forum()),
         ChangeNotifierProvider(create: (context) => Event()),
+        ChangeNotifierProvider(create: (context) => News()),
       ],
       child: GetMaterialApp(
         locale: const Locale('fr', 'FR'),

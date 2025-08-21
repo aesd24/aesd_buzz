@@ -56,8 +56,8 @@ class _ForumMainState extends State<ForumMain> {
           padding: EdgeInsets.all(10),
           child: CustomFormTextField(
             label: "Recherche",
-            prefix: cusIcon(Icons.search),
-          ),
+            prefix: cusIcon(Icons.search)
+          )
         ),
         Expanded(
           child: Consumer<Forum>(
