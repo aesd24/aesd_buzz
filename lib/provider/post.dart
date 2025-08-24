@@ -10,7 +10,7 @@ class PostProvider extends ChangeNotifier {
   PostPaginator? _paginator;
 
   PostModel? _selectedPost;
-  PostModel get selectedPost => _selectedPost!;
+  PostModel? get selectedPost => _selectedPost;
 
   final List<PostModel> _posts = [];
   final List<CommentModel> _postComments = [];

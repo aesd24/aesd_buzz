@@ -47,7 +47,14 @@ class Forum extends ChangeNotifier {
   Future likeSubject({required int subjectId}) async {
     final response = await _requestHandler.likeSubject(subjectId: subjectId);
     if (response.statusCode == 200) {
-      return true;
+      if (selectedSubject!.isLiked){
+        selectedSubject!.likes--;
+        selectedSubject!.isLiked = false;
+      } else {
+        selectedSubject!.likes++;
+        selectedSubject!.isLiked = true;
+      }
+      notifyListeners();
     } else {
       throw HttpException("Le sujet n'a pas été liké. Rééssayez !");
     }

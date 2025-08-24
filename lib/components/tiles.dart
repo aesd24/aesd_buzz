@@ -81,3 +81,25 @@ Widget customTransactionTile(
     ),
   );
 }
+
+Widget infoTile(BuildContext context,{required String text, required IconData icon}) {
+  final textTheme = Theme.of(context).textTheme;
+  final scheme = Theme.of(context).colorScheme;
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 15),
+    child: Row(
+      children: [
+        cusFaIcon(FontAwesomeIcons.locationDot),
+        const SizedBox(width: 5),
+        Flexible(
+          child: Text(
+            text,
+            style: textTheme.bodySmall!.copyWith(
+              color: scheme.onSurface.withAlpha(100),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}

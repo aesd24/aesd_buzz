@@ -1,5 +1,8 @@
+import 'package:aesd/pages/social/church/list.dart';
 import 'package:aesd/pages/social/event/list.dart';
 import 'package:aesd/pages/social/new/list.dart';
+import 'package:aesd/pages/social/servants_list.dart';
+import 'package:aesd/pages/social/singers_list.dart';
 import 'package:flutter/material.dart';
 import 'package:aesd/pages/social/posts/list.dart';
 
@@ -51,9 +54,9 @@ class _SocialPageState extends State<SocialPage> {
                 EventsList(),
                 NewsList(),
                 PostList(),
-                Placeholder(),
-                Placeholder(),
-                Placeholder(),
+                ChurchList(),
+                ServantsList(),
+                SingersList(),
               ]
             ),
           )

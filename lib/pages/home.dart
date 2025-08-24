@@ -1,7 +1,7 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/drawer.dart';
 import 'package:aesd/components/icon.dart';
-import 'package:aesd/pages/social/forum/list.dart';
+import 'package:aesd/pages/forum/list.dart';
 import 'package:aesd/pages/social/social.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';

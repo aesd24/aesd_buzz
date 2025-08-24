@@ -2,6 +2,7 @@ import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 
 class ButtonType {
   final Widget? icon;
@@ -133,10 +134,13 @@ class _CustomTextButtonState extends State<CustomTextButton> {
 Widget customActionButton(Widget icon, String text, {
   void Function()? onPressed
 }) {
-  return GestureDetector(
+  return InkWell(
+    overlayColor: WidgetStatePropertyAll(notifire.getMaingey.withAlpha(70)),
+    borderRadius: BorderRadius.circular(100),
+    radius: 20,
     onTap: onPressed,
     child: Padding(
-      padding: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(7),
       child: Row(
         children: [
           icon,
@@ -145,5 +149,12 @@ Widget customActionButton(Widget icon, String text, {
         ],
       )
     )
+  );
+}
+
+Widget customBackButton({Color? color}) {
+  return IconButton(
+    onPressed: () => Get.back(),
+    icon: cusFaIcon(FontAwesomeIcons.arrowLeftLong, color: color),
   );
 }

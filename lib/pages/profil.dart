@@ -5,7 +5,9 @@ import 'package:aesd/components/icon.dart';
 import 'package:aesd/models/servant_model.dart';
 import 'package:aesd/models/user_model.dart';
 import 'package:aesd/provider/auth.dart';
+import 'package:aesd/provider/servant.dart';
 import 'package:aesd/services/message.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -22,25 +24,24 @@ class UserProfil extends StatefulWidget {
 
 class _UserProfilState extends State<UserProfil> {
   bool isLoading = false;
-  bool isSubscribing = false;
   bool subscribed = false;
   bool isSelf = false;
 
   late ServantModel servant;
 
-  void init() async {
+  void loadServant(int servantId) async {
     try {
       setState(() {
         isLoading = true;
       });
-      /*await Provider.of<Servant>(context, listen: false).getServant(
-        servantId: servantId!
+      await Provider.of<Servant>(context, listen: false).getServant(
+        servantId: servantId
       ).then((value) {
         setState(() {
           servant = ServantModel.fromJson(value);
           subscribed = value['isSubscribed'];
         });
-      });*/
+      });
     } on HttpException {
       MessageService.showErrorMessage("L'opération à échoué !");
     } catch (e) {
@@ -55,17 +56,17 @@ class _UserProfilState extends State<UserProfil> {
   void onSubscribe(bool subscribed) async {
     try {
       setState(() {
-        isSubscribing = true;
+        isLoading = true;
       });
-      /*await Provider.of<Servant>(context, listen: false).subscribe(
+      await Provider.of<Servant>(context, listen: false).subscribe(
         servantId: servant.id,
         subscribe: !subscribed
       ).then((value) async {
         setState(() {
           this.subscribed = !subscribed;
         });
-        showSnackBar(context: context, message: value['message'], type: SnackBarType.success);
-      });*/
+        MessageService.showSuccessMessage(value['message']);
+      });
     } on HttpException {
       MessageService.showErrorMessage("L'opération à échoué !");
     } catch (e) {
@@ -81,6 +82,10 @@ class _UserProfilState extends State<UserProfil> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final servantId = Get.arguments['servantId'] as int?;
+      if (servantId != null) loadServant(servantId);
+    });
   }
 
   @override
@@ -91,6 +96,10 @@ class _UserProfilState extends State<UserProfil> {
         final user = Get.arguments['user'] as UserModel;
         isSelf = user.id == provider.user!.id;
         return LoadingOverlay(
+          progressIndicator: CircularProgressIndicator(
+            color: Colors.white,
+            strokeWidth: 1.5
+          ),
           isLoading: isLoading,
           child: Scaffold(
             body: CustomScrollView(
@@ -102,7 +111,7 @@ class _UserProfilState extends State<UserProfil> {
                     icon: cusFaIcon(
                       FontAwesomeIcons.arrowLeftLong,
                       color: Colors.white,
-                    ),
+                    )
                   ),
                   backgroundColor:
                       Colors.green, //Theme.of(context).colorScheme.surface,
@@ -124,11 +133,14 @@ class _UserProfilState extends State<UserProfil> {
                                     radius: 53,
                                     backgroundImage:
                                         user.photo != null
-                                            ? NetworkImage(user.photo!)
+                                            ? FastCachedImageProvider(user.photo!)
                                             : null,
-                                    child: user.photo == null ? SvgPicture.asset(
-                                      "assets/illustrations/user-avatar.svg",
-                                    ) : null,
+                                    child:
+                                        user.photo == null
+                                            ? SvgPicture.asset(
+                                              "assets/illustrations/user-avatar.svg",
+                                            )
+                                            : null,
                                   ),
                                 ),
                                 if (!isSelf && !subscribed)
@@ -300,7 +312,7 @@ class _UserProfilState extends State<UserProfil> {
                               ],
                             ],
                           ),
-                        ),
+                        )
                       ],
                     ),
                   ),

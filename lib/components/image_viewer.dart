@@ -25,13 +25,15 @@ class ImageViewer extends StatelessWidget {
           imageProvider: FastCachedImageProvider(imageUrl),
           loadingBuilder:
               (context, event) => Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: imageShimmerPlaceholder(height: 400),
-            ),
+                padding: EdgeInsets.symmetric(horizontal: 15),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: imageShimmerPlaceholder(height: 400),
+                ),
+              ),
+          backgroundDecoration: BoxDecoration(
+            color: Colors.black.withAlpha(100),
           ),
-          backgroundDecoration: BoxDecoration(color: Colors.black.withAlpha(100)),
         ),
       ),
     );

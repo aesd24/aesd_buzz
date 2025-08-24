@@ -42,7 +42,7 @@ class EventModel {
       padding: EdgeInsets.all(7),
       child: Container(
         decoration: BoxDecoration(
-          color: notifire.getcontiner,
+          color: notifire.getContainer,
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(

@@ -1,8 +1,8 @@
+import 'package:aesd/appstaticdata/routes.dart';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/image_viewer.dart';
-import 'package:aesd/components/modal.dart';
 import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/functions/formatteurs.dart';
 import 'package:aesd/models/user_model.dart';
@@ -39,11 +39,12 @@ class PostModel {
   }) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    return Padding(
-      padding: EdgeInsets.all(7),
+    return GestureDetector(
+      onTap: () => Get.toNamed(Routes.postDetail, arguments: {'postId': id}),
       child: Container(
+        margin: EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: notifire.getcontiner,
+          color: notifire.getContainer,
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
@@ -63,7 +64,9 @@ class PostModel {
                 child: Hero(
                   tag: image!,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(10),
+                    ),
                     child: FastCachedImage(
                       fit: BoxFit.cover,
                       url: image!,
@@ -141,7 +144,7 @@ class PostModel {
                           FontAwesomeIcons.comment,
                           color: notifire.getMainText,
                         ),
-                        "Commenter",
+                        comments == 0 ? "Commenter" : comments.toString(),
                         onPressed:
                             () => showModalBottomSheet(
                               context: context,

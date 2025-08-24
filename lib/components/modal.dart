@@ -56,7 +56,7 @@ class _CustomDialogState extends State<CustomDialog> {
             child: Container(
               width: 500,
               decoration: BoxDecoration(
-                color: notifire.getcontiner,
+                color: notifire.getContainer,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Padding(

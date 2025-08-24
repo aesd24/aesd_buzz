@@ -50,37 +50,24 @@ class _NewsListState extends State<NewsList> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(10),
-              child: CustomFormTextField(
-                label: "Recherche",
-                prefix: cusIcon(Icons.search),
-              ),
-            ),
-            Expanded(
-              child: isLoading ? ListShimmerPlaceholder() : Consumer<News>(
-                builder: (context, provider, child) {
-                  if (provider.news.isEmpty) {
-                    return notFoundTile(text: "Aucun évènement trouvé");
-                  }
-                  return RefreshIndicator(
-                    onRefresh: () async => await loadNews(),
-                    child: ListView.builder(
-                      itemCount: provider.news.length,
-                      itemBuilder: (context, index) {
-                        var current = provider.news[index];
-                        return current.buildWidget(context);
-                      },
-                    ),
-                  );
+        isLoading ? ListShimmerPlaceholder() : Consumer<News>(
+          builder: (context, provider, child) {
+            if (provider.news.isEmpty) {
+              return notFoundTile(text: "Aucun évènement trouvé");
+            }
+            return RefreshIndicator(
+              onRefresh: () async => await loadNews(),
+              child: ListView.builder(
+                itemCount: provider.news.length,
+                itemBuilder: (context, index) {
+                  var current = provider.news[index];
+                  return current.buildWidget(context);
                 },
               ),
-            ),
-            if (isLoading) loadingBar(),
-          ],
+            );
+          },
         ),
+        if (isLoading) loadingBar(),
       ],
     );
   }

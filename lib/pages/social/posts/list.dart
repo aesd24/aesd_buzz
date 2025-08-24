@@ -109,23 +109,31 @@ class _PostListState extends State<PostList> {
         Column(
           children: [
             Expanded(
-              child: isLoading ? ListShimmerPlaceholder() : Consumer<PostProvider>(
-                builder: (context, provider, child) {
-                  if (provider.posts.isEmpty) {
-                    return notFoundTile(text: "Aucun post pour le moment");
-                  }
-                  return RefreshIndicator(
-                    onRefresh: () async => await _getPosts(),
-                    child: ListView.builder(
-                      itemCount: provider.posts.length,
-                      itemBuilder: (context, index) {
-                        var current = provider.posts[index];
-                        return current.buildWidget(context, onLike: onLike);
-                      },
-                    ),
-                  );
-                },
-              ),
+              child:
+                  isLoading
+                      ? ListShimmerPlaceholder()
+                      : Consumer<PostProvider>(
+                        builder: (context, provider, child) {
+                          if (provider.posts.isEmpty) {
+                            return notFoundTile(
+                              text: "Aucun post pour le moment",
+                            );
+                          }
+                          return RefreshIndicator(
+                            onRefresh: () async => await _getPosts(),
+                            child: ListView.builder(
+                              itemCount: provider.posts.length,
+                              itemBuilder: (context, index) {
+                                var current = provider.posts[index];
+                                return current.buildWidget(
+                                  context,
+                                  onLike: onLike,
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
             ),
             if (isLoading) loadingBar(),
           ],
@@ -145,7 +153,6 @@ class _PostListState extends State<PostList> {
                       backgroundColor: Colors.transparent,
                       builder:
                           (context) => CreatePost(
-                            title: "Faire un post",
                             canPickImage: true,
                             onSubmit: (createObj) => onCreate(createObj),
                             pictureValidator: (pic, content) {

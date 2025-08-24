@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/fields.dart';
 import 'package:aesd/components/icon.dart';
@@ -57,22 +56,21 @@ class _CommentPagesState extends State<CommentPages> {
           isCommenting = true;
         });
         await Future.delayed(Duration(seconds: 1), () async {
-          await Provider.of<PostProvider>(
-            context,
-            listen: false,
-          ).makeComment(widget.postId, _commentController.text).then((value) async {
-            await Provider.of<PostProvider>(
-              context,
-              listen: false,
-            ).postDetail(widget.postId).then((value) {
-              setState(() {
-                isCommenting = false;
+          await Provider.of<PostProvider>(context, listen: false)
+              .makeComment(widget.postId, _commentController.text)
+              .then((value) async {
+                await Provider.of<PostProvider>(
+                  context,
+                  listen: false,
+                ).postDetail(widget.postId).then((value) {
+                  setState(() {
+                    isCommenting = false;
+                  });
+                });
+                FocusScope.of(context).unfocus();
+                _commentController.clear();
+                MessageService.showSuccessMessage("Commentaire envoyé !");
               });
-            });
-            FocusScope.of(context).unfocus();
-            _commentController.clear();
-            MessageService.showSuccessMessage("Commentaire envoyé !");
-          });
         });
       } on DioException {
         MessageService.showErrorMessage(

@@ -1,11 +1,13 @@
+import 'package:aesd/appstaticdata/routes.dart';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
-import 'package:aesd/components/modal.dart';
+import 'package:aesd/components/image_viewer.dart';
 import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/functions/formatteurs.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 
 class NewsModel {
   late int id;
@@ -23,11 +25,12 @@ class NewsModel {
   }
 
   Widget buildWidget(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(7),
+    return GestureDetector(
+      onTap: () => Get.toNamed(Routes.newsDetail, arguments: {'newId': id}),
       child: Container(
+        margin: EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: notifire.getcontiner,
+          color: notifire.getContainer,
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
@@ -43,7 +46,7 @@ class NewsModel {
             // image box
             if (imageUrl != null)
               GestureDetector(
-                onTap: () => showImageModal(context, imageUrl: imageUrl!),
+                onTap: () => Get.to(ImageViewer(imageUrl: imageUrl!)),
                 child: ClipRRect(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
                   child: FastCachedImage(
@@ -66,8 +69,8 @@ class NewsModel {
                     padding: EdgeInsets.symmetric(vertical: 10),
                     child: Row(
                       children: [
-                        cusFaIcon(FontAwesomeIcons.calendarDay),
-                        SizedBox(width: 5),
+                        cusFaIcon(FontAwesomeIcons.calendar, size: 16),
+                        SizedBox(width: 15),
                         Text(
                           formatDate(date),
                           style: Theme.of(context).textTheme.bodyMedium,
@@ -81,7 +84,10 @@ class NewsModel {
                     padding: EdgeInsets.only(top: 10),
                     child: Text(
                       title,
-                      style: Theme.of(context).textTheme.titleMedium,
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        color: notifire.getMainText,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
 

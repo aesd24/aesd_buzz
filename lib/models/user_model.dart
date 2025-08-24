@@ -18,16 +18,12 @@ class UserModel {
   late int? churchId;
   //late ChurchModel? church;
 
-  static String get servant => "serviteur_de_dieu";
-  static String get faithful => "fidele";
-  static String get singer => "chantre";
-
   Widget buildWidget(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return ListTile(
       onTap: () {}, //Get.to(UserProfil(user: this)),
       leading: CircleAvatar(
-        backgroundImage: photo != null ? NetworkImage(photo!) : null,
+        backgroundImage: photo != null ? FastCachedImageProvider(photo!) : null,
       ),
       title: Text(name, style: textTheme.labelMedium),
       subtitle: Text(
@@ -61,7 +57,8 @@ class UserModel {
           CircleAvatar(
             radius: 17,
             backgroundColor: notifire.getMainColor,
-            backgroundImage: photo != null ? FastCachedImageProvider(photo!) : null,
+            backgroundImage:
+                photo != null ? FastCachedImageProvider(photo!) : null,
             child:
                 photo != null
                     ? null

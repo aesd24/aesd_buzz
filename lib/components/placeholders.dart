@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
@@ -70,12 +68,11 @@ class _CommentsPlaceholderState extends State<CommentsPlaceholder> {
           children: List.generate(10, (index) {
             return _buildPlaceholderBox(height: 30, width: double.infinity);
           }),
-        )
-      )
+        ),
+      ),
     );
   }
 }
-
 
 Widget _buildPlaceholderBox({required double height, required double width}) {
   return Shimmer.fromColors(
@@ -88,7 +85,7 @@ Widget _buildPlaceholderBox({required double height, required double width}) {
       margin: EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: notifire.getbgcolor,
-        borderRadius: BorderRadius.circular(5)
+        borderRadius: BorderRadius.circular(5),
       ),
     ),
   );

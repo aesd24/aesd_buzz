@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:aesd/components/fields.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/not_found.dart';
+import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/components/structure.dart';
 import 'package:aesd/services/message.dart';
 import 'package:aesd/provider/forum.dart';
@@ -49,7 +50,9 @@ class _ForumMainState extends State<ForumMain> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return isLoading ? Scaffold(
+      body: ListShimmerPlaceholder(),
+    ) : Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
