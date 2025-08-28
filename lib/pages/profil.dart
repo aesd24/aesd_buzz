@@ -34,9 +34,10 @@ class _UserProfilState extends State<UserProfil> {
       setState(() {
         isLoading = true;
       });
-      await Provider.of<Servant>(context, listen: false).getServant(
-        servantId: servantId
-      ).then((value) {
+      await Provider.of<Servant>(
+        context,
+        listen: false,
+      ).getServant(servantId: servantId).then((value) {
         setState(() {
           servant = ServantModel.fromJson(value);
           subscribed = value['isSubscribed'];
@@ -58,15 +59,14 @@ class _UserProfilState extends State<UserProfil> {
       setState(() {
         isLoading = true;
       });
-      await Provider.of<Servant>(context, listen: false).subscribe(
-        servantId: servant.id,
-        subscribe: !subscribed
-      ).then((value) async {
-        setState(() {
-          this.subscribed = !subscribed;
-        });
-        MessageService.showSuccessMessage(value['message']);
-      });
+      await Provider.of<Servant>(context, listen: false)
+          .subscribe(servantId: servant.id, subscribe: !subscribed)
+          .then((value) async {
+            setState(() {
+              this.subscribed = !subscribed;
+            });
+            MessageService.showSuccessMessage(value['message']);
+          });
     } on HttpException {
       MessageService.showErrorMessage("L'opération à échoué !");
     } catch (e) {
@@ -98,7 +98,7 @@ class _UserProfilState extends State<UserProfil> {
         return LoadingOverlay(
           progressIndicator: CircularProgressIndicator(
             color: Colors.white,
-            strokeWidth: 1.5
+            strokeWidth: 1.5,
           ),
           isLoading: isLoading,
           child: Scaffold(
@@ -111,7 +111,7 @@ class _UserProfilState extends State<UserProfil> {
                     icon: cusFaIcon(
                       FontAwesomeIcons.arrowLeftLong,
                       color: Colors.white,
-                    )
+                    ),
                   ),
                   backgroundColor:
                       Colors.green, //Theme.of(context).colorScheme.surface,
@@ -133,7 +133,9 @@ class _UserProfilState extends State<UserProfil> {
                                     radius: 53,
                                     backgroundImage:
                                         user.photo != null
-                                            ? FastCachedImageProvider(user.photo!)
+                                            ? FastCachedImageProvider(
+                                              user.photo!,
+                                            )
                                             : null,
                                     child:
                                         user.photo == null
@@ -276,7 +278,8 @@ class _UserProfilState extends State<UserProfil> {
                               // actions sur le propre compte
                               if (isSelf) ...[
                                 _customActionButton(
-                                  onPressed: () => {},
+                                  onPressed:
+                                      () => Get.toNamed(Routes.updateUser),
                                   text: "Modifier mes informations",
                                   icon: FontAwesomeIcons.pen,
                                 ),
@@ -312,7 +315,7 @@ class _UserProfilState extends State<UserProfil> {
                               ],
                             ],
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),

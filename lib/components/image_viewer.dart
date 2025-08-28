@@ -34,6 +34,8 @@ class ImageViewer extends StatelessWidget {
           backgroundDecoration: BoxDecoration(
             color: Colors.black.withAlpha(100),
           ),
+          minScale: PhotoViewComputedScale.covered * .8,
+          maxScale: PhotoViewComputedScale.covered * 5
         ),
       ),
     );

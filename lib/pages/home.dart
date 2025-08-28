@@ -3,6 +3,7 @@ import 'package:aesd/components/drawer.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/pages/forum/list.dart';
 import 'package:aesd/pages/social/social.dart';
+import 'package:aesd/pages/testimony/list.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -74,7 +75,7 @@ class _MainPageState extends State<MainPage> {
               SocialPage(),
               ForumMain(),
               Placeholder(),
-              Placeholder(),
+              TestimoniesList(),
             ][_pageIndex],
       ),
       bottomNavigationBar: BottomNavigationBar(

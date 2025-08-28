@@ -132,6 +132,9 @@ class Auth extends ChangeNotifier {
   Future modifyInformation(Map<String, dynamic> data) async {
     final formData = FormData.fromMap(data);
     final result = await request.modifyInformation(formData);
+    if (result.statusCode == 200) {
+      await getUserData();
+    }
     if (result.data['errors'] != null) {
       for (var error in result.data['errors']) {
         throw HttpException(error);
@@ -140,7 +143,7 @@ class Auth extends ChangeNotifier {
     if (result.statusCode >= 400) {
       throw HttpException(result.data['message']);
     }
-    return result;
+    return true;
   }
 
   Future<bool> isLoggedIn() async {

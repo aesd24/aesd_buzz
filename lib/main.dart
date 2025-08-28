@@ -7,6 +7,7 @@ import 'package:aesd/provider/post.dart';
 import 'package:aesd/provider/proviercolors.dart';
 import 'package:aesd/provider/servant.dart';
 import 'package:aesd/provider/singer.dart';
+import 'package:aesd/provider/testimony.dart';
 import 'package:aesd/services/message.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -110,6 +111,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => News()),
         ChangeNotifierProvider(create: (context) => Servant()),
         ChangeNotifierProvider(create: (context) => Singer()),
+        ChangeNotifierProvider(create: (context) => Testimony())
       ],
       child: GetMaterialApp(
         locale: const Locale('fr', 'FR'),

@@ -100,7 +100,6 @@ flutter:
     - assets/illustrations/
     - assets/locales/ar.json
     - assets/locales/en.json
-    - assets/notification.riv
 
 
   fonts:
