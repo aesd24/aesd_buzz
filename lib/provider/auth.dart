@@ -7,7 +7,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class Auth extends ChangeNotifier {
-  UserModel? user;
+  UserModel? _user;
+  UserModel? get user => _user;
   late UserCreate _creationSchem;
   UserCreate get creationSchema => _creationSchem;
 
@@ -57,12 +58,14 @@ class Auth extends ChangeNotifier {
 
   Future<void> logout() async {
     _unExpiredCache.remove("access_token");
+    _user = null;
+    notifyListeners();
   }
 
   Future getUserData() async {
     var response = await request.getUserData();
     if (response.statusCode == 200) {
-      user = UserModel.fromJson(response.data);
+      _user = UserModel.fromJson(response.data);
     } else {
       throw const HttpException(
         "Impossible de récupérer les informations de l'utilisateur",
@@ -129,6 +132,9 @@ class Auth extends ChangeNotifier {
   Future modifyInformation(Map<String, dynamic> data) async {
     final formData = FormData.fromMap(data);
     final result = await request.modifyInformation(formData);
+    if (result.statusCode == 200) {
+      await getUserData();
+    }
     if (result.data['errors'] != null) {
       for (var error in result.data['errors']) {
         throw HttpException(error);
@@ -137,7 +143,7 @@ class Auth extends ChangeNotifier {
     if (result.statusCode >= 400) {
       throw HttpException(result.data['message']);
     }
-    return result;
+    return true;
   }
 
   Future<bool> isLoggedIn() async {

@@ -1,3 +1,4 @@
+import 'package:aesd/appstaticdata/routes.dart';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:aesd/services/message.dart';
@@ -26,7 +27,7 @@ class _AuthMiddlewareState extends State<AuthMiddleware> {
     } catch (e) {
       e.printError();
       MessageService.showInfoMessage("Connectez-vous pour continuer !");
-      Get.offAllNamed("/login");
+      Get.offAllNamed(Routes.auth);
     } finally {
       setState(() {
         _isLoading = false;

@@ -3,7 +3,6 @@ import 'package:aesd/components/icon.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-
 // Custom form text field
 class CustomFormTextField extends StatefulWidget {
   const CustomFormTextField({
@@ -16,7 +15,7 @@ class CustomFormTextField extends StatefulWidget {
     this.type = TextInputType.text,
     this.maxLines,
     this.suffix,
-    this.controller
+    this.controller,
   });
 
   final String label;
@@ -34,21 +33,22 @@ class CustomFormTextField extends StatefulWidget {
 }
 
 class _CustomFormTextFieldState extends State<CustomFormTextField> {
-
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: TextFormField(
         controller: widget.controller,
-        style: TextStyle(color: notifire!.getMainText),
+        style: TextStyle(color: notifire.getMainText),
         decoration: InputDecoration(
           enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(25),
-              borderSide:  BorderSide(color: notifire!.isDark?   notifire!.geticoncolor  :Colors.grey.shade200)),
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide(color: notifire.getMaingey),
+          ),
           border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(25),
-              borderSide:  BorderSide(color: notifire!.isDark?   notifire!.geticoncolor  :Colors.grey.shade200)),
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide(color: notifire.getMaingey),
+          ),
           hintText: widget.label,
           hintStyle: mediumGreyTextStyle,
           prefixIcon: widget.prefix,
@@ -73,7 +73,6 @@ class _CustomFormTextFieldState extends State<CustomFormTextField> {
   }
 }
 
-
 // Custom dropdown button
 class CustomDropdownButton extends StatefulWidget {
   const CustomDropdownButton({
@@ -85,7 +84,7 @@ class CustomDropdownButton extends StatefulWidget {
     this.suffix,
     this.onChanged,
     this.validator,
-    this.validate = false
+    this.validate = false,
   });
 
   final String value;
@@ -117,11 +116,23 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
       child: DropdownButtonFormField(
         decoration: InputDecoration(
           enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(25),
-              borderSide:  BorderSide(color: notifire!.isDark? notifire!.geticoncolor:Colors.grey.shade200)),
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide(
+              color:
+                  notifire.isDark
+                      ? notifire.geticoncolor
+                      : Colors.grey.shade200,
+            ),
+          ),
           border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(25),
-              borderSide:  BorderSide(color: notifire!.isDark? notifire!.geticoncolor:Colors.grey.shade200)),
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide(
+              color:
+                  notifire.isDark
+                      ? notifire.geticoncolor
+                      : Colors.grey.shade200,
+            ),
+          ),
           hintText: widget.label,
           hintStyle: mediumGreyTextStyle,
           prefixIcon: widget.prefix,
@@ -142,12 +153,11 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
           if (widget.onChanged != null) {
             widget.onChanged!(value);
           }
-        }
+        },
       ),
     );
   }
 }
-
 
 // Password field
 class PasswordField extends StatefulWidget {
@@ -185,7 +195,9 @@ class _PasswordFieldState extends State<PasswordField> {
             isObscure = !isObscure;
           });
         },
-        child: cusIcon(isObscure ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash),
+        child: cusIcon(
+          isObscure ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash,
+        ),
       ),
       validator: widget.validator,
       validate: widget.validate,
@@ -193,14 +205,13 @@ class _PasswordFieldState extends State<PasswordField> {
   }
 }
 
-
 // email field
 class EmailField extends StatefulWidget {
   const EmailField({
     super.key,
     this.label,
     this.controller,
-    this.validate = false
+    this.validate = false,
   });
   final String? label;
   final bool validate;
@@ -221,14 +232,12 @@ class _EmailFieldState extends State<EmailField> {
       validate: widget.validate,
       validator: (value) {
         if (!RegExp(
-            "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]{2,}?\\.[a-zA-Z]{2,}\$")
-            .hasMatch(value!)) {
-          if (!RegExp("^[a-zA-Z0-9._%-]{5,}")
-              .hasMatch(value)) {
+          "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]{2,}?\\.[a-zA-Z]{2,}\$",
+        ).hasMatch(value!)) {
+          if (!RegExp("^[a-zA-Z0-9._%-]{5,}").hasMatch(value)) {
             return "Entrez au moins 5 caractères avant le '@'";
           }
-          if (!RegExp("^[.]*.[a-zA-Z0-9]{2,}\$")
-              .hasMatch(value)) {
+          if (!RegExp("^[.]*.[a-zA-Z0-9]{2,}\$").hasMatch(value)) {
             return "Nom de domaine invalide !";
           }
           return "Adresse email invalide !";
@@ -239,14 +248,13 @@ class _EmailFieldState extends State<EmailField> {
   }
 }
 
-
 // phone number field
 class PhoneField extends StatefulWidget {
   const PhoneField({
     super.key,
     this.label,
     this.validate = false,
-    this.controller
+    this.controller,
   });
   final String? label;
   final bool validate;
@@ -279,7 +287,6 @@ class _PhoneFieldState extends State<PhoneField> {
   }
 }
 
-
 // multiline field
 class MultilineField extends StatefulWidget {
   const MultilineField({
@@ -287,7 +294,7 @@ class MultilineField extends StatefulWidget {
     required this.label,
     this.controller,
     this.validator,
-    this.validate = false
+    this.validate = false,
   });
 
   final String label;
@@ -313,7 +320,3 @@ class _MultilineFieldState extends State<MultilineField> {
     );
   }
 }
-
-
-
-

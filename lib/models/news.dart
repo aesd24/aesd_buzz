@@ -1,4 +1,13 @@
+import 'package:aesd/appstaticdata/routes.dart';
+import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/components/icon.dart';
+import 'package:aesd/components/image_viewer.dart';
+import 'package:aesd/components/placeholders.dart';
+import 'package:aesd/functions/formatteurs.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 
 class NewsModel {
   late int id;
@@ -7,7 +16,7 @@ class NewsModel {
   late String? imageUrl;
   late DateTime date;
 
-  NewsModel.fromJson(json) {
+  NewsModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     title = json['titre'];
     content = json['contenu'];
@@ -15,51 +24,105 @@ class NewsModel {
     date = DateTime.parse(json['created_at']);
   }
 
-  Widget getWidget(BuildContext context) {
+  Widget buildWidget(BuildContext context) {
     return GestureDetector(
-      onTap: () {},//=> NavigationService.push(NewsPage(news: this)),
+      onTap: () => Get.toNamed(Routes.newsDetail, arguments: {'newId': id}),
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        width: double.infinity,
-        height: 200,
+        margin: EdgeInsets.all(10),
         decoration: BoxDecoration(
+          color: notifire.getContainer,
           borderRadius: BorderRadius.circular(10),
-          image: DecorationImage(
-            image: imageUrl != null ? NetworkImage(imageUrl!) : AssetImage("assets/news.jpeg"),
-            fit: BoxFit.cover
-          )
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withAlpha(30),
+              spreadRadius: 2,
+              blurRadius: 3,
+              offset: Offset(2, 3),
+            ),
+          ],
         ),
-        child: Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              gradient: LinearGradient(colors: [
-                Colors.black.withAlpha(200),
-                Colors.black.withAlpha(75),
-              ], begin: Alignment.bottomCenter, end: Alignment.topCenter)),
-          alignment: Alignment.bottomLeft,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 5),
-                child: Text(
-                  title.length < 30 ? title : '${title.substring(0, 30)}...',
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: Colors.white, fontWeight: FontWeight.bold
+        child: Column(
+          children: [
+            // image box
+            if (imageUrl != null)
+              GestureDetector(
+                onTap: () => Get.to(ImageViewer(imageUrl: imageUrl!)),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                  child: FastCachedImage(
+                    fit: BoxFit.cover,
+                    url: imageUrl!,
+                    loadingBuilder: (context, progress) {
+                      return imageShimmerPlaceholder(height: 200);
+                    },
                   ),
                 ),
               ),
-              Text(
-                content.length < 150 ? content : '${content.substring(0, 150)}...',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall!
-                    .copyWith(color: Colors.white70),
-              )
-            ],
-          ),
+
+            Padding(
+              padding: EdgeInsets.all(15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Date de l'actualité
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                    child: Row(
+                      children: [
+                        cusFaIcon(FontAwesomeIcons.calendar, size: 16),
+                        SizedBox(width: 15),
+                        Text(
+                          formatDate(date),
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // titre de l'actualité
+                  Padding(
+                    padding: EdgeInsets.only(top: 10),
+                    child: Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        color: notifire.getMainText,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  // contenu de l'actualité
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    child:
+                        content.length > 150
+                            ? RichText(
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: '${content.substring(0, 150)}... ',
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                  TextSpan(
+                                    text: 'Lire la suite',
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                            : Text(
+                              content,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

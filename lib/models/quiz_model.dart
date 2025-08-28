@@ -40,7 +40,7 @@ class QuizModel {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text("$questionCount Questions"),
-            Text(formatDate(createdAt, stringMonth: true))
+            Text(formatDate(createdAt))
           ],
         ),
       ),

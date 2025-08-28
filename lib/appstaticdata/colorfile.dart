@@ -7,20 +7,20 @@ Color primeryColor =  const Color(0xffffffff);
 Color darkPrimeryColor = const Color(0xff293226);
 
 Color bgcolor = const Color(0xfff2f5f2);
-Color darkbgcolor = const Color(0xff1f251d);
+Color darkbgcolor = const Color(0xFF030A00);
 
-Color mainColor = const Color(0xff3ae700);
-Color darkmainColor = const Color(0xff0e7900);
+Color mainColor = const Color(0xff2dbc00);
+Color darkmainColor = const Color(0xff0a5e00);
 
 Color bordercolor =  Colors.grey.shade200;
 Color darkbordercolor =  const Color(0xff313f2a);
 
-Color  iconcolor = const Color(0xff304c25);
+Color  iconcolor = const Color(0xff384238);
 Color  darkiconcolor = const Color(0xffcccecc);
 
 
-Color continercolor = const Color(0xffffffff);
-Color darkcontinercolor = const Color(0xff293226);
+Color containerColor = Colors.white;
+Color darkContainerColor = Colors.black;
 
 Color continercolo1r = Colors.grey.shade100;
 Color darkcontinercolo1r = const Color(0xff293526);
@@ -53,3 +53,12 @@ Color darktextcolor = Colors.grey.shade300;
 
 Color themgrey1 = Colors.grey;
 Color themblack1 = Colors.grey;
+
+Color successColor = Colors.green;
+Color darkSuccessColor = Colors.green.shade800;
+Color dangerColor = Colors.red;
+Color darkDangerColor = Colors.red.shade800;
+Color warningColor = Colors.amber;
+Color darkWarningColor = Colors.amber.shade800;
+Color infoColor = Colors.teal;
+Color darkInfoColor = Colors.teal.shade800;

@@ -1,9 +1,8 @@
-
 import 'package:aesd/appstaticdata/routes.dart';
+import 'package:aesd/provider/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-
+import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,19 +12,30 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
   var selected = 0;
-  @override
-  initState()  {
 
+  void init() async {
+    try {
+      await Provider.of<Auth>(context, listen: false).isLoggedIn().then((value) {
+        print(value);
+        if (value) {
+          Get.offNamed(Routes.homepage);
+        }
+      });
+    } catch (e) {
+      Get.offNamed(Routes.auth);
+    }
+  }
+
+  @override
+  initState() {
     super.initState();
 
-     Future.delayed(const Duration(seconds: 4),() {
-
-       Get.offAllNamed(Routes.auth);
-
+    Future.delayed(const Duration(seconds: 2), () async {
+      init();
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,19 +47,16 @@ class _SplashScreenState extends State<SplashScreen> {
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage("assets/images/bg-1.jpg"),
-                fit: BoxFit.cover
-              )
+                fit: BoxFit.cover,
+              ),
             ),
             child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Colors.white70,
-                    Colors.white10
-                  ],
+                  colors: [Colors.white70, Colors.white10],
                   begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter
-                )
+                  end: Alignment.bottomCenter,
+                ),
               ),
             ),
           ),
@@ -60,7 +67,7 @@ class _SplashScreenState extends State<SplashScreen> {
               height: 150,
               width: 150,
             ),
-          )
+          ),
         ],
       ),
     );
