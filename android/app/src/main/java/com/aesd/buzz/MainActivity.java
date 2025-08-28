@@ -1,4 +1,4 @@
-package com.aesd.aesd;
+package com.aesd.buzz;
 
 import io.flutter.embedding.android.FlutterActivity;
 
