@@ -63,21 +63,21 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _handleMessage(RemoteMessage message) async {
-    /*if (message.data.containsKey('id')) {
+    if (message.data.containsKey('id')) {
       switch (message.data['type']) {
         case 'post':
-          Get.toNamed(AppRoutes.postDetail, arguments: int.parse(message.data['id']));
+          Get.toNamed(Routes.postDetail, arguments: int.parse(message.data['id']));
           break;
-        case 'event':
-          Get.toNamed(AppRoutes.eventDetail, arguments: int.parse(message.data['id']));
+        /*case 'event':
+          Get.toNamed(Routes.eventDetail, arguments: int.parse(message.data['id']));
           break;
         case 'ceremony':
-          Get.toNamed(AppRoutes.ceremonyDetail, arguments: int.parse(message.data['id']));
-          break;
+          Get.toNamed(Routes.ceremonyDetail, arguments: int.parse(message.data['id']));
+          break;*/
         default:
           break;
       }
-    }*/
+    }
   }
 
   OpenedByNotificationResponse appOpenedByNotification() {

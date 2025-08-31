@@ -10,6 +10,7 @@ import 'package:aesd/pages/profil.dart';
 import 'package:aesd/pages/forum/subject.dart';
 import 'package:aesd/pages/social/new/detail.dart';
 import 'package:aesd/pages/social/posts/detail.dart';
+import 'package:aesd/pages/testimony/detail.dart';
 import 'package:aesd/pages/wallet/transactions.dart';
 import 'package:aesd/pages/wallet/wallet.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,6 +30,7 @@ class Routes {
   static String newsDetail = '/newsDetail';
   static String subject = '/subject';
   static String updateUser = '/user/update';
+  static String testimonyDetail = '/testimonyDetail';
 }
 
 final getPage = [
@@ -48,6 +50,7 @@ final getPage = [
   GetPage(name: Routes.newsDetail, page: _buildLoggedPage(NewsPage())),
   GetPage(name: Routes.subject, page: _buildLoggedPage(DiscutionSubjectPage())),
   GetPage(name: Routes.updateUser, page: _buildLoggedPage(UpdateUserPage())),
+  GetPage(name: Routes.testimonyDetail, page: _buildLoggedPage(TestimonyDetail()))
 ];
 
 Widget Function() _buildLoggedPage(Widget page) {

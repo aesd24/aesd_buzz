@@ -5,7 +5,11 @@ String formatDate(DateTime date, {bool withTime = true}) {
   return DateFormat('d MMM yyyy', 'fr_FR').format(date);
 }
 
-String getTimeInString(Duration duration) {
+String getTimeInString(
+  Duration duration, {
+  bool showHours = true,
+  bool showSeconds = true,
+}) {
   int seconds = duration.inSeconds;
   int minutes = 0;
   int hours = 0;
@@ -17,9 +21,17 @@ String getTimeInString(Duration duration) {
     hours++;
     minutes -= 60;
   }
-  return "${hours < 10 ? '0$hours' : hours.toString()}"
-      ":${minutes < 10 ? '0$minutes' : minutes.toString()}"
-      ":${seconds < 10 ? '0$seconds' : seconds.toString()}";
+  final hoursString =
+      showHours ? "${hours < 10 ? '0$hours' : hours.toString()}:" : '';
+  final minutesString = "${minutes < 10 ? '0$minutes' : minutes.toString()}:";
+  final secondsString =
+      showSeconds
+          ? seconds < 10
+              ? '0$seconds'
+              : seconds.toString()
+          : '';
+
+  return hoursString + minutesString + secondsString;
 }
 
 String getPostFormattedDate(DateTime postDate) {

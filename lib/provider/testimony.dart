@@ -8,6 +8,8 @@ class Testimony extends ChangeNotifier {
   final _request = TestimonyRequest();
   final List<TestimonyModel> _testimonies = [];
   List<TestimonyModel> get testimonies => _testimonies;
+  TestimonyModel? _selectedTestimony;
+  TestimonyModel? get selectedTestimony => _selectedTestimony;
 
   Future getAll() async {
     final response = await _request.all();
@@ -21,6 +23,14 @@ class Testimony extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future getAny(int id) async {
+    final response = await _request.one(id);
+    if (response.statusCode != 200) {
+      return HttpException(response.message);
+    }
+    _selectedTestimony = TestimonyModel.fromJson(response.data);
+  }
+
   Future create(Map<String, dynamic> data) async {
     final formData = FormData.fromMap({
       'title': data['title'],
@@ -30,6 +40,7 @@ class Testimony extends ChangeNotifier {
       'mediaType': data['mediaType'],
     });
     final response = await _request.create(formData);
+    print(response);
     if (response.statusCode != 201) {
       throw HttpException(response.data['message']);
     }
