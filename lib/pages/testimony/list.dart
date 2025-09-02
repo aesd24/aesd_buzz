@@ -3,6 +3,7 @@ import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/not_found.dart';
 import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/components/structure.dart';
+import 'package:aesd/pages/testimony/create.dart';
 import 'package:aesd/provider/testimony.dart';
 import 'package:aesd/services/message.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,6 @@ class TestimoniesList extends StatefulWidget {
 
 class _TestimoniesListState extends State<TestimoniesList> {
   bool isLoading = false;
-
   Future getTestimonies() async {
     try {
       setState(() {
@@ -65,7 +65,7 @@ class _TestimoniesListState extends State<TestimoniesList> {
                               itemCount: provider.testimonies.length,
                               itemBuilder: (context, index) {
                                 var current = provider.testimonies[index];
-                                return current.getWidget(context);
+                                return current.buildWidget(context);
                               },
                             ),
                           );
@@ -82,7 +82,13 @@ class _TestimoniesListState extends State<TestimoniesList> {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: FloatingActionButton(
-              onPressed: () => {},
+              onPressed:
+                  () => showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => CreateTestimony(),
+                  ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(100),
               ),

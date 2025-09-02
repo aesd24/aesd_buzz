@@ -44,6 +44,13 @@ class ButtonType {
     iconColor: Colors.white,
     icon: null,
   );
+
+  ButtonType get disabled => ButtonType(
+    foreColor: Colors.white,
+    backColor: notifire.getMaingey,
+    iconColor: Colors.white,
+    icon: null,
+  );
 }
 
 // elevated button
@@ -99,12 +106,14 @@ class CustomTextButton extends StatefulWidget {
     required this.label,
     this.icon,
     this.type,
+    this.disabled = false,
   });
 
   final void Function()? onPressed;
   final String label;
   final Widget? icon;
   final ButtonType? type;
+  final bool disabled;
 
   @override
   State<CustomTextButton> createState() => _CustomTextButtonState();
@@ -114,25 +123,32 @@ class _CustomTextButtonState extends State<CustomTextButton> {
   @override
   Widget build(BuildContext context) {
     ButtonType type = widget.type ?? ButtonType.info;
+    if (widget.disabled) {
+      type = type.disabled;
+    }
     return TextButton.icon(
       icon: widget.icon ?? type.icon,
       iconAlignment: IconAlignment.end,
-      onPressed: widget.onPressed,
+      onPressed: !widget.disabled ? widget.onPressed : null,
       label: Text(widget.label),
       style: ButtonStyle(
         backgroundColor: WidgetStatePropertyAll(type.backColor),
         iconColor: WidgetStatePropertyAll(type.iconColor),
         foregroundColor: WidgetStatePropertyAll(type.foreColor),
         fixedSize: WidgetStatePropertyAll(Size.fromHeight(34)),
-        overlayColor: WidgetStatePropertyAll(Colors.white38),
+        overlayColor: WidgetStatePropertyAll(
+          widget.disabled ? Colors.transparent : Colors.white38,
+        ),
         elevation: WidgetStatePropertyAll(0),
       ),
     );
   }
 }
 
-Widget customActionButton(Widget icon, String text, {
-  void Function()? onPressed
+Widget customActionButton(
+  Widget icon,
+  String text, {
+  void Function()? onPressed,
 }) {
   return InkWell(
     overlayColor: WidgetStatePropertyAll(notifire.getMaingey.withAlpha(70)),
@@ -141,14 +157,8 @@ Widget customActionButton(Widget icon, String text, {
     onTap: onPressed,
     child: Padding(
       padding: const EdgeInsets.all(7),
-      child: Row(
-        children: [
-          icon,
-          SizedBox(width: 5),
-          Text(text),
-        ],
-      )
-    )
+      child: Row(children: [icon, SizedBox(width: 5), Text(text)]),
+    ),
   );
 }
 
