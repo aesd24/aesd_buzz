@@ -3,6 +3,7 @@ import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/not_found.dart';
 import 'package:aesd/components/placeholders.dart';
+import 'package:aesd/functions/formatteurs.dart';
 import 'package:aesd/provider/testimony.dart';
 import 'package:aesd/services/message.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -23,16 +24,24 @@ class TestimonyDetail extends StatefulWidget {
 
 class _TestimonyDetailState extends State<TestimonyDetail> {
   bool _isLoading = true;
+  bool _testimonyReady = false;
 
   Future<void> _getTestimony(int id) async {
     setState(() => _isLoading = true);
     try {
       await Provider.of<Testimony>(context, listen: false).getAny(id).then((_) {
-        final testimony =
-            Provider.of<Testimony>(context, listen: false).selectedTestimony!;
-        initialize(testimony.mediaUrl, isAudio: testimony.mediaType == 'audio');
+        if (mounted) {
+          final testimony =
+              Provider.of<Testimony>(context, listen: false).selectedTestimony!;
+          initialize(
+            testimony.mediaUrl,
+            isAudio: testimony.mediaType == 'audio',
+          );
+        }
       });
+      setState(() => _testimonyReady = true);
     } catch (e) {
+      setState(() => _testimonyReady = false);
       MessageService.showErrorMessage("Impossible de récupérer le témoignage");
     }
     setState(() {
@@ -99,10 +108,8 @@ class _TestimonyDetailState extends State<TestimonyDetail> {
         _isVideoLoading = false;
       });
     } catch (e) {
-      print("Erreur d'initialisation du lecteur vidéo: $e");
-      MessageService.showErrorMessage(
-        "Impossible de charger la vidéo: ${e.toString()}",
-      );
+      e.printError();
+      MessageService.showErrorMessage("Impossible de charger la vidéo");
       setState(() {
         _isVideoLoading = false;
         _isVideoInitialized = false;
@@ -140,9 +147,9 @@ class _TestimonyDetailState extends State<TestimonyDetail> {
   Future<void> _pauseResumeAudio() async {
     try {
       if (_playerState == PlayerState.paused) {
-        await _audioPlayer.pause();
-      } else {
         await _audioPlayer.resume();
+      } else {
+        await _audioPlayer.pause();
       }
     } catch (e) {
       // ... gestion d'erreur si nécessaire ...
@@ -159,7 +166,6 @@ class _TestimonyDetailState extends State<TestimonyDetail> {
   Future<void> _prepareAudioPlayer(String audioUrl) async {
     setState(() => _isAudioLoading = true);
     try {
-      print("audioUrl: $audioUrl");
       await _audioPlayer.setSourceUrl(audioUrl).then((value) async {
         await _audioPlayer.getDuration().then((value) {
           if (value != null) setState(() => _duration = value);
@@ -176,12 +182,9 @@ class _TestimonyDetailState extends State<TestimonyDetail> {
         _audioInitialized = false;
         _isAudioLoading = false;
       });
-      MessageService.showErrorMessage(
-        "Impossible de charger le flux audio",
-      );
+      MessageService.showErrorMessage("Impossible de charger le flux audio");
     } finally {
       setState(() => _isAudioLoading = false);
-      print("terminé: $_isAudioLoading");
     }
   }
 
@@ -212,20 +215,18 @@ class _TestimonyDetailState extends State<TestimonyDetail> {
     final size = MediaQuery.of(context).size;
     return Consumer<Testimony>(
       builder: (context, provider, child) {
-        if (provider.selectedTestimony == null) {
-          return Scaffold(
-            appBar: AppBar(leading: customBackButton()),
-            body: Center(child: notFoundTile(text: "Témoignage introuvable !")),
-          );
-        }
         final testimony = provider.selectedTestimony!;
         final mainColor =
             testimony.mediaType == 'audio' ? Colors.blue : Colors.deepPurple;
-        if (testimony.mediaType == 'audio') {
-          _prepareAudioPlayer(testimony.mediaUrl);
-        }
         return _isLoading
             ? Scaffold(body: SafeArea(child: ListShimmerPlaceholder()))
+            : !_testimonyReady
+            ? Scaffold(
+              appBar: AppBar(leading: customBackButton()),
+              body: Center(
+                child: notFoundTile(text: "Témoignage introuvable !"),
+              ),
+            )
             : Scaffold(
               appBar: AppBar(
                 leading: customBackButton(),
@@ -261,48 +262,85 @@ class _TestimonyDetailState extends State<TestimonyDetail> {
                           : Container(
                             padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              border: Border.all(color: mainColor, width: 1.5),
-                              borderRadius: BorderRadius.circular(15),
-                              color: mainColor.shade50,
-                            ),
-                            child: Row(
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    if (_playerState == PlayerState.stopped){
-                                      _playAudio(testimony.mediaUrl);
-                                    } else {
-                                      _pauseResumeAudio();
-                                    }
-                                  },
-                                  icon: cusFaIcon(
-                                    _playerState == PlayerState.playing
-                                        ? FontAwesomeIcons.pause
-                                        : FontAwesomeIcons.play,
-                                    color: Colors.white,
-                                  ),
-                                  style: ButtonStyle(
-                                    backgroundColor: WidgetStatePropertyAll(
-                                      mainColor,
-                                    ),
-                                    foregroundColor: WidgetStatePropertyAll(
-                                      Colors.white,
-                                    ),
-                                  ),
+                              color: notifire.getContainer,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: mainColor.withAlpha(50),
+                                  offset: Offset(0, 5),
+                                  blurRadius: 5,
+                                  spreadRadius: 2,
                                 ),
-                                Expanded(
-                                  child: Slider(
-                                    min: 0,
-                                    max: _duration.inMilliseconds.toDouble(),
-                                    value: _position.inMilliseconds.toDouble(),
-                                    onChanged: (value) {
-                                      _seekAudio(
-                                        Duration(milliseconds: value.toInt()),
-                                      );
-                                    },
-                                    activeColor: notifire.getMainColor,
-                                    inactiveColor: notifire.getMaingey,
-                                    thumbColor: notifire.getMainColor,
+                              ],
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Column(
+                              children: [
+                                // slider pour le son et bouton pour lancer la musique
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () {
+                                        if (_playerState ==
+                                            PlayerState.stopped) {
+                                          _playAudio(testimony.mediaUrl);
+                                        } else if (_playerState ==
+                                            PlayerState.completed) {
+                                          _seekAudio(Duration.zero);
+                                          _playAudio(testimony.mediaUrl);
+                                        } else {
+                                          _pauseResumeAudio();
+                                        }
+                                      },
+                                      icon: cusFaIcon(
+                                        _playerState == PlayerState.playing
+                                            ? FontAwesomeIcons.pause
+                                            : FontAwesomeIcons.play,
+                                        color: mainColor,
+                                      ),
+                                      style: ButtonStyle(
+                                        backgroundColor: WidgetStatePropertyAll(
+                                          notifire.getContainer,
+                                        ),
+                                        shape: WidgetStatePropertyAll(
+                                          CircleBorder(
+                                            side: BorderSide(
+                                              color: mainColor,
+                                              width: 1.5,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Slider(
+                                        min: 0,
+                                        max:
+                                            _duration.inMilliseconds.toDouble(),
+                                        value:
+                                            _position.inMilliseconds.toDouble(),
+                                        onChanged: (value) {
+                                          _seekAudio(
+                                            Duration(
+                                              milliseconds: value.toInt(),
+                                            ),
+                                          );
+                                        },
+                                        activeColor: mainColor,
+                                        inactiveColor: mainColor.shade50,
+                                        thumbColor: mainColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                // Affichage de la durée du son et de la position
+                                Padding(
+                                  padding: EdgeInsets.only(top: 15, bottom: 7),
+                                  child: Text(
+                                    '${getTimeInString(_position)} / ${getTimeInString(_duration)}',
+                                    style: TextStyle(
+                                      color: notifire.getMaingey,
+                                    ),
                                   ),
                                 ),
                               ],
