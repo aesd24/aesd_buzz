@@ -1,8 +1,13 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
+import 'package:aesd/components/icon.dart';
+import 'package:aesd/components/placeholders.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:photo_view/photo_view.dart';
 
 Future<void> showModal({
   required BuildContext context,
@@ -51,7 +56,7 @@ class _CustomDialogState extends State<CustomDialog> {
             child: Container(
               width: 500,
               decoration: BoxDecoration(
-                color: notifire!.getcontiner,
+                color: notifire.getContainer,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Padding(
@@ -64,7 +69,7 @@ class _CustomDialogState extends State<CustomDialog> {
                       child: Text(
                         widget.title,
                         style: TextStyle(
-                          color: notifire!.getMainText,
+                          color: notifire.getMainText,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -74,7 +79,7 @@ class _CustomDialogState extends State<CustomDialog> {
                       Text(
                         widget.subtitle!,
                         style: TextStyle(
-                          color: notifire!.getMainText,
+                          color: notifire.getMainText,
                           fontSize: 15,
                         ),
                       ),
@@ -96,7 +101,7 @@ class _CustomDialogState extends State<CustomDialog> {
                       widget.content,
                       style: mediumBlackTextStyle.copyWith(
                         height: 1.7,
-                        color: notifire!.getMainText,
+                        color: notifire.getMainText,
                       ),
                     ),
 
@@ -129,4 +134,45 @@ class _CustomDialogState extends State<CustomDialog> {
       ),
     );
   }
+}
+
+Future<void> showImageModal(BuildContext context, {required String imageUrl}) {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.zero,
+        child: Stack(
+          children: [
+            PhotoView(
+              imageProvider: FastCachedImageProvider(imageUrl),
+              loadingBuilder:
+                  (context, event) => Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: imageShimmerPlaceholder(height: 400)
+                    ),
+                  ),
+              backgroundDecoration: BoxDecoration(
+                color: Colors.black.withAlpha(100),
+              ),
+            ),
+            Positioned(
+              top: 20,
+              right: 20,
+              child: GestureDetector(
+                onTap: () => Get.back(),
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: cusFaIcon(FontAwesomeIcons.xmark, color: Colors.white),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }

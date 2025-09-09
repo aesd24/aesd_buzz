@@ -8,7 +8,7 @@ Widget textDivider(String text) {
       children: [
         Text(
           text,
-          style: mediumBlackTextStyle.copyWith(color: notifire!.getMainText),
+          style: mediumBlackTextStyle.copyWith(color: notifire.getMainText),
         ),
         const SizedBox(
           width: 5,
@@ -18,7 +18,7 @@ Widget textDivider(String text) {
           width: 40,
           height: 3,
           decoration: BoxDecoration(
-              color: notifire!.getTextColor1,
+              color: notifire.getTextColor1,
               borderRadius: BorderRadius.circular(10)
           ),
         )

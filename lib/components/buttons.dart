@@ -2,6 +2,7 @@ import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 
 class ButtonType {
   final Widget? icon;
@@ -17,29 +18,36 @@ class ButtonType {
   });
 
   static final ButtonType success = ButtonType(
-    icon: cusFaIcon(FontAwesomeIcons.check),
+    icon: cusFaIcon(FontAwesomeIcons.check, color: Colors.white),
     foreColor: Colors.white,
-    backColor: notifire!.success,
+    backColor: notifire.success,
     iconColor: Colors.white,
   );
 
   static final ButtonType warning = ButtonType(
-    icon: cusFaIcon(FontAwesomeIcons.triangleExclamation),
+    icon: cusFaIcon(FontAwesomeIcons.triangleExclamation, color: Colors.white),
     foreColor: Colors.white,
-    backColor: notifire!.warning,
+    backColor: notifire.warning,
     iconColor: Colors.white,
   );
 
   static final ButtonType error = ButtonType(
-    icon: cusFaIcon(FontAwesomeIcons.circleXmark),
+    icon: cusFaIcon(FontAwesomeIcons.circleXmark, color: Colors.white),
     foreColor: Colors.white,
-    backColor: notifire!.danger,
+    backColor: notifire.danger,
     iconColor: Colors.white,
   );
 
   static final ButtonType info = ButtonType(
     foreColor: Colors.white,
-    backColor: notifire!.info,
+    backColor: notifire.info,
+    iconColor: Colors.white,
+    icon: null,
+  );
+
+  ButtonType get disabled => ButtonType(
+    foreColor: Colors.white,
+    backColor: notifire.getMaingey,
     iconColor: Colors.white,
     icon: null,
   );
@@ -50,12 +58,12 @@ class CustomElevatedButton extends StatefulWidget {
   const CustomElevatedButton({
     super.key,
     required this.text,
-    required this.icon,
+    this.icon,
     this.onPressed,
   });
 
   final String text;
-  final Widget icon;
+  final Widget? icon;
   final void Function()? onPressed;
 
   @override
@@ -92,18 +100,20 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
 
 // text button
 class CustomTextButton extends StatefulWidget {
-  CustomTextButton({
+  const CustomTextButton({
     super.key,
     this.onPressed,
     required this.label,
     this.icon,
     this.type,
+    this.disabled = false,
   });
 
   final void Function()? onPressed;
   final String label;
-  Widget? icon;
-  ButtonType? type;
+  final Widget? icon;
+  final ButtonType? type;
+  final bool disabled;
 
   @override
   State<CustomTextButton> createState() => _CustomTextButtonState();
@@ -112,20 +122,49 @@ class CustomTextButton extends StatefulWidget {
 class _CustomTextButtonState extends State<CustomTextButton> {
   @override
   Widget build(BuildContext context) {
-    widget.type ??= ButtonType.info;
+    ButtonType type = widget.type ?? ButtonType.info;
+    if (widget.disabled) {
+      type = type.disabled;
+    }
     return TextButton.icon(
-      icon: widget.type?.icon ?? widget.icon,
+      icon: widget.icon ?? type.icon,
       iconAlignment: IconAlignment.end,
-      onPressed: widget.onPressed,
+      onPressed: !widget.disabled ? widget.onPressed : null,
       label: Text(widget.label),
       style: ButtonStyle(
-        backgroundColor: WidgetStatePropertyAll(widget.type?.backColor),
-        iconColor: WidgetStatePropertyAll(widget.type?.iconColor),
-        foregroundColor: WidgetStatePropertyAll(widget.type?.foreColor),
+        backgroundColor: WidgetStatePropertyAll(type.backColor),
+        iconColor: WidgetStatePropertyAll(type.iconColor),
+        foregroundColor: WidgetStatePropertyAll(type.foreColor),
         fixedSize: WidgetStatePropertyAll(Size.fromHeight(34)),
-        overlayColor: WidgetStatePropertyAll(Colors.white38),
+        overlayColor: WidgetStatePropertyAll(
+          widget.disabled ? Colors.transparent : Colors.white38,
+        ),
         elevation: WidgetStatePropertyAll(0),
       ),
     );
   }
+}
+
+Widget customActionButton(
+  Widget icon,
+  String text, {
+  void Function()? onPressed,
+}) {
+  return InkWell(
+    overlayColor: WidgetStatePropertyAll(notifire.getMaingey.withAlpha(70)),
+    borderRadius: BorderRadius.circular(100),
+    radius: 20,
+    onTap: onPressed,
+    child: Padding(
+      padding: const EdgeInsets.all(7),
+      child: Row(children: [icon, SizedBox(width: 5), Text(text)]),
+    ),
+  );
+}
+
+Widget customBackButton({Color? color}) {
+  return IconButton(
+    onPressed: () => Get.back(),
+    icon: cusFaIcon(FontAwesomeIcons.arrowLeftLong, color: color),
+  );
 }

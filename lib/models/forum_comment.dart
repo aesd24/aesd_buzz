@@ -43,27 +43,19 @@ class ForumComment {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                radius: 17,
+              Text(
+                ownerName,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    ownerName,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  Text(
-                    formatDate(date),
-                    style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                        color: Colors.black54
-                    ),
-                  )
-                ],
-              ),
+              Text(
+                formatDate(date),
+                style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                    color: Colors.black54
+                ),
+              )
             ],
           ),
           Padding(
