@@ -15,6 +15,7 @@ class CustomFormTextField extends StatefulWidget {
     this.type = TextInputType.text,
     this.maxLines,
     this.suffix,
+    this.onChanged,
     this.controller,
   });
 
@@ -24,6 +25,7 @@ class CustomFormTextField extends StatefulWidget {
   final Widget? suffix;
   final TextInputType type;
   final String? Function(String?)? validator;
+  final void Function(String?)? onChanged;
   final bool validate;
   final int? maxLines;
   final TextEditingController? controller;
@@ -54,6 +56,7 @@ class _CustomFormTextFieldState extends State<CustomFormTextField> {
           prefixIcon: widget.prefix,
           suffixIcon: widget.suffix,
         ),
+        onChanged: widget.onChanged,
         keyboardType: widget.type,
         maxLines: widget.maxLines,
         obscureText: widget.isObscure,

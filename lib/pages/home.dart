@@ -2,6 +2,7 @@ import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/drawer.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/pages/forum/list.dart';
+import 'package:aesd/pages/quiz/list.dart';
 import 'package:aesd/pages/social/social.dart';
 import 'package:aesd/pages/testimony/list.dart';
 import 'package:aesd/provider/auth.dart';
@@ -74,7 +75,7 @@ class _MainPageState extends State<MainPage> {
             [
               SocialPage(),
               ForumMain(),
-              Placeholder(),
+              QuizzesList(),
               TestimoniesList(),
             ][_pageIndex],
       ),
