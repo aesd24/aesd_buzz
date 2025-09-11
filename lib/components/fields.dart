@@ -1,5 +1,6 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
+import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -317,6 +318,73 @@ class _MultilineFieldState extends State<MultilineField> {
       validator: widget.validator,
       validate: widget.validate,
       controller: widget.controller,
+    );
+  }
+}
+
+// DateTime Field
+class CustomDateTimeField extends StatelessWidget {
+  const CustomDateTimeField({
+    super.key,
+    required this.label,
+    this.prefix,
+    this.suffix,
+    this.defaultValue,
+    this.firstDate,
+    this.lastDate,
+    this.validate = false,
+    this.onChanged,
+    this.validator,
+    this.mode = DateTimeFieldPickerMode.dateAndTime,
+  });
+
+  final String label;
+  final Widget? prefix;
+  final Widget? suffix;
+  final DateTime? firstDate;
+  final DateTime? lastDate;
+  final DateTime? defaultValue;
+  final bool validate;
+  final void Function(DateTime?)? onChanged;
+  final String? Function(DateTime?)? validator;
+  final DateTimeFieldPickerMode mode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 5),
+      child: DateTimeFormField(
+        decoration: InputDecoration(
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide(color: notifire.getMaingey),
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(25),
+            borderSide: BorderSide(color: notifire.getMaingey),
+          ),
+          hintText: label,
+          hintStyle: mediumGreyTextStyle,
+          prefixIcon: prefix,
+          suffixIcon: suffix,
+        ),
+        mode: mode,
+        firstDate: firstDate,
+        lastDate: lastDate,
+        initialPickerDateTime: defaultValue ?? DateTime.now(),
+        validator: (value) {
+          if (validate) {
+            if (value == null) {
+              return "Ce champs est obligatoire";
+            }
+            if (validator != null) {
+              return validator!(value);
+            }
+          }
+          return null;
+        },
+        onChanged: onChanged,
+      ),
     );
   }
 }
