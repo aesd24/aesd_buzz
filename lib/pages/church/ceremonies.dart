@@ -1,4 +1,5 @@
-import 'package:aesd/components/field.dart';
+import 'package:aesd/components/fields.dart';
+import 'package:aesd/components/icon.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -17,8 +18,8 @@ class _CeremoniesPageState extends State<CeremoniesPage> {
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 8.0),
-          child: customTextField(
-            prefixIcon: const Icon(Icons.search),
+          child: CustomFormTextField(
+            prefix: cusIcon(Icons.search),
             suffix: PopupMenuButton(
                 icon: const FaIcon(
                   FontAwesomeIcons.sort,

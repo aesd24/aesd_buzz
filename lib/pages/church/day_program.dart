@@ -1,9 +1,8 @@
 import 'dart:io';
-
-import 'package:aesd/components/snack_bar.dart';
 import 'package:aesd/models/day_program.dart';
 import 'package:aesd/models/event.dart';
-import 'package:aesd/providers/event.dart';
+import 'package:aesd/provider/event.dart';
+import 'package:aesd/services/message.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -26,9 +25,9 @@ class _ProgramState extends State<Program> {
         'title': "Programme $index",
         'startTime': "${index + 10}:00:00",
         'endTime': "${index + 11}:00:00",
-        'place': "Lien $index"
+        'place': "Lien $index",
       };
-    })
+    }),
   });
 
   /* var lastEvent = EventModel.fromJson({
@@ -40,26 +39,19 @@ class _ProgramState extends State<Program> {
 
   void init() async {
     try {
-      await Provider.of<Event>(context, listen: false).getEvents(churchId: widget.churchId);
+      await Provider.of<Event>(
+        context,
+        listen: false,
+      ).getEvents(churchId: widget.churchId);
     } on HttpException catch (e) {
-      showSnackBar(
-        context: context,
-        message: e.message,
-        type: SnackBarType.danger
-      );
+      MessageService.showErrorMessage(e.message);
     } on DioException {
-      showSnackBar(
-        context: context,
-        message: "Erreur réseau. Veuillez vérifier votre connexion internet.",
-        type: SnackBarType.danger
+      MessageService.showErrorMessage(
+        "Erreur réseau. Veuillez vérifier votre connexion internet.",
       );
     } catch (e) {
       e.printError();
-      showSnackBar(
-        context: context,
-        message: "Une erreur inattendue s'est produite !",
-        type: SnackBarType.danger
-      );
+      MessageService.showErrorMessage("Une erreur inattendue s'est produite !");
     }
   }
 
@@ -79,10 +71,9 @@ class _ProgramState extends State<Program> {
             children: [
               Text(
                 "Programme du jour",
-                style: Theme.of(context)
-                    .textTheme
-                    .labelLarge!
-                    .copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge!.copyWith(fontWeight: FontWeight.bold),
               ),
               /* TextButton.icon(
                   onPressed: () => null,//NavigationService.push(context, destination: ),
@@ -92,23 +83,24 @@ class _ProgramState extends State<Program> {
             ],
           ),
           Consumer<Event>(
-            builder: (context, eventProvider, child){
+            builder: (context, eventProvider, child) {
               EventModel? lastEvent;
               if (eventProvider.events.isNotEmpty) {
                 lastEvent = eventProvider.events.last;
               }
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
-                child: lastEvent != null ? 
-                  lastEvent.getWidget(context) :
-                  Text("Aucun événement pour le moment..."),
+                child:
+                    lastEvent != null
+                        ? lastEvent.buildWidget(context)
+                        : Text("Aucun événement pour le moment..."),
               );
             },
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 15),
             child: currentProgram.getWidget(context),
-          )
+          ),
         ],
       ),
     );
