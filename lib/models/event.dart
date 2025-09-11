@@ -37,7 +37,7 @@ class EventModel {
     isPublic = json['est_public'] == 1;
   }
 
-  Widget buildWidget(BuildContext context) {
+  Widget buildWidget(BuildContext context, {Future Function(int)? onDelete}) {
     return Padding(
       padding: EdgeInsets.all(7),
       child: Container(
@@ -89,7 +89,7 @@ class EventModel {
                             Text(
                               location,
                               style: Theme.of(context).textTheme.bodyMedium,
-                            )
+                            ),
                           ],
                         ),
                         Row(
@@ -99,7 +99,7 @@ class EventModel {
                             Text(
                               "Du ${formatDate(startDate)} au ${formatDate(endDate)}",
                               style: Theme.of(context).textTheme.bodyMedium,
-                            )
+                            ),
                           ],
                         ),
                       ],
