@@ -2,6 +2,9 @@ import 'dart:io';
 
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/fields.dart';
+import 'package:aesd/components/icon.dart';
+import 'package:aesd/components/loader.dart';
+import 'package:aesd/components/modal.dart';
 import 'package:aesd/functions/camera_functions.dart';
 import 'package:aesd/functions/file_functions.dart';
 import 'package:aesd/models/ceremony.dart';
@@ -18,7 +21,7 @@ class CeremonyForm extends StatefulWidget {
     super.key,
     required this.churchId,
     this.ceremony,
-    this.editMode = false
+    this.editMode = false,
   });
 
   final int churchId;
@@ -30,7 +33,7 @@ class CeremonyForm extends StatefulWidget {
 }
 
 class _CeremonyFormState extends State<CeremonyForm> {
-    final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
   // data
@@ -41,7 +44,7 @@ class _CeremonyFormState extends State<CeremonyForm> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 
-  init() async {
+  Future init() async {
     if (widget.editMode) {
       _titleController.text = widget.ceremony!.title;
       _descriptionController.text = widget.ceremony!.description;
@@ -50,14 +53,14 @@ class _CeremonyFormState extends State<CeremonyForm> {
   }
 
   @override
-  initState(){
+  initState() {
     super.initState();
     init();
   }
 
   // functions
   Future<void> handleSubmit() async {
-    if (! _formKey.currentState!.validate()) {
+    if (!_formKey.currentState!.validate()) {
       MessageService.showWarningMessage(
         "Veuillez renseigner correctement les champs",
       );
@@ -71,8 +74,8 @@ class _CeremonyFormState extends State<CeremonyForm> {
       );
       return;
     }
-    if (! widget.editMode){
-      if ( movie == null){
+    if (!widget.editMode) {
+      if (movie == null) {
         MessageService.showWarningMessage(
           "Veuillez ajouter le film de la cérémonie",
         );
@@ -80,73 +83,67 @@ class _CeremonyFormState extends State<CeremonyForm> {
       }
     }
 
-    messageBox(
-      context,
-      title: "Avertissement",
-      content: Text("Le chargement pourrait prendre du temps à cause de la taille du fichier."),
-      actions: [
-        TextButton(
-          onPressed: () => NavigationService.close(),
-          style: ButtonStyle(
-            foregroundColor: WidgetStatePropertyAll(Colors.grey),
+    showModal(
+      context: context,
+      dialog: CustomAlertDialog(
+        title: "Avertissement",
+        content:
+            "Le chargement pourrait prendre du temps à cause de la taille du fichier.",
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            style: ButtonStyle(
+              foregroundColor: WidgetStatePropertyAll(Colors.grey),
+            ),
+            child: Text("Annuler"),
           ),
-          child: Text("Annuler"),
-        ),
-        TextButton.icon(
-          onPressed: () async {
-            NavigationService.close();
-            !widget.editMode ? await createCeremony() : await updateCeremony();
-          },
-          icon: FaIcon(FontAwesomeIcons.check),
-          iconAlignment: IconAlignment.end,
-          label: Text("Ok"),
-        )
-      ]
+          TextButton.icon(
+            onPressed: () async {
+              Get.back();
+              !widget.editMode
+                  ? await createCeremony()
+                  : await updateCeremony();
+            },
+            icon: FaIcon(FontAwesomeIcons.check),
+            iconAlignment: IconAlignment.end,
+            label: Text("Ok"),
+          ),
+        ],
+      ),
     );
   }
 
-  updateCeremony() async {
+  Future<void> updateCeremony() async {
     // Effectuer la création
     try {
       setState(() {
         _isLoading = true;
       });
-      await Provider.of<Ceremonies>(context, listen: false).update({
-        'title': _titleController.text,
-        'description': _descriptionController.text,
-        'date': date!,
-        'movie': movie?.path,
-        "church_id": widget.churchId
-      }, id: widget.ceremony!.id).then((value) async {
-        await Provider.of<Ceremonies>(context, listen: false).all(
-          churchId: widget.churchId
-        );
-        showSnackBar(
-          context: context,
-          message: value['message'],
-          type: SnackBarType.success
-        );
-      });
-    } on HttpException catch(e) {
-      showSnackBar(
-        context: context,
-        message: e.message,
-        type: SnackBarType.danger
-      );
-    } on DioException catch(e) {
+      await Provider.of<Ceremonies>(context, listen: false)
+          .update({
+            'title': _titleController.text,
+            'description': _descriptionController.text,
+            'date': date!,
+            'movie': movie?.path,
+            "church_id": widget.churchId,
+          }, id: widget.ceremony!.id)
+          .then((value) async {
+            await Provider.of<Ceremonies>(
+              context,
+              listen: false,
+            ).all(churchId: widget.churchId);
+            MessageService.showSuccessMessage(value['message']);
+          });
+    } on HttpException catch (e) {
+      MessageService.showErrorMessage(e.message);
+    } on DioException catch (e) {
       e.printError();
-      showSnackBar(
-        context: context,
-        message: "Erreur réseau. Vérifiez votre connexion internet et rééssayez...",
-        type: SnackBarType.danger
+      MessageService.showErrorMessage(
+        "Erreur réseau. Vérifiez votre connexion internet et rééssayez...",
       );
     } catch (e) {
       e.printError();
-      showSnackBar(
-        context: context,
-        message: "Une erreur inattendue est survenue",
-        type: SnackBarType.danger
-      );
+      MessageService.showErrorMessage("Une erreur inattendue est survenue");
     } finally {
       setState(() {
         _isLoading = false;
@@ -154,48 +151,37 @@ class _CeremonyFormState extends State<CeremonyForm> {
     }
   }
 
-  createCeremony() async {
+  Future<void> createCeremony() async {
     // Effectuer la création
     try {
       setState(() {
         _isLoading = true;
       });
-      await Provider.of<Ceremonies>(context, listen: false).create({
-        'title': _titleController.text,
-        'description': _descriptionController.text,
-        'date': date!,
-        'movie': movie!.path,
-        "church_id": widget.churchId
-      }).then((value) {
-        showSnackBar(
-          context: context,
-          message: "Cérémonie créé avec succès",
-          type: SnackBarType.success
-        );
-        Provider.of<Ceremonies>(context, listen: false).all(
-          churchId: widget.churchId
-        );
-      });
-    } on HttpException catch(e) {
-      showSnackBar(
-        context: context,
-        message: e.message,
-        type: SnackBarType.danger
-      );
-    } on DioException catch(e) {
+      await Provider.of<Ceremonies>(context, listen: false)
+          .create({
+            'title': _titleController.text,
+            'description': _descriptionController.text,
+            'date': date!,
+            'movie': movie!.path,
+            "church_id": widget.churchId,
+          })
+          .then((value) {
+            MessageService.showSuccessMessage("Cérémonie créé avec succès");
+            Provider.of<Ceremonies>(
+              context,
+              listen: false,
+            ).all(churchId: widget.churchId);
+          });
+    } on HttpException catch (e) {
+      MessageService.showErrorMessage(e.message);
+    } on DioException catch (e) {
       e.printError();
-      showSnackBar(
-        context: context,
-        message: "Erreur réseau. Vérifiez votre connexion internet et rééssayez...",
-        type: SnackBarType.danger
+      MessageService.showErrorMessage(
+        "Erreur réseau. Vérifiez votre connexion internet et rééssayez...",
       );
     } catch (e) {
       e.printError();
-      showSnackBar(
-        context: context,
-        message: "Une erreur inattendue est survenue",
-        type: SnackBarType.danger
-      );
+      MessageService.showErrorMessage("Une erreur inattendue est survenue");
     } finally {
       setState(() {
         _isLoading = false;
@@ -208,9 +194,7 @@ class _CeremonyFormState extends State<CeremonyForm> {
     return CustomFileLoader(
       isLoading: _isLoading,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text("Création de cérémonie"),
-        ),
+        appBar: AppBar(title: Text("Création de cérémonie")),
         body: Padding(
           padding: const EdgeInsets.all(15),
           child: Form(
@@ -221,108 +205,103 @@ class _CeremonyFormState extends State<CeremonyForm> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        customTextField(
-                          prefixIcon: Icon(
-                            FontAwesomeIcons.church,
-                            size: 20,
-                            color: Colors.grey
-                          ),
+                        CustomFormTextField(
+                          prefix: cusIcon(FontAwesomeIcons.church),
                           controller: _titleController,
-                          label: "Titre",
-                          placeholder: "Titre de la cérémonie",
+                          label: "Titre de la cérémonie",
+                          validate: true,
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "Ce champs est obligatoire";
                             }
                             return null;
-                          }
+                          },
                         ),
-                        
-                        customDateField(
+
+                        CustomDateTimeField(
                           label: "Date de la cérémonie",
                           lastDate: DateTime.now(),
-                          value: date,
-                          onChanged: (value) => setState(() => date = value)
+                          defaultValue: date,
+                          onChanged: (value) => setState(() => date = value),
                         ),
-                    
-                        customMultilineField(
+
+                        MultilineField(
                           label: "Descrivez la cérémonie...",
                           controller: _descriptionController,
+                          validate: true,
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "Ce champs est obligatoire";
                             }
                             return null;
-                          }
+                          },
                         ),
-                    
+
                         InkWell(
-                            onTap: () async {
-                              File? file = await pickVideo();
-                              if (file != null) {  
-                                setState(() => movie = file);
-                                showSnackBar(
-                                  context: context,
-                                  message: "Vidéo chargé avec succès !",
-                                  type: SnackBarType.success
-                                );
-                              } else {
-                                showSnackBar(
-                                  context: context,
-                                  message: "Echec du chargement de la vidéo",
-                                  type: SnackBarType.danger
-                                );
-                              }
-                            },
-                            child: AnimatedContainer(
-                              duration: Duration(milliseconds: 300),
-                              width: double.infinity,
-                              margin: const EdgeInsets.symmetric(vertical: 5),
-                              padding: const EdgeInsets.all(15),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: movie == null ? Colors.grey : Colors.green
+                          onTap: () async {
+                            File? file = await pickVideo();
+                            if (file != null) {
+                              setState(() => movie = file);
+                            } else {
+                              MessageService.showErrorMessage(
+                                "Echec du chargement de la vidéo",
+                              );
+                            }
+                          },
+                          child: AnimatedContainer(
+                            duration: Duration(milliseconds: 300),
+                            width: double.infinity,
+                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color:
+                                    movie == null ? Colors.grey : Colors.green,
+                              ),
+                              borderRadius: BorderRadius.circular(7),
+                            ),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  movie == null
+                                      ? Icons.movie
+                                      : Icons.check_circle,
+                                  size: 80,
+                                  color:
+                                      movie == null
+                                          ? Colors.grey
+                                          : Colors.green,
                                 ),
-                                borderRadius: BorderRadius.circular(7),
-                              ),
-                              child: Column(
-                                children: [
-                                  Icon(
-                                    movie == null ? Icons.movie : Icons.check_circle,
-                                    size: 80,
-                                    color: movie == null ? Colors.grey : Colors.green
-                                  ),
-                                  SizedBox(height: 10),
-                                  Text(
-                                    movie == null ?
-                                    "Chargez le film de la cérémonie ${widget.editMode ? "(optionnel)" : ""}":
-                                    "Vidéo chargé"
-                                  )
-                                ],
-                              )
+                                SizedBox(height: 10),
+                                Text(
+                                  movie == null
+                                      ? "Chargez le film de la cérémonie ${widget.editMode ? "(optionnel)" : ""}"
+                                      : "Vidéo chargé",
+                                ),
+                              ],
                             ),
                           ),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "Ajoutez une vidéo de moins de 300 Mo",
-                              style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                                color: Colors.grey
-                              ),
-                            ),
+                        ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Ajoutez une vidéo de moins de 300 Mo",
+                            style: Theme.of(context).textTheme.labelMedium!
+                                .copyWith(color: Colors.grey),
                           ),
+                        ),
                       ],
                     ),
                   ),
                 ),
-                customButton(
-                  context: context,
+                CustomElevatedButton(
                   text: "Valider",
-                  onPressed: () async => await handleSubmit()
+                  icon: cusFaIcon(FontAwesomeIcons.paperPlane),
+                  onPressed: () async => await handleSubmit(),
                 ),
-                SizedBox(height: 10)
+                SizedBox(height: 10),
               ],
-            )
+            ),
           ),
         ),
       ),

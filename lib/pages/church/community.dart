@@ -1,8 +1,8 @@
-import 'package:aesd/services/navigation.dart';
+import 'package:aesd/pages/chats/message_on.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 import '../../models/user_model.dart';
-import '../chats/message_on.dart';
 
 class Community extends StatefulWidget {
   const Community({super.key, required this.members, this.subscribed = false, });
@@ -32,7 +32,7 @@ class _CommunityState extends State<Community> {
             children: List.generate(widget.members.length, (index) {
               var current = widget.members[index];
               return Card(
-                  child: current.tile(context)
+                  child: current.buildTile()
               );
             }),
           ),
@@ -57,7 +57,7 @@ class _CommunityState extends State<Community> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: ListTile(
-                    onTap: () => NavigationService.push(MessageOnPage()),
+                    onTap: () => Get.to(MessageOnPage()),
                     leading: CircleAvatar(
                       backgroundColor: Colors.blueGrey.shade100,
                       child: FaIcon(

@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'package:aesd/components/icon.dart';
+import 'package:aesd/functions/launcher.dart';
 import 'package:aesd/models/ceremony.dart';
+import 'package:aesd/services/message.dart';
 import 'package:chewie/chewie.dart';
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/fields.dart';
@@ -7,9 +10,11 @@ import 'package:aesd/components/fields.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 import '../../provider/ceremonies.dart';
 
@@ -37,7 +42,8 @@ class _CeremonyViewerState extends State<CeremonyViewer> {
     try {
       // initialisation du controller de vidéo
       _videoPlayerController = VideoPlayerController.networkUrl(
-          Uri.parse(videoUrl));
+        Uri.parse(videoUrl),
+      );
       _videoPlayerController.initialize();
 
       // initialisation du conteneur de vidéo personnalisé
@@ -45,7 +51,7 @@ class _CeremonyViewerState extends State<CeremonyViewer> {
         videoPlayerController: _videoPlayerController,
         deviceOrientationsOnEnterFullScreen: [
           DeviceOrientation.landscapeLeft,
-          DeviceOrientation.landscapeRight
+          DeviceOrientation.landscapeRight,
         ],
         deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
       );
@@ -55,7 +61,7 @@ class _CeremonyViewerState extends State<CeremonyViewer> {
     setState(() {});
   }
 
-  makeDonation() async {
+  Future<dynamic> makeDonation() async {
     try {
       setState(() {
         isLoading = true;
@@ -63,14 +69,11 @@ class _CeremonyViewerState extends State<CeremonyViewer> {
 
       // vérifier que le formulaire a été validé
       if (!_formKey.currentState!.validate()) {
-        return showSnackBar(
-            context: context,
-            message: "Entrez un montant correct !",
-            type: SnackBarType.danger);
+        return MessageService.showErrorMessage("Entrez un montant correct !");
       }
 
       // initier un paiement cinetpay
-      var response =
+      /*var response =
           await Provider.of<CinetPay>(context, listen: false).makePayment(
         context,
         amount: int.parse(amountController.text),
@@ -86,13 +89,8 @@ class _CeremonyViewerState extends State<CeremonyViewer> {
         var json = jsonDecode(response.body);
         var data = json["data"];
         Uri paymentUrl = Uri.parse(data['payment_url']);
-        NavigationService.push(
-          CustomWebView(
-            url: paymentUrl.toString(),
-            title: "Faire un paiement",
-          )
-        );
-      }
+        uriLauncher(paymentUrl);
+      }*/
     } catch (e) {
       e.printError();
     } finally {
@@ -102,26 +100,22 @@ class _CeremonyViewerState extends State<CeremonyViewer> {
     }
   }
 
-  loadCeremony(int id) async {
+  Future<void> loadCeremony(int id) async {
     try {
-      await Provider.of<Ceremonies>(context, listen: false).ceremonyDetail(
-        id
-      ).then((value) {
-        ceremony = Provider.of<Ceremonies>(context, listen: false).selectedCeremony;
+      await Provider.of<Ceremonies>(
+        context,
+        listen: false,
+      ).ceremonyDetail(id).then((value) {
+        ceremony =
+            Provider.of<Ceremonies>(context, listen: false).selectedCeremony;
         initializeVideo(ceremony!.video);
       });
     } on DioException {
-      showSnackBar(
-          context: context,
-          message: "Erreur réseau. vérifiez votre connexion internet",
-          type: SnackBarType.danger
+      MessageService.showErrorMessage(
+        "Erreur réseau. vérifiez votre connexion internet",
       );
-    } catch(e) {
-      showSnackBar(
-          context: context,
-          message: "Une erreur inattendu s'est produite !",
-          type: SnackBarType.danger
-      );
+    } catch (e) {
+      MessageService.showErrorMessage("Une erreur inattendu s'est produite !");
       e.printError();
     } finally {
       setState(() {
@@ -163,96 +157,97 @@ class _CeremonyViewerState extends State<CeremonyViewer> {
     return LoadingOverlay(
       isLoading: isLoading,
       child: Scaffold(
-          appBar: ceremony == null ? null : AppBar(title: Text(ceremony!.title)),
-          body: ceremony == null ? Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 1.5,
-            ),
-          ) : Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "${ceremony!.date.day}/${ceremony!.date.month}/${ceremony!.date.year}",
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelLarge!
-                          .copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      ceremony!.description,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyMedium!
-                          .copyWith(color: Colors.black45),
-                    ),
-
-                    const SizedBox(height: 15),
-
-                    // la vidéo
-                    if (_chewieController != null)
-                      SizedBox(
-                        height: size.height * .3,
-                        width: size.width,
-                        child: Chewie(controller: _chewieController!),
+        appBar: ceremony == null ? null : AppBar(title: Text(ceremony!.title)),
+        body:
+            ceremony == null
+                ? Center(child: CircularProgressIndicator(strokeWidth: 1.5))
+                : Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${ceremony!.date.day}/${ceremony!.date.month}/${ceremony!.date.year}",
+                        style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        ceremony!.description,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium!.copyWith(color: Colors.black45),
                       ),
 
-                    if (_chewieController == null)
-                      const Center(
-                          child: Text("La vidéo n'est pas disponible !")),
+                      const SizedBox(height: 15),
 
-                    // partie des offrandes
-                    Form(
-                      key: _formKey,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: customTextField(
-                                label: "Montant",
-                                placeholder: "Combien voulez vous offrir ?",
+                      // la vidéo
+                      if (_chewieController != null)
+                        SizedBox(
+                          height: size.height * .3,
+                          width: size.width,
+                          child: Chewie(controller: _chewieController!),
+                        ),
+
+                      if (_chewieController == null)
+                        const Center(
+                          child: Text("La vidéo n'est pas disponible !"),
+                        ),
+
+                      // partie des offrandes
+                      Form(
+                        key: _formKey,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: CustomFormTextField(
+                                label: "Combien voulez vous offrir",
                                 type: TextInputType.number,
                                 controller: amountController,
                                 onChanged: (value) {
                                   if (int.tryParse(value) == null) {
-                                    return showSnackBar(
-                                        context: context,
-                                        message:
-                                            "Renseignez une valeur entière",
-                                        type: SnackBarType.warning);
+                                    return MessageService.showWarningMessage(
+                                      "Renseignez une valeur entière",
+                                    );
                                   }
                                 },
+                                validate: true,
                                 validator: (value) {
-                                  if (int.tryParse(value) == null) {
+                                  if (int.tryParse(value!) == null) {
                                     return "Entrez une valeur entière uniquement !";
                                   }
                                   if (int.parse(value) % 5 != 0) {
                                     return "Le montant doit être multiple de 5 !";
                                   }
                                   return null;
-                                }),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Text(
-                              "Fr",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(fontWeight: FontWeight.bold),
+                                },
+                              ),
                             ),
-                          )
-                        ],
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                              ),
+                              child: Text(
+                                "Fr",
+                                style: Theme.of(context).textTheme.titleMedium!
+                                    .copyWith(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
 
-                    customButton(
-                        context: context,
-                        text: "Faire une offrande",
+                      CustomElevatedButton(
+                        text: "Faire mon offrande",
+                        icon: cusFaIcon(FontAwesomeIcons.moneyBillWave),
                         onPressed: () async {
                           await makeDonation();
-                        })
-                  ]))),
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+      ),
     );
   }
 }
