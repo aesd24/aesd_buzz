@@ -2,6 +2,7 @@ import 'package:aesd/appstaticdata/dictionnary.dart';
 import 'package:aesd/appstaticdata/routes.dart';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
+import 'package:aesd/pages/dashboard/dashboard.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -129,10 +130,11 @@ class AppMenuDrawer extends StatelessWidget {
                                   Dictionnary.servant.code)
                                 ListTile(
                                   leading: cusFaIcon(
-                                    FontAwesomeIcons.gaugeHigh,
+                                    FontAwesomeIcons.screwdriverWrench,
                                   ),
+                                  onTap: () => Get.to(Dashboard(user: user)),
                                   title: Text(
-                                    "Dashboard",
+                                    "Administration",
                                     style: mediumBlackTextStyle,
                                   ),
                                 ),

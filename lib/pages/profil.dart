@@ -145,7 +145,10 @@ class _UserProfilState extends State<UserProfil> {
                                             : null,
                                   ),
                                 ),
-                                if (!isSelf && !subscribed)
+                                if (!isSelf &&
+                                    !subscribed &&
+                                    user.accountType.code ==
+                                        Dictionnary.servant.code)
                                   Positioned(
                                     top: -13,
                                     right: -13,

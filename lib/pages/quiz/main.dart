@@ -85,10 +85,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
               //     style: Theme.of(context).textTheme.bodyLarge,
               //   ),
               // ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 25),
-                child: Divider(),
-              ),
+              SizedBox(height: 20),
               parametersTile(
                 context,
                 label: "Nombre de questions",
@@ -108,7 +105,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
                 padding: EdgeInsets.only(bottom: 20),
                 child: Text(
                   "Une fois ouvert, vous devrez terminer"
-                  " le quiz avant de fermer la fenêtre.",
+                  " le quiz avant de quitter la page.",
                   style: Theme.of(context).textTheme.bodySmall!.copyWith(
                     color: Colors.red,
                     fontStyle: FontStyle.italic

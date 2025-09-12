@@ -1,4 +1,7 @@
+import 'package:aesd/components/buttons.dart';
+import 'package:aesd/components/divider.dart';
 import 'package:aesd/components/drawer.dart';
+import 'package:aesd/components/not_found.dart';
 import 'package:aesd/models/church_model.dart';
 import 'package:aesd/models/user_model.dart';
 import 'package:aesd/pages/social/church/creation/main.dart';
@@ -29,12 +32,13 @@ class _DashboardState extends State<Dashboard> {
   List<ChurchModel> userChurches = [];
 
   Future<void> init() async {
-    try{
+    try {
       setState(() {
         _isLoading = true;
       });
-      await Provider.of<Church>(context, listen: false).getUserChurches()
-      .then((value) {
+      await Provider.of<Church>(context, listen: false).getUserChurches().then((
+        value,
+      ) {
         userChurches = Provider.of<Church>(context, listen: false).userChurches;
         setState(() {});
       });
@@ -60,10 +64,7 @@ class _DashboardState extends State<Dashboard> {
       isLoading: _isLoading,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.onPrimary,
-          shadowColor: Colors.grey.shade300,
-          toolbarHeight: size.height * .1,
-          elevation: 2,
+          leading: customBackButton(),
           actions: [
             Padding(
               padding: EdgeInsets.only(right: 15),
@@ -72,65 +73,56 @@ class _DashboardState extends State<Dashboard> {
                   Text(
                     widget.user.name,
                     style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
-                      fontWeight: FontWeight.w600
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withAlpha(150),
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   SizedBox(width: 10),
                   CircleAvatar(
-                    backgroundImage: widget.user.photo != null ?
-                      NetworkImage(widget.user.photo!) : null,
+                    backgroundImage:
+                        widget.user.photo != null
+                            ? NetworkImage(widget.user.photo!)
+                            : null,
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
-        drawer: AppMenuDrawer(),
         body: Padding(
           padding: const EdgeInsets.all(10),
-          child: SingleChildScrollView(
+          child: Center(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 30, horizontal: 10),
-                  margin: EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Statistiques d'abonnements
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          customStat(context, value: 0, label: "Abonné(s)"),
-                          customStat(context, value: 0, label: "Abonnement(s)")
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                //if (widget.user.church != null)
-                SizedBox(height: 10),
-                Text(
-                  "Eglises",
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    fontWeight: FontWeight.bold
-                  ),
-                ),
+                textDivider("Liste de vos églises"),
                 Consumer<Church>(
                   builder: (context, churchProvider, child) {
-                    return Column(
-                    children: List.generate(
-                      churchProvider.userChurches.length, 
-                      (index) => churchCard(
-                        church: churchProvider.userChurches[index]
-                      )
-                    ),
-                  );
-                  }
+                    if (churchProvider.churches.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 30),
+                        child: notFoundTile(
+                          text: "Vous n'avez aucune église",
+                          icon: Icons.church_outlined,
+                        ),
+                      );
+                    }
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: List.generate(
+                          churchProvider.churches.length,
+                          (index) {
+                            return churchCard(
+                              church: churchProvider.userChurches[index],
+                            );
+                          },
+                        ),
+                      ),
+                    );
+                  },
                 ),
-                SizedBox(height: 30)
               ],
             ),
           ),
@@ -139,9 +131,7 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget churchCard({
-    required ChurchModel church,
-  }) {
+  Widget churchCard({required ChurchModel church}) {
     return Container(
       padding: EdgeInsets.all(5),
       margin: EdgeInsets.all(10),
@@ -152,9 +142,9 @@ class _DashboardState extends State<Dashboard> {
           BoxShadow(
             color: Theme.of(context).colorScheme.primary.withAlpha(100),
             blurRadius: 2,
-            offset: Offset(0.5, 0.5)
-          )
-        ]
+            offset: Offset(0.5, 0.5),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,24 +155,28 @@ class _DashboardState extends State<Dashboard> {
               icon: FaIcon(
                 FontAwesomeIcons.ellipsisVertical,
                 size: 16,
-                color: Colors.black
+                color: Colors.black,
               ),
               onSelected: (value) {
-                if (value == "profil"){
+                if (value == "profil") {
                   Get.to(ChurchDetailPage(churchId: church.id));
-                } else if (value == "edit"){
+                } else if (value == "edit") {
                   Get.to(
-                    MainChurchCreationPage(
-                      editMode: true,
-                      churchId: church.id
-                    )
+                    MainChurchCreationPage(editMode: true, churchId: church.id),
                   );
                 }
               },
-              itemBuilder: (context) => [
-                PopupMenuItem(value: "profil", child: Text("Consulter le profil")),
-                PopupMenuItem(value: "edit", child: Text("Modifier l' église"))
-              ]
+              itemBuilder:
+                  (context) => [
+                    PopupMenuItem(
+                      value: "profil",
+                      child: Text("Consulter le profil"),
+                    ),
+                    PopupMenuItem(
+                      value: "edit",
+                      child: Text("Modifier l' église"),
+                    ),
+                  ],
             ),
           ),
 
@@ -192,21 +186,26 @@ class _DashboardState extends State<Dashboard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if(church.logo != null) Container(
-                  height: 80,
-                  width: 80,
-                  margin: EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: NetworkImage(church.logo!),
-                      fit: BoxFit.cover
+                if (church.logo != null)
+                  Container(
+                    height: 80,
+                    width: 80,
+                    margin: EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: NetworkImage(church.logo!),
+                        fit: BoxFit.cover,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.shade200,
+                          blurRadius: 5,
+                          spreadRadius: 2,
+                        ),
+                      ],
                     ),
-                    boxShadow: [
-                      BoxShadow(color: Colors.grey.shade200, blurRadius: 5, spreadRadius: 2)
-                    ]
                   ),
-                ),
                 SizedBox(height: 5),
                 Text(church.name),
 
@@ -222,38 +221,40 @@ class _DashboardState extends State<Dashboard> {
                         label: "Porte-feuille",
                         icon: FontAwesomeIcons.wallet,
                         color: Colors.green,
-                        destination: Wallet()
+                        destination: Wallet(),
                       ),
                       customIconButton(
                         destination: ProgramListPage(),
                         color: Colors.purple,
                         icon: FontAwesomeIcons.calendarWeek,
-                        label: "Programme"
+                        label: "Programme",
                       ),
                       customIconButton(
                         destination: ChurchEvents(churchId: church.id),
                         color: Colors.amber,
                         icon: FontAwesomeIcons.solidCalendarDays,
-                        label: "Evènements"
+                        label: "Evènements",
                       ),
                       customIconButton(
                         destination: CeremoniesManagement(churchId: church.id),
                         color: Colors.orange,
                         icon: FontAwesomeIcons.film,
-                        label: "Cérémonies"
+                        label: "Cérémonies",
                       ),
                       customIconButton(
-                        destination: DashboardCommunityPage(churchId: church.id),
+                        destination: DashboardCommunityPage(
+                          churchId: church.id,
+                        ),
                         color: Colors.blue,
                         icon: FontAwesomeIcons.peopleGroup,
-                        label: "Communauté"
+                        label: "Communauté",
                       ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -263,42 +264,39 @@ class _DashboardState extends State<Dashboard> {
     required String label,
     required IconData icon,
     Color color = Colors.blue,
-    Widget? destination
+    Widget? destination,
   }) {
     return TextButton.icon(
-      onPressed: destination != null ?
-      () => Get.to(destination) : null,
+      onPressed: destination != null ? () => Get.to(destination) : null,
       icon: FaIcon(icon, size: 18),
       label: Text(label),
       style: ButtonStyle(
-        backgroundColor: WidgetStatePropertyAll(
-          color.withAlpha(80)
-        ),
+        backgroundColor: WidgetStatePropertyAll(color.withAlpha(80)),
         iconColor: WidgetStatePropertyAll(color),
         foregroundColor: WidgetStatePropertyAll(color),
-        overlayColor: WidgetStatePropertyAll(
-          color.withAlpha(100)
-        ),
+        overlayColor: WidgetStatePropertyAll(color.withAlpha(100)),
       ),
     );
   }
 
-  Column customStat(BuildContext context,
-      {required int value, required String label}) {
+  Column customStat(
+    BuildContext context, {
+    required int value,
+    required String label,
+  }) {
     return Column(
       children: [
         Text(
           value.toString(),
           style: Theme.of(context).textTheme.displayMedium!.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.bold),
+            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         Text(
           label,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.primary
-          ),
-        )
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
+        ),
       ],
     );
   }
