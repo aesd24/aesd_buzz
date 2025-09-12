@@ -11,6 +11,7 @@ import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/image_container.dart';
 import 'package:aesd/components/modal.dart';
 import 'package:aesd/functions/camera_functions.dart';
+import 'package:aesd/functions/launcher.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:aesd/schemas/user.dart';
 import 'package:aesd/services/message.dart';
@@ -122,7 +123,7 @@ class _RegisterPageState extends State<RegisterPage> {
           if (accountType == Dictionnary.servant.code) {
             showModal(
               context: context,
-              dialog: CustomDialog(
+              dialog: CustomAlertDialog(
                 title: "Verification !",
                 content:
                 "Votre compte sera soumis à une vérification avant "
@@ -346,7 +347,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           Uri url = Uri.parse(
                             "https://eglisesetserviteursdedieu.com/privacy-policy",
                           );
-                          launchUrl(url, mode: LaunchMode.inAppBrowserView);
+                          uriLauncher(url);
                         },
                 ),
               ],

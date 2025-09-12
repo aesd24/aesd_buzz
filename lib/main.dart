@@ -1,4 +1,5 @@
 import 'package:aesd/provider/auth.dart';
+import 'package:aesd/provider/ceremonies.dart';
 import 'package:aesd/provider/church.dart';
 import 'package:aesd/provider/event.dart';
 import 'package:aesd/provider/forum.dart';
@@ -113,7 +114,8 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => News()),
         ChangeNotifierProvider(create: (context) => Servant()),
         ChangeNotifierProvider(create: (context) => Singer()),
-        ChangeNotifierProvider(create: (context) => Testimony())
+        ChangeNotifierProvider(create: (context) => Testimony()),
+        ChangeNotifierProvider(create: (context) => Ceremonies())
       ],
       child: GetMaterialApp(
         locale: const Locale('fr', 'FR'),

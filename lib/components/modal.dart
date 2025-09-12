@@ -11,7 +11,7 @@ import 'package:photo_view/photo_view.dart';
 
 Future<void> showModal({
   required BuildContext context,
-  required CustomDialog dialog,
+  required CustomAlertDialog dialog,
 }) {
   return showDialog(
     context: context,
@@ -22,8 +22,8 @@ Future<void> showModal({
   );
 }
 
-class CustomDialog extends StatefulWidget {
-  const CustomDialog({
+class CustomAlertDialog extends StatefulWidget {
+  const CustomAlertDialog({
     super.key,
     required this.title,
     this.subtitle,
@@ -41,10 +41,10 @@ class CustomDialog extends StatefulWidget {
   final void Function()? onOk;
 
   @override
-  State<CustomDialog> createState() => _CustomDialogState();
+  State<CustomAlertDialog> createState() => _CustomAlertDialogState();
 }
 
-class _CustomDialogState extends State<CustomDialog> {
+class _CustomAlertDialogState extends State<CustomAlertDialog> {
   @override
   Widget build(BuildContext context) {
     return Align(

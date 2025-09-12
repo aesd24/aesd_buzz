@@ -4,8 +4,7 @@ import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/components/tiles.dart';
 import 'package:aesd/models/day_program.dart';
 import 'package:aesd/models/servant_model.dart';
-import 'package:fast_cached_network_image/fast_cached_network_image.dart'
-    show FastCachedImage, FastCachedImageProvider;
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -53,24 +52,11 @@ class ChurchModel {
             : null;
   }
 
-  toJson() => {
-    'id': id,
-    'name': name,
-    'image': image,
-    'email': email,
-    'logo_url': logo,
-    'cover_url': cover,
-    'adresse': address,
-    'description': description,
-    'phone': phone,
-    'servant': mainServant,
-  };
-
-  Widget buildWidget(BuildContext context) {
+  Widget buildWidget(
+      BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return GestureDetector(
-      onTap:
-          () => {}, //Get.toNamed(Routes.postDetail, arguments: {'postId': id}),
+      onTap: () => {},
       child: Container(
         margin: EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -78,52 +64,33 @@ class ChurchModel {
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withAlpha(30),
+              color: notifire.getMainColor.withAlpha(30),
               spreadRadius: 2,
               blurRadius: 3,
-              offset: Offset(2, 3),
+              offset: Offset(0, 2),
             ),
           ],
         ),
         child: Column(
           children: [
-
             // image box
-            SizedBox(
-              height: 200,
-              child: GestureDetector(
-                onTap: () => Get.to(ImageViewer(imageUrl: image)),
-                child: Stack(
-                  children: [
-                    Hero(
-                      tag: image,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(10),
-                        ),
-                        child: FastCachedImage(
-                          fit: BoxFit.cover,
-                          url: image,
-                          loadingBuilder: (context, progress) {
-                            return imageShimmerPlaceholder(height: 200);
-                          },
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 5,
-                      left: 5,
-                      child: CircleAvatar(
-                        backgroundColor: notifire.getContainer,
-                        radius: 33,
-                        child: CircleAvatar(
-                          radius: 30,
-                          backgroundColor: notifire.getMaingey,
-                          backgroundImage: FastCachedImageProvider(logo!),
-                        ),
-                      ),
-                    ),
-                  ],
+            GestureDetector(
+              onTap: () => Get.to(ImageViewer(imageUrl: image)),
+              child: Hero(
+                tag: image,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(10),
+                  ),
+                  child: FastCachedImage(
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    url: image,
+                    loadingBuilder: (context, progress) {
+                      return imageShimmerPlaceholder(height: 200);
+                    },
+                  ),
                 ),
               ),
             ),
@@ -133,29 +100,31 @@ class ChurchModel {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Nom de l'église
+                  // Contenu du post
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),
                     child: Text(
                       name,
                       style: textTheme.titleMedium!.copyWith(
-                        color: notifire.getmaintext,
+                        color: notifire.getMainText,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
 
-                  // Adresse de l'église
-                  infoTile(
-                    context,
-                    text: address,
-                    icon: FontAwesomeIcons.locationDot,
-                  ),
-
-                  // Numéro de téléphone
-                  infoTile(
-                    context,
-                    text: phone,
-                    icon: FontAwesomeIcons.phone,
+                  //mainServant.buildTile(),
+                  Wrap(
+                    spacing: 5,
+                    runSpacing: 5,
+                    children: [
+                      textIconTile(
+                        context,
+                        FontAwesomeIcons.phone,
+                        "(+225) $phone",
+                      ),
+                      textIconTile(context, FontAwesomeIcons.at, email),
+                      textIconTile(context, FontAwesomeIcons.locationDot, address),
+                    ],
                   ),
                 ],
               ),
