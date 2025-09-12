@@ -205,10 +205,12 @@ class _CeremonyViewerState extends State<CeremonyViewer> {
                                 type: TextInputType.number,
                                 controller: amountController,
                                 onChanged: (value) {
-                                  if (int.tryParse(value) == null) {
-                                    return MessageService.showWarningMessage(
-                                      "Renseignez une valeur entière",
-                                    );
+                                  if (value != null) {
+                                    if (int.tryParse(value) == null) {
+                                      return MessageService.showWarningMessage(
+                                        "Renseignez une valeur entière",
+                                      );
+                                    }
                                   }
                                 },
                                 validate: true,

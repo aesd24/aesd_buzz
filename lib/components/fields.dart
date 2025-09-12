@@ -18,7 +18,6 @@ class CustomFormTextField extends StatefulWidget {
     this.suffix,
     this.onChanged,
     this.controller,
-    this.onChanged,
   });
 
   final String label;
@@ -31,7 +30,6 @@ class CustomFormTextField extends StatefulWidget {
   final bool validate;
   final int? maxLines;
   final TextEditingController? controller;
-  final void Function(dynamic value)? onChanged;
 
   @override
   State<CustomFormTextField> createState() => _CustomFormTextFieldState();
