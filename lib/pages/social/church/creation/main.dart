@@ -237,6 +237,7 @@ class _MainChurchCreationPageState extends State<MainChurchCreationPage> {
       color: Colors.black.withAlpha(70),
       child: Scaffold(
         appBar: AppBar(
+          leading: customBackButton(),
           title: Text(update ? 'Modifier mon église' : 'Créer une église'),
         ),
         body: Padding(
@@ -384,7 +385,7 @@ class _MainChurchCreationPageState extends State<MainChurchCreationPage> {
                         CustomFormTextField(
                           label: "Adresse email",
                           type: TextInputType.emailAddress,
-                          prefix: cusIcon(Icons.email_outlined),
+                          prefix: cusIcon(FontAwesomeIcons.at),
                           validator: (value) {
                             if (!RegExp(
                               "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]{2,}?\\.[a-zA-Z]{2,}\$",

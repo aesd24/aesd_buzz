@@ -5,14 +5,15 @@ import 'package:aesd/models/user_model.dart';
 import 'package:aesd/provider/church.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:aesd/pages/ceremonies/short_list.dart';
-import 'package:aesd/pages/church/day_program.dart';
 import 'package:aesd/services/message.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:provider/provider.dart';
+
 import 'community.dart';
+import 'day_program.dart';
 
 class ChurchDetailPage extends StatefulWidget {
   const ChurchDetailPage({super.key, required this.churchId});

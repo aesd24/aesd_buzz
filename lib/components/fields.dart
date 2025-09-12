@@ -124,19 +124,13 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25),
             borderSide: BorderSide(
-              color:
-                  notifire.isDark
-                      ? notifire.geticoncolor
-                      : Colors.grey.shade200,
+              color: notifire.getMaingey,
             ),
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(25),
             borderSide: BorderSide(
-              color:
-                  notifire.isDark
-                      ? notifire.geticoncolor
-                      : Colors.grey.shade200,
+              color: notifire.getMaingey,
             ),
           ),
           hintText: widget.label,
@@ -154,7 +148,10 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
           }
           return null;
         },
-        items: widget.items,
+        items: [
+          DropdownMenuItem(value: '', child: Text(widget.label)),
+          ...widget.items
+        ],
         onChanged: (value) {
           if (widget.onChanged != null) {
             widget.onChanged!(value);

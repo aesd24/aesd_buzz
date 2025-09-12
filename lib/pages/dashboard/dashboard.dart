@@ -1,10 +1,10 @@
 import 'package:aesd/components/drawer.dart';
 import 'package:aesd/models/church_model.dart';
 import 'package:aesd/models/user_model.dart';
+import 'package:aesd/pages/social/church/creation/main.dart';
+import 'package:aesd/pages/social/church/detail.dart';
 import 'package:aesd/pages/wallet/wallet.dart';
 import 'package:aesd/provider/church.dart';
-import 'package:aesd/pages/church/creation/main.dart';
-import 'package:aesd/pages/church/detail.dart';
 import 'package:aesd/pages/dashboard/ceremony.dart';
 import 'package:aesd/pages/dashboard/community.dart';
 import 'package:aesd/pages/dashboard/events.dart';

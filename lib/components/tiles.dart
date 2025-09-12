@@ -103,3 +103,18 @@ Widget infoTile(BuildContext context,{required String text, required IconData ic
     ),
   );
 }
+
+Row textIconTile(BuildContext context, IconData icon, String text) {
+  return Row(
+    children: [
+      cusFaIcon(icon, size: 14),
+      SizedBox(width: 5),
+      Text(
+        text,
+        style: Theme.of(
+          context,
+        ).textTheme.bodyMedium!.copyWith(color: notifire.getMainText),
+      ),
+    ],
+  );
+}
