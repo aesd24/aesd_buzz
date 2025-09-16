@@ -1,5 +1,7 @@
 import 'package:aesd/functions/formatteurs.dart';
+import 'package:aesd/pages/quiz/main.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class QuizModel {
   late int id;
@@ -20,13 +22,13 @@ class QuizModel {
     questionCount = json['questions_count'] ?? json['questions'].length;
   }
   
-  toTile(context) => GestureDetector(
-    onTap: () {}, //=> NavigationService.push(QuizMainPage(quiz: this)),
+  GestureDetector toTile() => GestureDetector(
+    onTap: () => Get.to(QuizMainPage(quiz: this)), //=> Get.to(QuizMainPage(quiz: this)),
     child: Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
         border: Border.all(width: 1, color: Colors.grey),
-        borderRadius: BorderRadius.circular(3),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: ListTile(
         title: Text(
@@ -40,7 +42,7 @@ class QuizModel {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text("$questionCount Questions"),
-            Text(formatDate(createdAt))
+            Text(formatDate(createdAt, withTime: false))
           ],
         ),
       ),

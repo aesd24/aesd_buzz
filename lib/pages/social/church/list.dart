@@ -59,71 +59,72 @@ class _ChurchListState extends State<ChurchList> {
   Widget build(BuildContext context) {
     return isLoading
         ? ListShimmerPlaceholder()
-        : Consumer<Church>(
-          builder: (context, provider, child) {
-            if (provider.churches.isEmpty) {
-              return Center(
-                child: SingleChildScrollView(
-                  child: RefreshIndicator(
-                    onRefresh: () async => loadChurches(),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [notFoundTile(text: "Aucune eglise trouvée")],
-                    ),
-                  ),
-                ),
-              );
-            }
-
-            final churches = provider.churches;
-
-            return Consumer<Auth>(
+        : Stack(
+          children: [
+            Consumer<Church>(
               builder: (context, provider, child) {
-                final user = provider.user;
-                return Stack(
-                  children: [
-                    SingleChildScrollView(
-                      child: Column(
-                        children: List.generate(5, (index) {
-                          return RefreshIndicator(
-                            onRefresh: () async => loadChurches(),
-                            child: ListView.builder(
-                              itemCount: churches.length,
-                              itemBuilder: (context, index) {
-                                return churches[index].buildWidget(context);
-                              },
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-
-                    // bouton flottant pour ajout d'église
-                    if (user != null &&
-                        user.accountType.code == Dictionnary.servant.code)
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: FloatingActionButton(
-                            backgroundColor: notifire.getMainColor,
-                            onPressed: () => Get.to(MainChurchCreationPage()),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100),
-                            ),
-                            elevation: 3,
-                            child: cusFaIcon(
-                              FontAwesomeIcons.plus,
-                              color: Colors.white,
-                            ),
-                          ),
+                if (provider.churches.isEmpty) {
+                  return Center(
+                    child: SingleChildScrollView(
+                      child: RefreshIndicator(
+                        onRefresh: () async => loadChurches(),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [notFoundTile(text: "Aucune eglise trouvée")],
                         ),
                       ),
-                  ],
+                    ),
+                  );
+                }
+
+                final churches = provider.churches;
+
+                return SingleChildScrollView(
+                  child: Column(
+                    children: List.generate(5, (index) {
+                      return RefreshIndicator(
+                        onRefresh: () async => loadChurches(),
+                        child: ListView.builder(
+                          itemCount: churches.length,
+                          itemBuilder: (context, index) {
+                            return churches[index].buildWidget(context);
+                          },
+                        ),
+                      );
+                    }),
+                  ),
                 );
               },
-            );
-          },
+            ),
+            Consumer<Auth>(
+              builder: (context, provider, child) {
+                final user = provider.user;
+                // bouton flottant pour ajout d'église
+                if (user != null &&
+                    user.accountType.code == Dictionnary.servant.code) {
+                  return Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FloatingActionButton(
+                        backgroundColor: notifire.getMainColor,
+                        onPressed: () => Get.to(MainChurchCreationPage()),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        elevation: 3,
+                        child: cusFaIcon(
+                          FontAwesomeIcons.plus,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return SizedBox();
+              }
+            )
+          ],
         );
   }
 }

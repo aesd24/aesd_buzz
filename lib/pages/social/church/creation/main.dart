@@ -9,6 +9,7 @@ import 'package:aesd/models/church_model.dart';
 import 'package:aesd/provider/church.dart';
 import 'package:aesd/services/message.dart';
 import 'package:dio/dio.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -287,7 +288,7 @@ class _MainChurchCreationPageState extends State<MainChurchCreationPage> {
                                               radius: 70,
                                               backgroundImage:
                                                   church?.logo != null
-                                                      ? NetworkImage(
+                                                      ? FastCachedImageProvider(
                                                         church!.logo!,
                                                       )
                                                       : null,
@@ -473,7 +474,7 @@ class _MainChurchCreationPageState extends State<MainChurchCreationPage> {
               ),
               // bouton de validation
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
+                padding: EdgeInsets.only(bottom: 20),
                 child: CustomElevatedButton(
                   text: "Soumettre",
                   onPressed:

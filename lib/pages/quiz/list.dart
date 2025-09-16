@@ -95,7 +95,7 @@ class _QuizzesListState extends State<QuizzesList> {
                                 itemCount: quizProvider.allQuizzes.length,
                                 itemBuilder: (context, index) {
                                   final quiz = quizProvider.allQuizzes[index];
-                                  return quiz.toTile(context);
+                                  return quiz.toTile();
                                 },
                               )
                               : Center(
