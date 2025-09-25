@@ -79,19 +79,13 @@ class _ChurchListState extends State<ChurchList> {
 
                 final churches = provider.churches;
 
-                return SingleChildScrollView(
-                  child: Column(
-                    children: List.generate(5, (index) {
-                      return RefreshIndicator(
-                        onRefresh: () async => loadChurches(),
-                        child: ListView.builder(
-                          itemCount: churches.length,
-                          itemBuilder: (context, index) {
-                            return churches[index].buildWidget(context);
-                          },
-                        ),
-                      );
-                    }),
+                return RefreshIndicator(
+                  onRefresh: () async => loadChurches(),
+                  child: ListView.builder(
+                    itemCount: churches.length,
+                    itemBuilder: (context, index) {
+                      return churches[index].buildWidget(context);
+                    },
                   ),
                 );
               },

@@ -4,6 +4,7 @@ import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/components/tiles.dart';
 import 'package:aesd/models/day_program.dart';
 import 'package:aesd/models/servant_model.dart';
+import 'package:aesd/pages/social/church/detail.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -56,7 +57,7 @@ class ChurchModel {
       BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return GestureDetector(
-      onTap: () => {},
+      onTap: () => Get.to(ChurchDetailPage(churchId: id)),
       child: Container(
         margin: EdgeInsets.all(10),
         decoration: BoxDecoration(

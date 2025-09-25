@@ -247,8 +247,8 @@ class _PostDetailState extends State<PostDetail> {
                                 ),
                               ),
                               Divider(
-                                color: notifire.getMainText.withAlpha(170),
-                                thickness: 2,
+                                color: notifire.getMaingey,
+                                thickness: 1,
                               ),
                               Column(
                                 children: List.generate(

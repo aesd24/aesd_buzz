@@ -32,12 +32,15 @@ class Church extends ChangeNotifier {
   Future fetchChurches() async {
     final response = await _request.all(page: _currentPage);
     if (response.statusCode == 200) {
-      final data = response.data;
-      _paginator = ChurchPaginator.fromJson(data);
+      final churches =
+          (response.data['data'] as List)
+              .map((e) => ChurchModel.fromJson(e))
+              .toList();
+      //_paginator = ChurchPaginator.fromJson(data);
       if (_churches.isNotEmpty && _currentPage == 0) {
         _churches.clear();
       }
-      _churches.addAll(_paginator.churches);
+      _churches.addAll(churches);
 
       notifyListeners();
     }
@@ -67,7 +70,9 @@ class Church extends ChangeNotifier {
     if (response.statusCode == 200) {
       return true;
     } else {
-      throw const HttpException("La modification de l'église à échoué. Rééssayez");
+      throw const HttpException(
+        "La modification de l'église à échoué. Rééssayez",
+      );
     }
   }
 
@@ -80,14 +85,15 @@ class Church extends ChangeNotifier {
       'description': data['description'],
       'type_church': data['churchType'],
       'logo': await MultipartFile.fromFile(data['image'].path),
-      'attestation_file_path':
-          await MultipartFile.fromFile(data['attestation_file'].path),
+      'attestation_file_path': await MultipartFile.fromFile(
+        data['attestation_file'].path,
+      ),
       'is_main': data['isMain'],
-      'main_church_id': data['mainChurchId']
+      'main_church_id': data['mainChurchId'],
     });
 
     var response = await _request.create(formData);
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       return true;
     } else {
       throw const HttpException("La création de l'église à échoué. Rééssayez");
