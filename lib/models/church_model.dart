@@ -53,11 +53,11 @@ class ChurchModel {
             : null;
   }
 
-  Widget buildWidget(
-      BuildContext context) {
+  Widget buildWidget(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return GestureDetector(
-      onTap: () => Get.to(ChurchDetailPage(), arguments: {'churchId': id}),
+      onTap:
+          () => Get.to(() => ChurchDetailPage(), arguments: {'churchId': id}),
       child: Container(
         margin: EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -80,9 +80,7 @@ class ChurchModel {
               child: Hero(
                 tag: image,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(10),
-                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
                   child: FastCachedImage(
                     height: 200,
                     width: double.infinity,
@@ -124,7 +122,11 @@ class ChurchModel {
                         "(+225) $phone",
                       ),
                       textIconTile(context, FontAwesomeIcons.at, email),
-                      textIconTile(context, FontAwesomeIcons.locationDot, address),
+                      textIconTile(
+                        context,
+                        FontAwesomeIcons.locationDot,
+                        address,
+                      ),
                     ],
                   ),
                 ],

@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
+import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/modal.dart';
+import 'package:aesd/components/not_found.dart';
 import 'package:aesd/components/placeholders.dart';
-import 'package:aesd/models/church_model.dart';
 import 'package:aesd/models/user_model.dart';
 import 'package:aesd/provider/church.dart';
 import 'package:aesd/provider/auth.dart';
@@ -13,7 +14,6 @@ import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
-import 'package:loading_overlay/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
 import 'community.dart';
@@ -31,11 +31,14 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
   UserModel? owner;
   List<UserModel> members = [];
   bool _isLoading = false;
+  bool _subscribing = false;
 
   bool displayName = false;
 
   // controllers
-  final _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController(
+    initialScrollOffset: 0,
+  );
 
   Future<void> onSubscribe(int churchId, bool subscribed) async {
     if (subscribed) {
@@ -112,14 +115,16 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
   Future<void> handleSubscribtion(int churchId, bool willSubscribe) async {
     try {
       setState(() {
-        _isLoading = true;
+        _subscribing = true;
       });
       await Provider.of<Church>(
         context,
         listen: false,
       ).subscribe(churchId, willSubscribe: willSubscribe).then((value) async {
         MessageService.showSuccessMessage(value);
-        await Provider.of<Auth>(context, listen: false).getUserData();
+        if (mounted) {
+          await Provider.of<Auth>(context, listen: false).getUserData();
+        }
       });
     } on HttpException {
       MessageService.showErrorMessage("L'opération a échoué !");
@@ -127,7 +132,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
       MessageService.showErrorMessage("Une erreur inattendu est survenue");
     } finally {
       setState(() {
-        _isLoading = false;
+        _subscribing = false;
       });
     }
   }
@@ -137,23 +142,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
       setState(() {
         _isLoading = true;
       });
-      await Provider.of<Church>(context, listen: false)
-          .fetchChurch(churchId)
-          .then(
-            (value) => {
-              setState(() {
-                //church = ChurchModel.fromJson(value['eglise']);
-                members.clear();
-                for (var member in value['members']) {
-                  members.add(UserModel.fromJson(member));
-                }
-                owner = UserModel.fromJson(value['user']);
-              }),
-            },
-          );
-    } catch (e) {
-      e.printError();
-      MessageService.showErrorMessage("Une erreur inattendu est survenue !");
+      await Provider.of<Church>(context, listen: false).fetchChurch(churchId);
     } finally {
       setState(() {
         _isLoading = false;
@@ -164,9 +153,16 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
   @override
   void initState() {
     super.initState();
-    // init scroll controller
     _scrollController.addListener(() {
-      displayName = _scrollController.offset.toInt() > 50;
+      if (_scrollController.offset > 100) {
+        setState(() {
+          displayName = true;
+        });
+      } else {
+        setState(() {
+          displayName = false;
+        });
+      }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       churchId = Get.arguments['churchId'];
@@ -189,213 +185,198 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        body: _isLoading ? Padding(
-          padding: const EdgeInsets.all(20),
-          child: ListShimmerPlaceholder(),
-        ) : Consumer<Church>(
-          builder: (context, provider, child) {
-            final church = provider.selectedChurch;
-            return CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                SliverAppBar(
-                  pinned: true,
-                  expandedHeight: size.height * .4,
-                  backgroundColor: notifire.getbgcolor,
-                  leading: customBackButton(),
-                  flexibleSpace: FlexibleSpaceBar(
-                    title: displayName ? Text(
-                      church?.name ?? "",
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        color: notifire.getMainText,
-                      ),
-                    ) : null,
-                    background: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        image:
-                            church?.image == null
-                                ? null
-                                : DecorationImage(
-                                  image: FastCachedImageProvider(church!.image),
+        body:
+            _isLoading
+                ? Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: ListShimmerPlaceholder(),
+                )
+                : Consumer<Church>(
+                  builder: (context, provider, child) {
+                    final church = provider.selectedChurch;
+
+                    if (church == null) {
+                      return Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: notFoundTile(
+                          icon: Icons.church_outlined,
+                          text: "Impossible d'obtenir l'église",
+                        ),
+                      );
+                    }
+                    return CustomScrollView(
+                      controller: _scrollController,
+                      slivers: [
+                        SliverAppBar(
+                          pinned: true,
+                          expandedHeight: size.height * .4,
+                          backgroundColor: notifire.getbgcolor,
+                          leading: customBackButton(),
+                          actions: [
+                            Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child:
+                                  _subscribing
+                                      ? CircularProgressIndicator(
+                                        strokeWidth: 1.5,
+                                      )
+                                      : CustomTextButton(
+                                        onPressed:
+                                            () => handleSubscribtion(
+                                              churchId!,
+                                              !subscribed,
+                                            ),
+                                        label: "S'abonner",
+                                        icon: cusFaIcon(
+                                          FontAwesomeIcons.solidBookmark,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                            ),
+                          ],
+                          flexibleSpace: FlexibleSpaceBar(
+                            title:
+                                displayName
+                                    ? Text(
+                                      church.name,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleMedium!.copyWith(
+                                        color: notifire.getMainText,
+                                      ),
+                                    )
+                                    : null,
+                            background: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                image: DecorationImage(
+                                  image: FastCachedImageProvider(church.image),
                                   fit: BoxFit.cover,
                                 ),
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              notifire.getContainer.withAlpha(10),
-                              notifire.getContainer.withAlpha(80),
-                            ],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(15),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                church?.name ?? "",
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.titleLarge!.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
                               ),
-                              SizedBox(height: 10),
-                              Row(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                children: [
-                                  FaIcon(
-                                    FontAwesomeIcons.userTie,
-                                    size: 16,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      notifire.getContainer.withAlpha(170),
+                                      notifire.getContainer.withAlpha(10),
+                                    ],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
                                   ),
-                                  SizedBox(width: 7),
-                                  Text(
-                                    owner?.name ?? "Inconnu",
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleSmall!.copyWith(
-                                      color: Colors.white.withAlpha(170),
+                                ),
+                                child: Align(
+                                  alignment: Alignment.bottomLeft,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(25),
+                                    child: Text(
+                                      church.name,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleLarge!.copyWith(
+                                        color: notifire.getContainer,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    // title: Text(
-                    //   church?.name ?? "Chargement...",
-                    //   style: textTheme.titleMedium,
-                    // ),
-                  ),
-                ),
-                SliverAppBar(
-                  pinned: true,
-                  leading: SizedBox(),
-                  leadingWidth: 0,
-                  toolbarHeight: 10,
-                  expandedHeight: size.height * .23,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              child: TextButton.icon(
-                                onPressed:
-                                    () => onSubscribe(churchId!, subscribed),
-                                icon: FaIcon(
-                                  subscribed
-                                      ? FontAwesomeIcons.bookmark
-                                      : FontAwesomeIcons.solidBookmark,
-                                ),
-                                iconAlignment: IconAlignment.end,
-                                label: Text(
-                                  subscribed ? "Se désabonner" : "S'abonner",
-                                ),
-                                style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all(
-                                    subscribed ? Colors.transparent : Colors.blue,
-                                  ),
-                                  overlayColor: WidgetStateProperty.all(
-                                    subscribed
-                                        ? Colors.red.withAlpha(110)
-                                        : Colors.white.withAlpha(110),
-                                  ),
-                                  iconColor: WidgetStateProperty.all(
-                                    subscribed ? Colors.red : Colors.white,
-                                  ),
-                                  foregroundColor: WidgetStateProperty.all(
-                                    subscribed ? Colors.red : Colors.white,
-                                  ),
-                                  shape:
-                                      subscribed
-                                          ? WidgetStateProperty.all(
-                                            RoundedRectangleBorder(
-                                              side: const BorderSide(
-                                                width: 2,
-                                                color: Colors.red,
-                                              ),
-                                              borderRadius: BorderRadius.circular(
-                                                100,
-                                              ),
-                                            ),
-                                          )
-                                          : null,
                                 ),
                               ),
                             ),
                           ),
-
-                          customDataTile(
-                            icon: FontAwesomeIcons.locationDot,
-                            text: church!.address,
+                        ),
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: EdgeInsets.all(15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Wrap(
+                                  alignment: WrapAlignment.start,
+                                  runAlignment: WrapAlignment.start,
+                                  spacing: 15,
+                                  runSpacing: 10,
+                                  children: [
+                                    customDataTile(
+                                      icon: cusFaIcon(FontAwesomeIcons.userTie),
+                                      text: owner?.name ?? "Inconnu",
+                                    ),
+                                    customDataTile(
+                                      icon: cusFaIcon(
+                                        FontAwesomeIcons.locationDot,
+                                      ),
+                                      text: church.address,
+                                    ),
+                                    customDataTile(
+                                      icon: cusFaIcon(FontAwesomeIcons.phone),
+                                      text: church.phone,
+                                    ),
+                                    customDataTile(
+                                      icon: cusFaIcon(FontAwesomeIcons.at),
+                                      text: church.email,
+                                    ),
+                                  ],
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 25),
+                                  child: TabBar(
+                                    dividerColor: Colors.transparent,
+                                    dividerHeight: 0,
+                                    tabs: [
+                                      Tab(
+                                        icon: cusFaIcon(
+                                          FontAwesomeIcons.calendar,
+                                        ),
+                                        child: Text("Programme"),
+                                      ),
+                                      Tab(
+                                        icon: cusFaIcon(FontAwesomeIcons.film),
+                                        child: Text("Cérémonies"),
+                                      ),
+                                      Tab(
+                                        icon: cusFaIcon(FontAwesomeIcons.users),
+                                        child: Text("Communauté"),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          customDataTile(
-                            icon: FontAwesomeIcons.phone,
-                            text: church.phone,
+                        ),
+                        SliverFillRemaining(
+                          child: Padding(
+                            padding: const EdgeInsets.all(15),
+                            child: TabBarView(
+                              children: [
+                                Program(churchId: churchId!),
+                                CeremonyShortList(churchId: churchId!),
+                                Community(
+                                  members: members,
+                                  subscribed: subscribed,
+                                ),
+                              ],
+                            ),
                           ),
-                          customDataTile(
-                            icon: FontAwesomeIcons.solidEnvelope,
-                            text: church.email,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  bottom: TabBar(
-                    tabs: [
-                      Tab(text: "Programme"),
-                      Tab(text: "Céremonies"),
-                      Tab(text: "Membres"),
-                    ],
-                  ),
-                ),
-                SliverFillRemaining(
-                  child: Padding(
-                    padding: const EdgeInsets.all(15),
-                    child: TabBarView(
-                      children: [
-                        Program(churchId: churchId!),
-                        CeremonyShortList(churchId: churchId!),
-                        Community(members: members, subscribed: subscribed),
+                        ),
                       ],
-                    ),
-                  ),
+                    );
+                  },
                 ),
-              ],
-            );
-          }
-        ),
       ),
     );
   }
 
-  Widget customDataTile({required IconData? icon, required String text}) {
+  Widget customDataTile({required Widget icon, required String text}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 15, color: Colors.red),
-          const SizedBox(width: 5),
+          icon,
+          const SizedBox(width: 7),
           Flexible(
-            child: Text(text, style: Theme.of(context).textTheme.labelMedium!),
+            child: Text(text, style: Theme.of(context).textTheme.labelLarge!),
           ),
         ],
       ),

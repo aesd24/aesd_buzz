@@ -30,7 +30,9 @@ class _EventsListState extends State<EventsList> {
     } on HttpException catch (e) {
       MessageService.showErrorMessage(e.message);
     } on DioException {
-      MessageService.showErrorMessage("Erreur réseau. Vérifiez votre connexion internet");
+      MessageService.showErrorMessage(
+        "Erreur réseau. Vérifiez votre connexion internet",
+      );
     } catch (e) {
       e.printError();
       MessageService.showErrorMessage("Une erreur inattendu s'est produite.");
@@ -61,23 +63,26 @@ class _EventsListState extends State<EventsList> {
               ),
             ),
             Expanded(
-              child: isLoading ? ListShimmerPlaceholder() : Consumer<Event>(
-                builder: (context, provider, child) {
-                  if (provider.events.isEmpty) {
-                    return notFoundTile(text: "Aucun évènement trouvé");
-                  }
-                  return RefreshIndicator(
-                    onRefresh: () async {}, //=> await loadEvents(),
-                    child: ListView.builder(
-                      itemCount: provider.events.length,
-                      itemBuilder: (context, index) {
-                        var current = provider.events[index];
-                        return current.buildWidget(context);
-                      },
-                    ),
-                  );
-                },
-              ),
+              child:
+                  isLoading
+                      ? ListShimmerPlaceholder()
+                      : Consumer<Event>(
+                        builder: (context, provider, child) {
+                          if (provider.events.isEmpty) {
+                            return notFoundTile(text: "Aucun évènement trouvé");
+                          }
+                          return RefreshIndicator(
+                            onRefresh: () async {}, //=> await loadEvents(),
+                            child: ListView.builder(
+                              itemCount: provider.events.length,
+                              itemBuilder: (context, index) {
+                                var current = provider.events[index];
+                                return current.buildWidget(context);
+                              },
+                            ),
+                          );
+                        },
+                      ),
             ),
             if (isLoading) loadingBar(),
           ],

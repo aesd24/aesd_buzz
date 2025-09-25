@@ -16,7 +16,7 @@ class ChurchRequest extends DioClient {
 
   Future one(int id) async {
     final client = await getApiClient();
-    return client.get("churches/$id");
+    return client.get("$baseRoute/$id");
   }
 
   Future create(Object data) async {
@@ -31,7 +31,7 @@ class ChurchRequest extends DioClient {
 
   Future subscribe(int id, {required bool willSubscribe}) async {
     final client = await getApiClient();
-    return client.post("churches_subscribe/$id", data: {
+    return client.post("$baseRoute/$id/subscribe", data: {
       'subscriptionInput': willSubscribe ? 1 : 0
     });
   }

@@ -64,6 +64,7 @@ class Auth extends ChangeNotifier {
 
   Future getUserData() async {
     var response = await request.getUserData();
+    print(response.data);
     if (response.statusCode == 200) {
       _user = UserModel.fromJson(response.data);
     } else {

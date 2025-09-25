@@ -37,6 +37,7 @@ class Forum extends ChangeNotifier {
         subjectId: subjectId,
         comment: comment
     );
+    print(response);
     if (response.statusCode == 200) {
       return true;
     } else {

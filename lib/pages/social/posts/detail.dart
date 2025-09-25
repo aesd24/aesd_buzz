@@ -71,6 +71,30 @@ class _PostDetailState extends State<PostDetail> {
     }
   }
 
+  Future makeComment(int postId, String comment) async {
+    try {
+      await Provider.of<PostProvider>(
+        context,
+        listen: false,
+      ).makeComment(postId, comment).then((value) async {
+        await Provider.of<PostProvider>(
+          context,
+          listen: false,
+        ).postDetail(postId);
+        MessageService.showSuccessMessage("Commentaire envoyé !");
+      });
+    } on DioException {
+      MessageService.showErrorMessage(
+        "Erreur réseau. vérifiez votre connexion internet",
+      );
+    } on HttpException catch (e) {
+      MessageService.showErrorMessage(e.message);
+    } catch (e) {
+      MessageService.showErrorMessage("Une erreur inattendu s'est produite !");
+      e.printError();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -239,17 +263,21 @@ class _PostDetailState extends State<PostDetail> {
                                             backgroundColor: Colors.transparent,
                                             builder:
                                                 (context) => CreatePost(
-                                                  onSubmit: (createObj) {},
+                                                  onSubmit:
+                                                      (createObj) async {
+                                                        await makeComment(
+                                                          post.id,
+                                                          createObj.content,
+                                                        );
+                                                        Get.back();
+                                                      }
                                                 ),
                                           ),
                                     ),
                                   ],
                                 ),
                               ),
-                              Divider(
-                                color: notifire.getMaingey,
-                                thickness: 1,
-                              ),
+                              Divider(color: notifire.getMaingey, thickness: 1),
                               Column(
                                 children: List.generate(
                                   provider.comments.length,
