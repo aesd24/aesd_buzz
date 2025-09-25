@@ -8,6 +8,7 @@ import 'package:aesd/pages/auth/splash_screen.dart';
 import 'package:aesd/pages/home.dart';
 import 'package:aesd/pages/profil.dart';
 import 'package:aesd/pages/forum/subject.dart';
+import 'package:aesd/pages/social/church/detail.dart';
 import 'package:aesd/pages/social/new/detail.dart';
 import 'package:aesd/pages/social/posts/detail.dart';
 import 'package:aesd/pages/testimony/detail.dart';
@@ -19,18 +20,25 @@ import 'package:get/get.dart';
 class Routes {
   static String initial = "/";
   static String homepage = "/homePage";
+
+  // Auth
   static String auth = '/user/auth';
   static String forgot = '/user/forgot';
   static String verifyEmail = '/user/verifyEmail';
   static String changePassword = '/user/updatePassword';
+
+  // User
   static String profil = '/user/profil';
   static String wallet = '/wallet';
   static String transactions = '/transactions';
+  static String updateUser = '/user/update';
+
+  // Socials
   static String postDetail = '/postDetail';
   static String newsDetail = '/newsDetail';
   static String subject = '/subject';
-  static String updateUser = '/user/update';
   static String testimonyDetail = '/testimonyDetail';
+  static String churchDetail = '/churchDetail';
 }
 
 final getPage = [
@@ -50,7 +58,8 @@ final getPage = [
   GetPage(name: Routes.newsDetail, page: _buildLoggedPage(NewsPage())),
   GetPage(name: Routes.subject, page: _buildLoggedPage(DiscutionSubjectPage())),
   GetPage(name: Routes.updateUser, page: _buildLoggedPage(UpdateUserPage())),
-  GetPage(name: Routes.testimonyDetail, page: _buildLoggedPage(TestimonyDetail()))
+  GetPage(name: Routes.testimonyDetail, page: _buildLoggedPage(TestimonyDetail())),
+  GetPage(name: Routes.churchDetail, page: _buildLoggedPage(ChurchDetailPage()))
 ];
 
 Widget Function() _buildLoggedPage(Widget page) {

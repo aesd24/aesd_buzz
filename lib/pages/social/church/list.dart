@@ -39,9 +39,6 @@ class _ChurchListState extends State<ChurchList> {
     } on HttpException catch (e) {
       e.printError();
       MessageService.showErrorMessage(e.message);
-    } catch (e) {
-      e.printError();
-      MessageService.showErrorMessage("Une erreur inattendue est survenue !");
     } finally {
       setState(() {
         isLoading = false;

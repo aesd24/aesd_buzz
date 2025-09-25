@@ -1,11 +1,15 @@
 import 'dart:io';
+import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/modal.dart';
+import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/models/church_model.dart';
 import 'package:aesd/models/user_model.dart';
 import 'package:aesd/provider/church.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:aesd/pages/ceremonies/short_list.dart';
 import 'package:aesd/services/message.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -16,31 +20,24 @@ import 'community.dart';
 import 'day_program.dart';
 
 class ChurchDetailPage extends StatefulWidget {
-  const ChurchDetailPage({super.key, required this.churchId});
-
-  final int churchId;
+  const ChurchDetailPage({super.key});
 
   @override
   State<ChurchDetailPage> createState() => _ChurchDetailPageState();
 }
 
 class _ChurchDetailPageState extends State<ChurchDetailPage> {
-  final _scrollController = ScrollController();
-  int alpha = 0;
-  void setAlpha(int value) {
-    setState(() {
-      alpha = value;
-    });
-  }
-
-  ChurchModel? church;
+  int? churchId;
   UserModel? owner;
   List<UserModel> members = [];
   bool _isLoading = false;
 
-  final _pageController = PageController(initialPage: 0);
+  bool displayName = false;
 
-  Future<void> onSubscribe(bool subscribed) async {
+  // controllers
+  final _scrollController = ScrollController();
+
+  Future<void> onSubscribe(int churchId, bool subscribed) async {
     if (subscribed) {
       return showModal(
         context: context,
@@ -58,7 +55,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
             TextButton.icon(
               onPressed: () {
                 Get.back();
-                handleSubscribtion(!subscribed);
+                handleSubscribtion(churchId, !subscribed);
               },
               icon: FaIcon(FontAwesomeIcons.xmark),
               iconAlignment: IconAlignment.end,
@@ -92,7 +89,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
               TextButton.icon(
                 onPressed: () {
                   Get.back();
-                  handleSubscribtion(!subscribed);
+                  handleSubscribtion(churchId, !subscribed);
                 },
                 icon: FaIcon(FontAwesomeIcons.arrowsRotate),
                 iconAlignment: IconAlignment.end,
@@ -107,22 +104,23 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
           ),
         );
       } else {
-        handleSubscribtion(!subscribed);
+        handleSubscribtion(churchId, !subscribed);
       }
     }
   }
 
-  Future<void> handleSubscribtion(bool willSubscribe) async {
+  Future<void> handleSubscribtion(int churchId, bool willSubscribe) async {
     try {
       setState(() {
         _isLoading = true;
       });
-      await Provider.of<Church>(context, listen: false)
-          .subscribe(widget.churchId, willSubscribe: willSubscribe)
-          .then((value) async {
-            MessageService.showSuccessMessage(value);
-            await Provider.of<Auth>(context, listen: false).getUserData();
-          });
+      await Provider.of<Church>(
+        context,
+        listen: false,
+      ).subscribe(churchId, willSubscribe: willSubscribe).then((value) async {
+        MessageService.showSuccessMessage(value);
+        await Provider.of<Auth>(context, listen: false).getUserData();
+      });
     } on HttpException {
       MessageService.showErrorMessage("L'opération a échoué !");
     } catch (e) {
@@ -134,17 +132,17 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
     }
   }
 
-  Future<void> getChurch() async {
+  Future<void> getChurch(int churchId) async {
     try {
       setState(() {
         _isLoading = true;
       });
       await Provider.of<Church>(context, listen: false)
-          .fetchChurch(widget.churchId)
+          .fetchChurch(churchId)
           .then(
             (value) => {
               setState(() {
-                church = ChurchModel.fromJson(value['eglise']);
+                //church = ChurchModel.fromJson(value['eglise']);
                 members.clear();
                 for (var member in value['members']) {
                   members.add(UserModel.fromJson(member));
@@ -166,239 +164,223 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
   @override
   void initState() {
     super.initState();
-    getChurch();
+    // init scroll controller
     _scrollController.addListener(() {
-      _scrollController.offset < 150
-          ? setAlpha(0)
-          : _scrollController.offset < 400
-          ? setAlpha(((_scrollController.offset * 255) / 400).round())
-          : setAlpha(255);
+      displayName = _scrollController.offset.toInt() > 50;
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      churchId = Get.arguments['churchId'];
+      await getChurch(churchId!);
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final user = Provider.of<Auth>(context).user!;
-    bool subscribed = widget.churchId == user.churchId;
+    bool subscribed = churchId == user.churchId;
 
-    return LoadingOverlay(
-      isLoading: _isLoading,
-      child: DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          body: CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              SliverAppBar(
-                pinned: true,
-                expandedHeight: size.height * .4,
-                toolbarHeight: 70,
-                backgroundColor: Colors.grey.shade700,
-                leading: BackButton(color: Colors.white),
-                title: Text(
-                  church?.name ?? "",
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: Colors.white.withAlpha(alpha),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      image:
-                          church?.image == null
-                              ? null
-                              : DecorationImage(
-                                image: NetworkImage(church!.image),
-                                fit: BoxFit.cover,
-                              ),
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.black.withAlpha(60),
-                            Colors.black.withAlpha(160),
-                          ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        body: _isLoading ? Padding(
+          padding: const EdgeInsets.all(20),
+          child: ListShimmerPlaceholder(),
+        ) : Consumer<Church>(
+          builder: (context, provider, child) {
+            final church = provider.selectedChurch;
+            return CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverAppBar(
+                  pinned: true,
+                  expandedHeight: size.height * .4,
+                  backgroundColor: notifire.getbgcolor,
+                  leading: customBackButton(),
+                  flexibleSpace: FlexibleSpaceBar(
+                    title: displayName ? Text(
+                      church?.name ?? "",
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        color: notifire.getMainText,
                       ),
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          top: size.height * .12,
-                          left: 20,
+                    ) : null,
+                    background: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        image:
+                            church?.image == null
+                                ? null
+                                : DecorationImage(
+                                  image: FastCachedImageProvider(church!.image),
+                                  fit: BoxFit.cover,
+                                ),
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              notifire.getContainer.withAlpha(10),
+                              notifire.getContainer.withAlpha(80),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            CircleAvatar(
-                              radius: 45,
-                              backgroundColor: Colors.grey.withAlpha(180),
-                              child: CircleAvatar(
-                                radius: 40,
-                                backgroundImage:
-                                    church?.logo != null
-                                        ? NetworkImage(church!.logo!)
-                                        : null,
+                        child: Padding(
+                          padding: EdgeInsets.all(15),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                church?.name ?? "",
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.titleLarge!.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            Spacer(),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                top: 40,
-                                bottom: 20,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
+                              SizedBox(height: 10),
+                              Row(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
                                 children: [
+                                  FaIcon(
+                                    FontAwesomeIcons.userTie,
+                                    size: 16,
+                                  ),
+                                  SizedBox(width: 7),
                                   Text(
-                                    church?.name ?? "",
+                                    owner?.name ?? "Inconnu",
                                     style: Theme.of(
                                       context,
-                                    ).textTheme.titleLarge!.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                                    ).textTheme.titleSmall!.copyWith(
+                                      color: Colors.white.withAlpha(170),
                                     ),
-                                  ),
-                                  SizedBox(height: 10),
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      FaIcon(
-                                        FontAwesomeIcons.userTie,
-                                        size: 16,
-                                      ),
-                                      SizedBox(width: 7),
-                                      Text(
-                                        owner?.name ?? "Inconnu",
-                                        style: Theme.of(
-                                          context,
-                                        ).textTheme.titleSmall!.copyWith(
-                                          color: Colors.white.withAlpha(170),
-                                        ),
-                                      ),
-                                    ],
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
+                    // title: Text(
+                    //   church?.name ?? "Chargement...",
+                    //   style: textTheme.titleMedium,
+                    // ),
                   ),
-                  // title: Text(
-                  //   church?.name ?? "Chargement...",
-                  //   style: textTheme.titleMedium,
-                  // ),
                 ),
-              ),
-              SliverAppBar(
-                pinned: true,
-                leading: SizedBox(),
-                leadingWidth: 0,
-                toolbarHeight: 10,
-                expandedHeight: size.height * .23,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: TextButton.icon(
-                              onPressed: () => onSubscribe(subscribed),
-                              icon: FaIcon(
-                                subscribed
-                                    ? FontAwesomeIcons.bookmark
-                                    : FontAwesomeIcons.solidBookmark,
-                              ),
-                              iconAlignment: IconAlignment.end,
-                              label: Text(
-                                subscribed ? "Se désabonner" : "S'abonner",
-                              ),
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(
-                                  subscribed ? Colors.transparent : Colors.blue,
-                                ),
-                                overlayColor: WidgetStateProperty.all(
+                SliverAppBar(
+                  pinned: true,
+                  leading: SizedBox(),
+                  leadingWidth: 0,
+                  toolbarHeight: 10,
+                  expandedHeight: size.height * .23,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              child: TextButton.icon(
+                                onPressed:
+                                    () => onSubscribe(churchId!, subscribed),
+                                icon: FaIcon(
                                   subscribed
-                                      ? Colors.red.withAlpha(110)
-                                      : Colors.white.withAlpha(110),
+                                      ? FontAwesomeIcons.bookmark
+                                      : FontAwesomeIcons.solidBookmark,
                                 ),
-                                iconColor: WidgetStateProperty.all(
-                                  subscribed ? Colors.red : Colors.white,
+                                iconAlignment: IconAlignment.end,
+                                label: Text(
+                                  subscribed ? "Se désabonner" : "S'abonner",
                                 ),
-                                foregroundColor: WidgetStateProperty.all(
-                                  subscribed ? Colors.red : Colors.white,
-                                ),
-                                shape:
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all(
+                                    subscribed ? Colors.transparent : Colors.blue,
+                                  ),
+                                  overlayColor: WidgetStateProperty.all(
                                     subscribed
-                                        ? WidgetStateProperty.all(
-                                          RoundedRectangleBorder(
-                                            side: const BorderSide(
-                                              width: 2,
-                                              color: Colors.red,
+                                        ? Colors.red.withAlpha(110)
+                                        : Colors.white.withAlpha(110),
+                                  ),
+                                  iconColor: WidgetStateProperty.all(
+                                    subscribed ? Colors.red : Colors.white,
+                                  ),
+                                  foregroundColor: WidgetStateProperty.all(
+                                    subscribed ? Colors.red : Colors.white,
+                                  ),
+                                  shape:
+                                      subscribed
+                                          ? WidgetStateProperty.all(
+                                            RoundedRectangleBorder(
+                                              side: const BorderSide(
+                                                width: 2,
+                                                color: Colors.red,
+                                              ),
+                                              borderRadius: BorderRadius.circular(
+                                                100,
+                                              ),
                                             ),
-                                            borderRadius: BorderRadius.circular(
-                                              100,
-                                            ),
-                                          ),
-                                        )
-                                        : null,
+                                          )
+                                          : null,
+                                ),
                               ),
                             ),
                           ),
-                        ),
 
-                        customDataTile(
-                          icon: FontAwesomeIcons.locationDot,
-                          text: church?.address ?? "Chargement...",
-                        ),
-                        customDataTile(
-                          icon: FontAwesomeIcons.phone,
-                          text: church?.phone ?? "Chargement...",
-                        ),
-                        customDataTile(
-                          icon: FontAwesomeIcons.solidEnvelope,
-                          text: church?.email ?? "Chargement...",
-                        ),
+                          customDataTile(
+                            icon: FontAwesomeIcons.locationDot,
+                            text: church!.address,
+                          ),
+                          customDataTile(
+                            icon: FontAwesomeIcons.phone,
+                            text: church.phone,
+                          ),
+                          customDataTile(
+                            icon: FontAwesomeIcons.solidEnvelope,
+                            text: church.email,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  bottom: TabBar(
+                    tabs: [
+                      Tab(text: "Programme"),
+                      Tab(text: "Céremonies"),
+                      Tab(text: "Membres"),
+                    ],
+                  ),
+                ),
+                SliverFillRemaining(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: TabBarView(
+                      children: [
+                        Program(churchId: churchId!),
+                        CeremonyShortList(churchId: churchId!),
+                        Community(members: members, subscribed: subscribed),
                       ],
                     ),
                   ),
                 ),
-                bottom: TabBar(
-                  tabs: [
-                    Tab(text: "Programme"),
-                    Tab(text: "Céremonies"),
-                    Tab(text: "Membres"),
-                  ],
-                ),
-              ),
-              SliverFillRemaining(
-                child: Padding(
-                  padding: const EdgeInsets.all(15),
-                  child: TabBarView(
-                    children: [
-                      Program(churchId: widget.churchId),
-                      CeremonyShortList(churchId: widget.churchId),
-                      Community(members: members, subscribed: subscribed),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+              ],
+            );
+          }
         ),
       ),
     );
@@ -420,230 +402,6 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
     );
   }
 
-  /*
-  Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-          child: church == null ? Center(
-            child: Text("Chargement..."),
-          ) : SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Image de présentation de l'église
-                Container(
-                  height: 250,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      image: DecorationImage(
-                          image: NetworkImage(church!.image),
-                          fit: BoxFit.cover)),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withAlpha(25),
-                              Colors.black.withAlpha(160)
-                            ])),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        CircleAvatar(
-                          radius: 42,
-                          backgroundColor: Colors.black.withAlpha(75),
-                          child: CircleAvatar(
-                            radius: 35,
-                            backgroundColor: Colors.grey,
-                            backgroundImage: church!.logo != null
-                                ? NetworkImage(church!.logo!)
-                                : const AssetImage("assets/images/bg-5.jpg"),
-                          ),
-                        ),
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Flexible(
-                                child: Text(
-                              church!.name,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.clip,
-                            )),
-                            const SizedBox(height: 7),
-                            Text(
-                              owner != null
-                              ? owner!.name
-                              : "Inconnu",
-                              style: Theme.of(context)
-                                .textTheme
-                                .labelMedium!
-                                .copyWith(color: Colors.white.withAlpha(170)),
-                              overflow: TextOverflow.clip,
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 5),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.location_pin,
-                              size: 15,
-                              color: Colors.red,
-                            ),
-                            const SizedBox(width: 5),
-                            Flexible(
-                              child: Text(
-                                church!.address,
-                                style: Theme.of(context).textTheme.labelMedium!,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 5),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const FaIcon(
-                              FontAwesomeIcons.phone,
-                              size: 12,
-                              color: Colors.red,
-                            ),
-                            const SizedBox(width: 5),
-                            Flexible(
-                              child: Text(
-                                church!.phone,
-                                style: Theme.of(context).textTheme.labelMedium!,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 5),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const FaIcon(
-                              FontAwesomeIcons.solidEnvelope,
-                              size: 12,
-                              color: Colors.red,
-                            ),
-                            const SizedBox(width: 5),
-                            Flexible(
-                              child: Text(
-                                church!.email,
-                                style: Theme.of(context).textTheme.labelMedium!,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: TextButton.icon(
-                      onPressed: () => onSubscribe(subscribed),
-                      icon: FaIcon(
-                        subscribed ? FontAwesomeIcons.bookmark :
-                        FontAwesomeIcons.solidBookmark
-                      ),
-                      iconAlignment: IconAlignment.end,
-                      label: Text(subscribed ? "Se désabonner" : "S'abonner"),
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all(
-                          subscribed ? Colors.transparent : Colors.blue
-                        ),
-                        overlayColor: WidgetStateProperty.all(
-                          subscribed ? Colors.red.withAlpha(110)
-                          : Colors.white.withAlpha(110)
-                        ),
-                        iconColor: WidgetStateProperty.all(
-                          subscribed ? Colors.red : Colors.white
-                        ),
-                        foregroundColor: WidgetStateProperty.all(
-                          subscribed ? Colors.red : Colors.white
-                        ),
-                        shape: subscribed ? WidgetStateProperty.all(
-                          RoundedRectangleBorder(
-                            side: const BorderSide(width: 2, color: Colors.red),
-                            borderRadius: BorderRadius.circular(100)
-                          )
-                        ) : null
-                      ),
-                    ),
-                  ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.only(top: 5, bottom: 30),
-                  child: Text(church!.description),
-                ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    customNavitem(context,
-                      currentIndex: _pageIndex, index: 0, label: "Programme"),
-                    customNavitem(context,
-                      currentIndex: _pageIndex, index: 1, label: "Céremonies"),
-                    customNavitem(context,
-                      currentIndex: _pageIndex, index: 2, label: "Membres"),
-                  ],
-                ),
-
-                SizedBox(height: 20),
-
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.height * .5,
-                    child: PageView(
-                      controller: _pageController,
-                      onPageChanged: (value) => setPageIndex(value),
-                      children: [
-                        Program(churchId: widget.churchId),
-                        CeremonyShortList(churchId: widget.churchId),
-                        Community(members: members, subscribed: subscribed),
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
-  */
-
   InkWell customNavitem(
     BuildContext context, {
     required int index,
@@ -651,13 +409,6 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
     required int currentIndex,
   }) {
     return InkWell(
-      onTap: () {
-        _pageController.animateToPage(
-          index,
-          duration: Duration(milliseconds: 300),
-          curve: Curves.ease,
-        );
-      },
       child: AnimatedContainer(
         padding: const EdgeInsets.all(7),
         duration: const Duration(milliseconds: 300),

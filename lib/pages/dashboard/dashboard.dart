@@ -159,7 +159,7 @@ class _DashboardState extends State<Dashboard> {
               ),
               onSelected: (value) {
                 if (value == "profil") {
-                  Get.to(ChurchDetailPage(churchId: church.id));
+                  Get.to(ChurchDetailPage());
                 } else if (value == "edit") {
                   Get.to(
                     MainChurchCreationPage(editMode: true, churchId: church.id),

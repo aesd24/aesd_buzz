@@ -57,7 +57,7 @@ class ChurchModel {
       BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return GestureDetector(
-      onTap: () => Get.to(ChurchDetailPage(churchId: id)),
+      onTap: () => Get.to(ChurchDetailPage(), arguments: {'churchId': id}),
       child: Container(
         margin: EdgeInsets.all(10),
         decoration: BoxDecoration(

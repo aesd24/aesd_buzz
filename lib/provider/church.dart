@@ -11,7 +11,9 @@ class Church extends ChangeNotifier {
   final ChurchRequest _request = ChurchRequest();
   final List<ChurchModel> _churches = [];
   final List<ChurchModel> _userChurches = [];
+  ChurchModel? _selectedChurch;
 
+  ChurchModel? get selectedChurch => _selectedChurch;
   List<ChurchModel> get churches => _churches;
   List<ChurchModel> get userChurches => _userChurches;
 
@@ -33,7 +35,7 @@ class Church extends ChangeNotifier {
     final response = await _request.all(page: _currentPage);
     if (response.statusCode == 200) {
       final churches =
-          (response.data['data'] as List)
+          (response.data['data']['churches'] as List)
               .map((e) => ChurchModel.fromJson(e))
               .toList();
       //_paginator = ChurchPaginator.fromJson(data);
@@ -49,6 +51,7 @@ class Church extends ChangeNotifier {
   Future fetchChurch(int id) async {
     var response = await _request.one(id);
     if (response.statusCode == 200) {
+      _selectedChurch = ChurchModel.fromJson(response.data['data']['church']);
       return response.data;
     } else {
       throw Exception("Impossible de récupérer l'église");
