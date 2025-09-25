@@ -1,6 +1,8 @@
+import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/divider.dart';
 import 'package:aesd/components/drawer.dart';
+import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/not_found.dart';
 import 'package:aesd/models/church_model.dart';
 import 'package:aesd/models/user_model.dart';
@@ -12,6 +14,7 @@ import 'package:aesd/pages/dashboard/ceremony.dart';
 import 'package:aesd/pages/dashboard/community.dart';
 import 'package:aesd/pages/dashboard/events.dart';
 import 'package:aesd/pages/dashboard/programs.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -59,7 +62,6 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return LoadingOverlay(
       isLoading: _isLoading,
       child: Scaffold(
@@ -91,41 +93,158 @@ class _DashboardState extends State<Dashboard> {
             ),
           ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                textDivider("Liste de vos églises"),
-                Consumer<Church>(
-                  builder: (context, churchProvider, child) {
-                    if (churchProvider.churches.isEmpty) {
-                      return Padding(
-                        padding: const EdgeInsets.only(top: 30),
-                        child: notFoundTile(
-                          text: "Vous n'avez aucune église",
-                          icon: Icons.church_outlined,
-                        ),
-                      );
-                    }
-                    return SingleChildScrollView(
-                      child: Column(
-                        children: List.generate(
-                          churchProvider.churches.length,
-                          (index) {
-                            return churchCard(
-                              church: churchProvider.userChurches[index],
-                            );
-                          },
-                        ),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            textDivider("Liste de vos églises"),
+            Expanded(
+              child: Consumer<Church>(
+                builder: (context, churchProvider, child) {
+                  if (churchProvider.churches.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 30),
+                      child: notFoundTile(
+                        text: "Vous n'avez aucune église",
+                        icon: Icons.church_outlined,
                       ),
                     );
-                  },
-                ),
-              ],
+                  }
+                  return ListView.builder(
+                    itemCount: churchProvider.userChurches.length,
+                    itemBuilder: (context, index) {
+                      final current = churchProvider.userChurches[index];
+                      return Container(
+                        padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
+                        margin: EdgeInsets.symmetric(
+                          vertical: 7,
+                          horizontal: 15,
+                        ),
+                        decoration: BoxDecoration(
+                          color: notifire.getContainer,
+                          boxShadow: [
+                            BoxShadow(
+                              color: notifire.getMainColor.withAlpha(75),
+                              blurRadius: 5,
+                              spreadRadius: 1,
+                            ),
+                          ],
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ListTile(
+                              leading: CircleAvatar(
+                                radius: 25,
+                                backgroundImage: FastCachedImageProvider(
+                                  current.logo ?? current.image,
+                                ),
+                                backgroundColor: notifire.getMaingey.withAlpha(
+                                  200,
+                                ),
+                              ),
+                              title: Text(current.name),
+                              trailing: PopupMenuButton(
+                                itemBuilder: (context) {
+                                  return [
+                                    PopupMenuItem(
+                                      value: "profil",
+                                      child: Text("Consulter le profil"),
+                                    ),
+                                    PopupMenuItem(
+                                      value: "update",
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text("Modifier l'église"),
+                                          SizedBox(width: 10),
+                                          cusFaIcon(
+                                            FontAwesomeIcons.pen,
+                                            color: notifire.warning,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    PopupMenuItem(
+                                      value: "delete",
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text("Fermer l'église"),
+                                          SizedBox(width: 10),
+                                          cusFaIcon(
+                                            FontAwesomeIcons.xmark,
+                                            color: notifire.danger,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ];
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 15,
+                                horizontal: 30,
+                              ),
+                              child: Divider(
+                                thickness: 2,
+                                radius: BorderRadius.circular(10),
+                                color: notifire.getMaingey,
+                              ),
+                            ),
+                            Wrap(
+                              spacing: 10,
+                              runSpacing: 10,
+                              children: [
+                                customIconButton(
+                                  label: "Porte-feuille",
+                                  icon: FontAwesomeIcons.wallet,
+                                  color: Colors.green,
+                                  destination: Wallet(),
+                                ),
+                                customIconButton(
+                                  destination: ProgramListPage(),
+                                  color: Colors.purple,
+                                  icon: FontAwesomeIcons.calendarWeek,
+                                  label: "Programme",
+                                ),
+                                customIconButton(
+                                  destination: ChurchEvents(
+                                    churchId: current.id,
+                                  ),
+                                  color: Colors.amber,
+                                  icon: FontAwesomeIcons.solidCalendarDays,
+                                  label: "Evènements",
+                                ),
+                                customIconButton(
+                                  destination: CeremoniesManagement(
+                                    churchId: current.id,
+                                  ),
+                                  color: Colors.orange,
+                                  icon: FontAwesomeIcons.film,
+                                  label: "Cérémonies",
+                                ),
+                                customIconButton(
+                                  destination: DashboardCommunityPage(
+                                    churchId: current.id,
+                                  ),
+                                  color: Colors.blue,
+                                  icon: FontAwesomeIcons.peopleGroup,
+                                  label: "Communauté",
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -159,7 +278,10 @@ class _DashboardState extends State<Dashboard> {
               ),
               onSelected: (value) {
                 if (value == "profil") {
-                  Get.to(ChurchDetailPage());
+                  Get.to(
+                    ChurchDetailPage(),
+                    arguments: {'churchId': church.id},
+                  );
                 } else if (value == "edit") {
                   Get.to(
                     MainChurchCreationPage(editMode: true, churchId: church.id),
