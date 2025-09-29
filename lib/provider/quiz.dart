@@ -48,7 +48,7 @@ class Quiz extends ChangeNotifier {
     );
     print(response);
     if (response.statusCode == 200) {
-      //print(response.data);
+      return response.data;
     } else {
       throw HttpException("L'envoi des réponses a échoué");
     }

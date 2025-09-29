@@ -65,9 +65,9 @@ class ChurchModel {
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
-              color: notifire.getMainColor.withAlpha(30),
+              color: notifire.getMaingey.withAlpha(75),
               spreadRadius: 2,
-              blurRadius: 3,
+              blurRadius: 5,
               offset: Offset(0, 2),
             ),
           ],

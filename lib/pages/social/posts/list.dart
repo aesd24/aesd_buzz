@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:aesd/appstaticdata/dictionnary.dart';
+import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/not_found.dart';
 import 'package:aesd/components/placeholders.dart';
@@ -146,6 +147,7 @@ class _PostListState extends State<PostList> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: FloatingActionButton(
+                backgroundColor: notifire.getMainColor,
                 onPressed:
                     () => showModalBottomSheet(
                       context: context,

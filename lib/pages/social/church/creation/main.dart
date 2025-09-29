@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:aesd/appstaticdata/dictionnary.dart';
+import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/bottom_sheets.dart';
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/fields.dart';
@@ -194,7 +195,7 @@ class _MainChurchCreationPageState extends State<MainChurchCreationPage> {
           context,
           listen: false,
         ).fetchChurch(widget.churchId!).then((value) {
-          church = ChurchModel.fromJson(value['eglise']);
+          church = Provider.of<Church>(context, listen: false).selectedChurch;
         });
 
         //mise en place des données dans les champs
@@ -284,15 +285,14 @@ class _MainChurchCreationPageState extends State<MainChurchCreationPage> {
                                           )
                                           : CircleAvatar(
                                             radius: 85,
-                                            child: CircleAvatar(
-                                              radius: 70,
-                                              backgroundImage:
-                                                  church?.logo != null
-                                                      ? FastCachedImageProvider(
-                                                        church!.logo!,
-                                                      )
-                                                      : null,
-                                            ),
+                                            backgroundColor:
+                                                notifire.getMaingey,
+                                            backgroundImage:
+                                                church?.logo != null
+                                                    ? FastCachedImageProvider(
+                                                      church!.logo!,
+                                                    )
+                                                    : null,
                                           ),
                                 ),
                                 Padding(

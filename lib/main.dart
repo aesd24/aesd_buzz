@@ -68,14 +68,20 @@ class _MyAppState extends State<MyApp> {
     if (message.data.containsKey('id')) {
       switch (message.data['type']) {
         case 'post':
-          Get.toNamed(Routes.postDetail, arguments: int.parse(message.data['id']));
+          Get.toNamed(
+            Routes.postDetail,
+            arguments: int.parse(message.data['id']),
+          );
           break;
-        /*case 'event':
-          Get.toNamed(Routes.eventDetail, arguments: int.parse(message.data['id']));
+        case 'event':
+          Get.toNamed(
+            Routes.eventDetail,
+            arguments: int.parse(message.data['id']),
+          );
           break;
-        case 'ceremony':
-          Get.toNamed(Routes.ceremonyDetail, arguments: int.parse(message.data['id']));
-          break;*/
+        // case 'ceremony':
+        //   Get.toNamed(Routes.ceremonyDetail, arguments: int.parse(message.data['id']));
+        //   break;
         default:
           break;
       }
@@ -115,7 +121,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => Servant()),
         ChangeNotifierProvider(create: (context) => Singer()),
         ChangeNotifierProvider(create: (context) => Testimony()),
-        ChangeNotifierProvider(create: (context) => Ceremonies())
+        ChangeNotifierProvider(create: (context) => Ceremonies()),
       ],
       child: GetMaterialApp(
         locale: const Locale('fr', 'FR'),

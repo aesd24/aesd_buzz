@@ -5,6 +5,7 @@ import 'package:aesd/pages/auth/change_password/forgot_password.dart';
 import 'package:aesd/pages/auth/change_password/otp_verification.dart';
 import 'package:aesd/pages/auth/login_register/update.dart';
 import 'package:aesd/pages/auth/splash_screen.dart';
+import 'package:aesd/pages/events/detail.dart';
 import 'package:aesd/pages/home.dart';
 import 'package:aesd/pages/profil.dart';
 import 'package:aesd/pages/forum/subject.dart';
@@ -39,6 +40,7 @@ class Routes {
   static String subject = '/subject';
   static String testimonyDetail = '/testimonyDetail';
   static String churchDetail = '/churchDetail';
+  static String eventDetail = '/event';
 }
 
 final getPage = [
@@ -59,7 +61,8 @@ final getPage = [
   GetPage(name: Routes.subject, page: _buildLoggedPage(DiscutionSubjectPage())),
   GetPage(name: Routes.updateUser, page: _buildLoggedPage(UpdateUserPage())),
   GetPage(name: Routes.testimonyDetail, page: _buildLoggedPage(TestimonyDetail())),
-  GetPage(name: Routes.churchDetail, page: _buildLoggedPage(ChurchDetailPage()))
+  GetPage(name: Routes.churchDetail, page: _buildLoggedPage(ChurchDetailPage())),
+  GetPage(name: Routes.eventDetail, page: _buildLoggedPage(EventPage())),
 ];
 
 Widget Function() _buildLoggedPage(Widget page) {

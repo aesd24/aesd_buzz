@@ -61,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
       ) async {
         if (value) {
           MessageService.showSuccessMessage("Connexion reussi !");
-          Get.toNamed(Routes.homepage);
+          Get.offAllNamed(Routes.homepage);
         }
       });
     } on HttpException catch (e) {
