@@ -67,7 +67,9 @@ class _ChurchListState extends State<ChurchList> {
                         onRefresh: () async => loadChurches(),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
-                          children: [notFoundTile(text: "Aucune eglise trouvée")],
+                          children: [
+                            notFoundTile(text: "Aucune eglise trouvée"),
+                          ],
                         ),
                       ),
                     ),
@@ -99,7 +101,15 @@ class _ChurchListState extends State<ChurchList> {
                       padding: const EdgeInsets.all(8.0),
                       child: FloatingActionButton(
                         backgroundColor: notifire.getMainColor,
-                        onPressed: () => Get.to(MainChurchCreationPage()),
+                        onPressed: () {
+                          if (user.certifStatus !=
+                              CertificationStates.approved) {
+                            return MessageService.showWarningMessage(
+                              "Votre compte n'est pas validé vous n'avez pas les accès requis !",
+                            );
+                          }
+                          Get.to(MainChurchCreationPage());
+                        },
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100),
                         ),
@@ -113,8 +123,8 @@ class _ChurchListState extends State<ChurchList> {
                   );
                 }
                 return SizedBox();
-              }
-            )
+              },
+            ),
           ],
         );
   }

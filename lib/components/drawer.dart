@@ -2,6 +2,7 @@ import 'package:aesd/appstaticdata/dictionnary.dart';
 import 'package:aesd/appstaticdata/routes.dart';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
+import 'package:aesd/components/certification_banner.dart';
 import 'package:aesd/pages/dashboard/dashboard.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
@@ -56,7 +57,13 @@ class AppMenuDrawer extends StatelessWidget {
                             fontWeight: FontWeight.normal,
                           ),
                         ),
-                        Text(user.accountType.name, style: mediumGreyTextStyle),
+                        Row(
+                          children: [
+                            Text(user.accountType.name, style: mediumGreyTextStyle),
+                            SizedBox(width: 10),
+                            getCertificationIcon(context)
+                          ],
+                        ),
                         if (user.accountType.code == Dictionnary.servant.code)
                           Padding(
                             padding: EdgeInsets.only(top: 15),

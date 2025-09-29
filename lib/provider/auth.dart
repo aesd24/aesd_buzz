@@ -166,3 +166,9 @@ class Auth extends ChangeNotifier {
     return token;
   }
 }
+
+class CertificationStates {
+  static String approved = 'approved';
+  static String pending = 'pending';
+  static String rejected = 'rejected';
+}

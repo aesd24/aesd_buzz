@@ -1,5 +1,6 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
+import 'package:aesd/components/certification_banner.dart';
 import 'package:aesd/components/divider.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/not_found.dart';
@@ -92,6 +93,7 @@ class _DashboardState extends State<Dashboard> {
               ),
             ),
           ],
+          bottom: getCertificationBanner(context),
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.center,

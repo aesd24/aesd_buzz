@@ -7,7 +7,7 @@ import 'package:aesd/pages/auth/login_register/update.dart';
 import 'package:aesd/pages/auth/splash_screen.dart';
 import 'package:aesd/pages/events/detail.dart';
 import 'package:aesd/pages/home.dart';
-import 'package:aesd/pages/profil.dart';
+import 'package:aesd/pages/user/profil.dart';
 import 'package:aesd/pages/forum/subject.dart';
 import 'package:aesd/pages/social/church/detail.dart';
 import 'package:aesd/pages/social/new/detail.dart';

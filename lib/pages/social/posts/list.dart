@@ -148,25 +148,31 @@ class _PostListState extends State<PostList> {
               padding: const EdgeInsets.all(8.0),
               child: FloatingActionButton(
                 backgroundColor: notifire.getMainColor,
-                onPressed:
-                    () => showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder:
-                          (context) => CreatePost(
-                            canPickImage: true,
-                            onSubmit: (createObj) => onCreate(createObj),
-                            pictureValidator: (pic, content) {
-                              if (pic == null &&
-                                  (content == null || content.isEmpty)) {
-                                throw Exception(
-                                  "Le post ne peut être vide. Ajoutez une image ou du texte",
-                                );
-                              }
-                            },
-                          ),
-                    ),
+                onPressed: () {
+                  if (user!.certifStatus != CertificationStates.approved) {
+                    return MessageService.showWarningMessage(
+                      "Votre compte n'est pas validé vous n'avez pas les accès requis !",
+                    );
+                  }
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder:
+                        (context) => CreatePost(
+                          canPickImage: true,
+                          onSubmit: (createObj) => onCreate(createObj),
+                          pictureValidator: (pic, content) {
+                            if (pic == null &&
+                                (content == null || content.isEmpty)) {
+                              throw Exception(
+                                "Le post ne peut être vide. Ajoutez une image ou du texte",
+                              );
+                            }
+                          },
+                        ),
+                  );
+                },
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(100),
                 ),

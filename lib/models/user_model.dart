@@ -16,6 +16,8 @@ class UserModel {
   late String adress;
   late Type accountType;
   late int? churchId;
+  late String certifStatus;
+  late DateTime? certifiedAt;
   //late ChurchModel? church;
 
   Widget buildWidget(BuildContext context) {
@@ -84,6 +86,8 @@ class UserModel {
     accountType = Dictionnary.accountTypes.firstWhere(
       (element) => element.code == json['account_type'],
     );
+    certifStatus = json['details']['certif_status'];
+    certifiedAt = json['details']['certifiedAt'] != null ? DateTime.parse(json['details']['certifiedAt']) : null;
     churchId = json['details'] == null ? null : json['details']['church_id'];
     //church = json['church'] == null ? null : ChurchModel.fromJson(json['church']);
   }

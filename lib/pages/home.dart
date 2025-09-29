@@ -1,4 +1,5 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/components/certification_banner.dart';
 import 'package:aesd/components/drawer.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/pages/forum/list.dart';
@@ -68,6 +69,7 @@ class _MainPageState extends State<MainPage> {
           width: 40,
         ),
         centerTitle: true,
+        bottom: getCertificationBanner(context),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10),
