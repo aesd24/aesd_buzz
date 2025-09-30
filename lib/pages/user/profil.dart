@@ -301,6 +301,11 @@ class _UserProfilState extends State<UserProfil> {
                                 icon: FontAwesomeIcons.microphoneLines,
                               ),*/
                               _customActionButton(
+                                onPressed:
+                                    () => Get.toNamed(
+                                      Routes.churchDetail,
+                                      arguments: {'churchId': user.church?.id},
+                                    ),
                                 text: "Visiter l'église",
                                 icon: FontAwesomeIcons.church,
                               ),

@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 
+import 'church_model.dart';
+
 class UserModel {
   late int? id;
   late String name;
@@ -15,10 +17,9 @@ class UserModel {
   late String? photo;
   late String adress;
   late Type accountType;
-  late int? churchId;
   late String? certifStatus;
   late DateTime? certifiedAt;
-  //late ChurchModel? church;
+  late ChurchModel? church;
 
   Widget buildWidget(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -52,34 +53,24 @@ class UserModel {
   }
 
   Widget buildTile() {
-    return GestureDetector(
-      onTap:
-          () => Get.toNamed(
-            Routes.profil,
-            arguments: {
-              'user': this,
-              'servantId': accountType == Dictionnary.servant ? id : null,
-            },
-          ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 17,
-            backgroundColor: notifire.getMainColor,
-            backgroundImage:
-                photo != null ? FastCachedImageProvider(photo!) : null,
-            child:
-                photo != null
-                    ? null
-                    : cusFaIcon(
-                      FontAwesomeIcons.solidUser,
-                      color: notifire.getbgcolor,
-                    ),
-          ),
-          SizedBox(width: 10),
-          Text(name),
-        ],
-      ),
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: 17,
+          backgroundColor: notifire.getMainColor,
+          backgroundImage:
+              photo != null ? FastCachedImageProvider(photo!) : null,
+          child:
+              photo != null
+                  ? null
+                  : cusFaIcon(
+                    FontAwesomeIcons.solidUser,
+                    color: notifire.getbgcolor,
+                  ),
+        ),
+        SizedBox(width: 10),
+        Text(name),
+      ],
     );
   }
 
@@ -93,13 +84,14 @@ class UserModel {
     accountType = Dictionnary.accountTypes.firstWhere(
       (element) => element.code == json['account_type'],
     );
+    church =
+        json['church'] == null ? null : ChurchModel.fromJson(json['church']);
     if (json['details'] != null) {
       certifStatus = json['details']['certif_status'];
       certifiedAt =
           json['details']['certified_at'] != null
               ? DateTime.parse(json['details']['certified_at'])
               : null;
-      churchId = json['details']['church_id'];
     }
   }
 

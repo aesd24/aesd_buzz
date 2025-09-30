@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
+import 'package:aesd/components/image_viewer.dart';
 import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/functions/formatteurs.dart';
 import 'package:aesd/models/event.dart';
@@ -79,51 +80,59 @@ class _EventPageState extends State<EventPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Partie de l'image et des titres
-                      Container(
-                        width: double.infinity,
-                        height: MediaQuery.of(context).size.height * .5,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image:
-                                event.imageUrl == null
-                                    ? AssetImage("assets/event.jpg")
-                                    : FastCachedImageProvider(event.imageUrl!),
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.vertical(
-                            bottom: Radius.circular(15),
-                          ),
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.black.withAlpha(200),
-                                Colors.black.withAlpha(70),
-                              ],
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
+                      GestureDetector(
+                        onTap:
+                            () => Get.to(
+                              ImageViewer(imageUrl: event.imageUrl ?? ''),
                             ),
-                            borderRadius: const BorderRadius.vertical(
+                        child: Container(
+                          width: double.infinity,
+                          height: MediaQuery.of(context).size.height * .5,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image:
+                                  event.imageUrl == null
+                                      ? AssetImage("assets/event.jpg")
+                                      : FastCachedImageProvider(
+                                        event.imageUrl!,
+                                      ),
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.vertical(
                               bottom: Radius.circular(15),
                             ),
                           ),
-                          alignment: Alignment.bottomLeft,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                event.title,
-                                style: Theme.of(
-                                  context,
-                                ).textTheme.titleLarge!.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                          child: Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.black.withAlpha(200),
+                                  Colors.black.withAlpha(70),
+                                ],
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
                               ),
-                            ],
+                              borderRadius: const BorderRadius.vertical(
+                                bottom: Radius.circular(15),
+                              ),
+                            ),
+                            alignment: Alignment.bottomLeft,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  event.title,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleLarge!.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),

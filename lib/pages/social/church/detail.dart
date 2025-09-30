@@ -41,7 +41,11 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
     initialScrollOffset: 0,
   );
 
-  Future<void> onSubscribe(int churchId, bool subscribed, String accountType) async {
+  Future<void> onSubscribe(
+    int churchId,
+    bool subscribed,
+    String accountType,
+  ) async {
     if (subscribed) {
       return showModal(
         context: context,
@@ -74,7 +78,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
         ),
       );
     } else {
-      if (Provider.of<Auth>(context, listen: false).user!.churchId != null) {
+      if (Provider.of<Auth>(context, listen: false).user!.church?.id != null) {
         showModal(
           context: context,
           dialog: CustomAlertDialog(
@@ -143,7 +147,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
           }
         });
       }
-    } on HttpException catch(e) {
+    } on HttpException catch (e) {
       MessageService.showErrorMessage(e.message);
     } catch (e) {
       MessageService.showErrorMessage("Une erreur inattendu est survenue");
@@ -197,7 +201,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final user = Provider.of<Auth>(context).user!;
-    bool subscribed = churchId == user.churchId;
+    bool subscribed = churchId == user.church?.id;
 
     return DefaultTabController(
       length: 3,
@@ -231,29 +235,49 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
                           expandedHeight: size.height * .4,
                           backgroundColor: notifire.getbgcolor,
                           leading: customBackButton(),
-                          actions: [
-                            Padding(
-                              padding: const EdgeInsets.only(right: 10),
-                              child:
-                                  _subscribing
-                                      ? CircularProgressIndicator(
-                                        strokeWidth: 1.5,
-                                      )
-                                      : CustomTextButton(
-                                        onPressed:
-                                            () => handleSubscribtion(
-                                              churchId!,
-                                              !subscribed,
-                                              user.accountType.code
-                                            ),
-                                        label: "S'abonner",
-                                        icon: cusFaIcon(
-                                          FontAwesomeIcons.solidBookmark,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                            ),
-                          ],
+                          actions:
+                              (subscribed &&
+                                      user.accountType.code ==
+                                          Dictionnary.servant.code)
+                                  ? null
+                                  : [
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child:
+                                          _subscribing
+                                              ? CircularProgressIndicator(
+                                                strokeWidth: 1.5,
+                                              )
+                                              : CustomTextButton(
+                                                onPressed:
+                                                    () => handleSubscribtion(
+                                                      churchId!,
+                                                      !subscribed,
+                                                      user.accountType.code,
+                                                    ),
+                                                label:
+                                                    !subscribed
+                                                        ? "S'abonner"
+                                                        : "Me désabonner",
+                                                type: ButtonType(
+                                                  icon: cusFaIcon(
+                                                    !subscribed
+                                                        ? FontAwesomeIcons
+                                                            .solidBookmark
+                                                        : FontAwesomeIcons
+                                                            .bookmark,
+                                                    color: Colors.white,
+                                                  ),
+                                                  foreColor: Colors.white,
+                                                  backColor:
+                                                      !subscribed
+                                                          ? notifire.info
+                                                          : notifire.danger,
+                                                  iconColor: Colors.white,
+                                                ),
+                                              ),
+                                    ),
+                                  ],
                           flexibleSpace: FlexibleSpaceBar(
                             title:
                                 displayName
@@ -270,7 +294,9 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
                               decoration: BoxDecoration(
                                 color: Colors.grey,
                                 image: DecorationImage(
-                                  image: FastCachedImageProvider(church.logo ?? ''),
+                                  image: FastCachedImageProvider(
+                                    church.logo ?? '',
+                                  ),
                                   fit: BoxFit.cover,
                                 ),
                               ),

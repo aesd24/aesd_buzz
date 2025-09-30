@@ -83,10 +83,10 @@ class _PostListState extends State<PostList> {
       MessageService.showErrorMessage(
         "Une erreur s'est produite, vérifiez la connexion internet et rééssayez",
       );
-    } /*catch (e) {
+    } catch (e) {
       e.printError();
       MessageService.showErrorMessage("Une erreur s'est produite");
-    }*/ finally {
+    } finally {
       setState(() {
         isLoading = false;
       });

@@ -59,9 +59,12 @@ class AppMenuDrawer extends StatelessWidget {
                         ),
                         Row(
                           children: [
-                            Text(user.accountType.name, style: mediumGreyTextStyle),
+                            Text(
+                              user.accountType.name,
+                              style: mediumGreyTextStyle,
+                            ),
                             SizedBox(width: 10),
-                            getCertificationIcon(context)
+                            getCertificationIcon(context),
                           ],
                         ),
                         if (user.accountType.code == Dictionnary.servant.code)
@@ -117,6 +120,11 @@ class AppMenuDrawer extends StatelessWidget {
                                 ),
                               ),
                               ListTile(
+                                onTap:
+                                    () => Get.toNamed(
+                                      Routes.churchDetail,
+                                      arguments: {'churchId': user.church!.id},
+                                    ),
                                 leading: cusFaIcon(FontAwesomeIcons.church),
                                 title: Text(
                                   "Mon église",
