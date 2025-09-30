@@ -20,9 +20,13 @@ class Church extends ChangeNotifier {
   Future getUserChurches() async {
     final response = await _request.userChurches();
     if (response.statusCode == 200) {
-      var data = response.data['data']['churches'];
+      final mainChurches = response.data['data']['main_churches'];
+      final secondaries = response.data['data']['secondary_churches'];
       _userChurches.clear();
-      for (var church in data) {
+      for (var church in mainChurches) {
+        _userChurches.add(ChurchModel.fromJson(church));
+      }
+      for (var church in secondaries) {
         _userChurches.add(ChurchModel.fromJson(church));
       }
     } else {
@@ -33,9 +37,10 @@ class Church extends ChangeNotifier {
 
   Future fetchChurches() async {
     final response = await _request.all(page: _currentPage);
+    print(response);
     if (response.statusCode == 200) {
       final churches =
-          (response.data['data']['churches'] as List)
+          (response.data['data'] as List)
               .map((e) => ChurchModel.fromJson(e))
               .toList();
       //_paginator = ChurchPaginator.fromJson(data);
@@ -109,6 +114,15 @@ class Church extends ChangeNotifier {
       return response.data['message'];
     } else {
       throw const HttpException("L'inscription à l'église à échoué.");
+    }
+  }
+
+  Future membershipRequest(int churchId) async {
+    final response = await _request.requestMembership(churchId: churchId);
+    if (response.statusCode == 200) {
+      return "Demande d'adhésion soumise";
+    } else {
+      throw HttpException("Impossible de rejoindre cette église");
     }
   }
 }

@@ -20,6 +20,7 @@ class ColorNotifire with ChangeNotifier {
   Color get getbordercolor => isDark ? darkbordercolor : bordercolor;
   Color get geticoncolor => isDark ? darkiconcolor : iconcolor;
   Color get getContainer => isDark ? darkContainerColor : containerColor;
+  Color get getOnContainer => isDark ? onDarkContainer : onContainer;
   Color get getcontinershadow => isDark ? darkcontinercolo1r : continercolo1r;
 
   Color get getTextColor1 => isDark ? textwhite : textdark;

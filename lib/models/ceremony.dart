@@ -1,5 +1,8 @@
+import 'package:aesd/appstaticdata/routes.dart';
+import 'package:aesd/components/icon.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 
 class CeremonyModel {
   late int id;
@@ -9,7 +12,7 @@ class CeremonyModel {
   late DateTime date;
   late int churchId;
 
-  CeremonyModel.fromJson(json){
+  CeremonyModel.fromJson(Map<String, dynamic> json){
     id = json['id'];
     title = json['title'];
     description = json['description'];
@@ -18,21 +21,13 @@ class CeremonyModel {
     churchId = json['id_eglise'];
   }
 
-  toJson() => {
-    'title': title,
-    'description': description,
-    'video_url': video,
-    'date': date,
-    'church_id': churchId,
-  };
-
-  Widget card(BuildContext context,{
+  Widget card(BuildContext context, {
     Future Function()? onDelete,
     bool dashboardAccess = false
   }) {
     return InkWell(
     overlayColor: WidgetStateProperty.all(Colors.orange.shade50),
-    onTap: () {}, //NavigationService.push(CeremonyViewer(ceremony: this)),
+    onTap: () => Get.toNamed(Routes.ceremonyDetail, arguments: {"ceremonyId": id}),
     child: Container(
       margin: EdgeInsets.symmetric(vertical: 7),
       decoration: BoxDecoration(
@@ -53,14 +48,21 @@ class CeremonyModel {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Flexible(
-                  child: Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      color: Colors.white
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    cusFaIcon(FontAwesomeIcons.film, color: Colors.white),
+                    SizedBox(width: 10),
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                          color: Colors.white
+                        ),
+                        overflow: TextOverflow.clip,
+                      ),
                     ),
-                    overflow: TextOverflow.clip,
-                  ),
+                  ],
                 ),
                 Text(
                   "${date.day}/${date.month}/${date.year}",
@@ -95,39 +97,7 @@ class CeremonyModel {
                           iconColor: WidgetStateProperty.all(Colors.amber)
                         ),
                         icon: FaIcon(FontAwesomeIcons.pen, size: 20)
-                      ),
-                      /*IconButton(
-                        onPressed: () => messageBox(
-                          context,
-                          title: "Suppréssion",
-                          content: Text("Vous allez supprimer cette cérémonie. Voulez-vous continuer ?"),
-                          actions: [
-                            TextButton(
-                              onPressed: () {},
-                              style: ButtonStyle(
-                                foregroundColor: WidgetStatePropertyAll(Colors.grey),
-                              ),
-                              child: Text("Annuler")
-                            ),
-                            TextButton.icon(
-                              iconAlignment: IconAlignment.end,
-                              onPressed: () async {},
-                              style: ButtonStyle(
-                                foregroundColor: WidgetStatePropertyAll(Colors.red),
-                                iconColor: WidgetStatePropertyAll(Colors.red),
-                                overlayColor: WidgetStatePropertyAll(Colors.red.shade100),
-                              ),
-                              icon: FaIcon(FontAwesomeIcons.trashCan),
-                              label: Text("Supprimer")
-                            ),
-                          ]
-                        ),
-                        style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all(Colors.red.shade100),
-                          iconColor: WidgetStateProperty.all(Colors.red)
-                        ),
-                        icon: FaIcon(FontAwesomeIcons.trash, size: 20)
-                      )*/
+                      )
                     ],
                   ),
                 )

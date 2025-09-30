@@ -123,7 +123,7 @@ class AppMenuDrawer extends StatelessWidget {
                                   style: mediumBlackTextStyle,
                                 ),
                               ),
-                              ListTile(
+                              /*ListTile(
                                 leading: cusFaIcon(
                                   FontAwesomeIcons.moneyBillTransfer,
                                 ),
@@ -132,7 +132,7 @@ class AppMenuDrawer extends StatelessWidget {
                                   "Porte-monnaie",
                                   style: mediumBlackTextStyle,
                                 ),
-                              ),
+                              ),*/
                               if (provider.user!.accountType.code ==
                                   Dictionnary.servant.code)
                                 ListTile(
@@ -148,17 +148,17 @@ class AppMenuDrawer extends StatelessWidget {
                               ListTile(
                                 leading: cusFaIcon(FontAwesomeIcons.circleInfo),
                                 title: Text(
-                                  "En savoir plus",
+                                  "Donnez votre avis",
                                   style: mediumBlackTextStyle,
                                 ),
                               ),
-                              ListTile(
+                              /*ListTile(
                                 leading: cusFaIcon(FontAwesomeIcons.gears),
                                 title: Text(
                                   "Préférences",
                                   style: mediumBlackTextStyle,
                                 ),
-                              ),
+                              ),*/
                             ],
                           ),
                         ),

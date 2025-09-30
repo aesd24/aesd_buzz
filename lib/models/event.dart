@@ -1,6 +1,7 @@
 import 'package:aesd/appstaticdata/routes.dart';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
+import 'package:aesd/components/image_viewer.dart';
 import 'package:aesd/components/modal.dart';
 import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/components/tiles.dart';
@@ -62,7 +63,7 @@ class EventModel {
               // image box
               if (imageUrl != null)
                 GestureDetector(
-                  onTap: () => showImageModal(context, imageUrl: imageUrl!),
+                  onTap: () => Get.to(ImageViewer(imageUrl: imageUrl!)),
                   child: ClipRRect(
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(10),

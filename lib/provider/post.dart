@@ -38,7 +38,7 @@ class PostProvider extends ChangeNotifier {
 
   Future getPosts() async {
     var response = await _request.all();
-    print(response);
+    print(response.data);
     _paginator = PostPaginator.fromJson(response.data);
     if (response.statusCode == 200) {
       _posts.clear();

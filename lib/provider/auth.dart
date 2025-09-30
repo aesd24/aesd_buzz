@@ -21,6 +21,16 @@ class Auth extends ChangeNotifier {
   final UnExpiredCache _unExpiredCache = UnExpiredCache();
   final request = AuthRequest();
 
+  Future retryCertification(UserCertif schem) async {
+    final data = await schem.getFormData();
+    final response = await request.retryCertificationRequest(data);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw HttpException("Impossible d'envoyer les informations");
+    }
+  }
+
   Future login(UserLogin data) async {
     final response = await request.login(data: await data.getFormData());
     if (response.statusCode == 200) {

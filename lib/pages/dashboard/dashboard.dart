@@ -33,19 +33,13 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   bool _isLoading = false;
-  List<ChurchModel> userChurches = [];
 
   Future<void> init() async {
     try {
       setState(() {
         _isLoading = true;
       });
-      await Provider.of<Church>(context, listen: false).getUserChurches().then((
-        value,
-      ) {
-        userChurches = Provider.of<Church>(context, listen: false).userChurches;
-        setState(() {});
-      });
+      await Provider.of<Church>(context, listen: false).getUserChurches();
     } catch (e) {
       e.printError();
     } finally {
@@ -102,7 +96,7 @@ class _DashboardState extends State<Dashboard> {
             Expanded(
               child: Consumer<Church>(
                 builder: (context, churchProvider, child) {
-                  if (churchProvider.churches.isEmpty) {
+                  if (churchProvider.userChurches.isEmpty) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 30),
                       child: notFoundTile(
@@ -219,36 +213,36 @@ class _DashboardState extends State<Dashboard> {
             spacing: 10,
             runSpacing: 10,
             children: [
-              customIconButton(
+              /*customIconButton(
                 label: "Porte-feuille",
                 icon: FontAwesomeIcons.wallet,
                 color: Colors.green,
                 destination: Wallet(),
-              ),
-              customIconButton(
+              ),*/
+              /*customIconButton(
                 destination: ProgramListPage(),
                 color: Colors.purple,
                 icon: FontAwesomeIcons.calendarWeek,
                 label: "Programme",
-              ),
+              ),*/
               customIconButton(
                 destination: ChurchEvents(churchId: church.id),
                 color: Colors.amber,
                 icon: FontAwesomeIcons.solidCalendarDays,
-                label: "Evènements",
+                label: "Evènements"
               ),
               customIconButton(
                 destination: CeremoniesManagement(churchId: church.id),
-                color: Colors.orange,
+                color: Colors.red,
                 icon: FontAwesomeIcons.film,
-                label: "Cérémonies",
+                label: "Cérémonies"
               ),
-              customIconButton(
+              /*customIconButton(
                 destination: DashboardCommunityPage(churchId: church.id),
                 color: Colors.blue,
                 icon: FontAwesomeIcons.peopleGroup,
                 label: "Communauté",
-              ),
+              ),*/
             ],
           ),
         ],

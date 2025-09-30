@@ -16,7 +16,7 @@ class UserModel {
   late String adress;
   late Type accountType;
   late int? churchId;
-  late String certifStatus;
+  late String? certifStatus;
   late DateTime? certifiedAt;
   //late ChurchModel? church;
 
@@ -53,7 +53,14 @@ class UserModel {
 
   Widget buildTile() {
     return GestureDetector(
-      onTap: () => Get.toNamed(Routes.profil, arguments: {'user': this}),
+      onTap:
+          () => Get.toNamed(
+            Routes.profil,
+            arguments: {
+              'user': this,
+              'servantId': accountType == Dictionnary.servant ? id : null,
+            },
+          ),
       child: Row(
         children: [
           CircleAvatar(
@@ -86,10 +93,14 @@ class UserModel {
     accountType = Dictionnary.accountTypes.firstWhere(
       (element) => element.code == json['account_type'],
     );
-    certifStatus = json['details']['certif_status'];
-    certifiedAt = json['details']['certifiedAt'] != null ? DateTime.parse(json['details']['certifiedAt']) : null;
-    churchId = json['details'] == null ? null : json['details']['church_id'];
-    //church = json['church'] == null ? null : ChurchModel.fromJson(json['church']);
+    if (json['details'] != null) {
+      certifStatus = json['details']['certif_status'];
+      certifiedAt =
+          json['details']['certified_at'] != null
+              ? DateTime.parse(json['details']['certified_at'])
+              : null;
+      churchId = json['details']['church_id'];
+    }
   }
 
   Map<String, dynamic> toJson() => {

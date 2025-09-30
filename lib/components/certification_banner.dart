@@ -33,7 +33,7 @@ PreferredSize? getCertificationBanner(BuildContext context) {
       child: GestureDetector(
         onTap:
             () =>
-                banner == BannerType.rejectedBanner
+                banner != BannerType.rejectedBanner
                     ? Get.to(RetryCertifPage())
                     : null,
         child: Container(

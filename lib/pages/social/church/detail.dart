@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:aesd/appstaticdata/dictionnary.dart';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/icon.dart';
@@ -40,7 +41,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
     initialScrollOffset: 0,
   );
 
-  Future<void> onSubscribe(int churchId, bool subscribed) async {
+  Future<void> onSubscribe(int churchId, bool subscribed, String accountType) async {
     if (subscribed) {
       return showModal(
         context: context,
@@ -58,7 +59,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
             TextButton.icon(
               onPressed: () {
                 Get.back();
-                handleSubscribtion(churchId, !subscribed);
+                handleSubscribtion(churchId, !subscribed, accountType);
               },
               icon: FaIcon(FontAwesomeIcons.xmark),
               iconAlignment: IconAlignment.end,
@@ -92,7 +93,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
               TextButton.icon(
                 onPressed: () {
                   Get.back();
-                  handleSubscribtion(churchId, !subscribed);
+                  handleSubscribtion(churchId, !subscribed, accountType);
                 },
                 icon: FaIcon(FontAwesomeIcons.arrowsRotate),
                 iconAlignment: IconAlignment.end,
@@ -107,27 +108,43 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
           ),
         );
       } else {
-        handleSubscribtion(churchId, !subscribed);
+        handleSubscribtion(churchId, !subscribed, accountType);
       }
     }
   }
 
-  Future<void> handleSubscribtion(int churchId, bool willSubscribe) async {
+  Future<void> handleSubscribtion(
+    int churchId,
+    bool willSubscribe,
+    String accountType,
+  ) async {
     try {
       setState(() {
         _subscribing = true;
       });
-      await Provider.of<Church>(
-        context,
-        listen: false,
-      ).subscribe(churchId, willSubscribe: willSubscribe).then((value) async {
-        MessageService.showSuccessMessage(value);
-        if (mounted) {
-          await Provider.of<Auth>(context, listen: false).getUserData();
-        }
-      });
-    } on HttpException {
-      MessageService.showErrorMessage("L'opération a échoué !");
+      if (accountType == Dictionnary.servant.code) {
+        await Provider.of<Church>(
+          context,
+          listen: false,
+        ).membershipRequest(churchId).then((value) async {
+          MessageService.showSuccessMessage(value);
+          if (mounted) {
+            await Provider.of<Auth>(context, listen: false).getUserData();
+          }
+        });
+      } else {
+        await Provider.of<Church>(
+          context,
+          listen: false,
+        ).subscribe(churchId, willSubscribe: willSubscribe).then((value) async {
+          MessageService.showSuccessMessage(value);
+          if (mounted) {
+            await Provider.of<Auth>(context, listen: false).getUserData();
+          }
+        });
+      }
+    } on HttpException catch(e) {
+      MessageService.showErrorMessage(e.message);
     } catch (e) {
       MessageService.showErrorMessage("Une erreur inattendu est survenue");
     } finally {
@@ -187,9 +204,11 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
       child: Scaffold(
         body:
             _isLoading
-                ? Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: ListShimmerPlaceholder(),
+                ? SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: ListShimmerPlaceholder(),
+                  ),
                 )
                 : Consumer<Church>(
                   builder: (context, provider, child) {
@@ -225,6 +244,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
                                             () => handleSubscribtion(
                                               churchId!,
                                               !subscribed,
+                                              user.accountType.code
                                             ),
                                         label: "S'abonner",
                                         icon: cusFaIcon(
@@ -250,7 +270,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
                               decoration: BoxDecoration(
                                 color: Colors.grey,
                                 image: DecorationImage(
-                                  image: FastCachedImageProvider(church.image),
+                                  image: FastCachedImageProvider(church.logo ?? ''),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -259,7 +279,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
                                   gradient: LinearGradient(
                                     colors: [
                                       notifire.getContainer.withAlpha(170),
-                                      notifire.getContainer.withAlpha(10),
+                                      notifire.getOnContainer.withAlpha(60),
                                     ],
                                     begin: Alignment.topCenter,
                                     end: Alignment.bottomCenter,
@@ -319,6 +339,8 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
                                 Padding(
                                   padding: EdgeInsets.only(top: 25),
                                   child: TabBar(
+                                    isScrollable: true,
+                                    tabAlignment: TabAlignment.start,
                                     dividerColor: Colors.transparent,
                                     dividerHeight: 0,
                                     tabs: [

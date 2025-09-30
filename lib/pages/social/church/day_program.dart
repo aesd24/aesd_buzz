@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:aesd/components/not_found.dart';
 import 'package:aesd/models/day_program.dart';
 import 'package:aesd/models/event.dart';
 import 'package:aesd/provider/event.dart';
@@ -58,41 +59,32 @@ class _ProgramState extends State<Program> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Programme du jour",
-                style: Theme.of(
-                  context,
-                ).textTheme.labelLarge!.copyWith(fontWeight: FontWeight.bold),
-              ),
-              /* TextButton.icon(
-                  onPressed: () => null,//NavigationService.push(context, destination: ),
-                  icon: const Icon(Icons.keyboard_arrow_right),
-                  iconAlignment: IconAlignment.end,
-                  label: const Text("Tout voir")) */
-            ],
+          Text(
+            "Liste des événements",
+            style: Theme.of(
+              context,
+            ).textTheme.labelLarge!.copyWith(fontWeight: FontWeight.bold),
           ),
           Consumer<Event>(
-            builder: (context, eventProvider, child) {
-              EventModel? lastEvent;
-              if (eventProvider.events.isNotEmpty) {
-                lastEvent = eventProvider.events.last;
+            builder: (context, provider, child) {
+              final events = provider.events;
+              if (events.isEmpty) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: notFoundTile(text: "Aucun événement à afficher"),
+                );
               }
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
-                child:
-                    lastEvent != null
-                        ? lastEvent.buildWidget(context)
-                        : Text("Aucun événement pour le moment..."),
+                child: Column(
+                  children: List.generate(events.length, (index) {
+                    return events[index].buildWidget(context);
+                  }),
+                ),
               );
             },
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            child: currentProgram.getWidget(context),
           ),
         ],
       ),

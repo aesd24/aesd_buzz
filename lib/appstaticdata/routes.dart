@@ -5,6 +5,7 @@ import 'package:aesd/pages/auth/change_password/forgot_password.dart';
 import 'package:aesd/pages/auth/change_password/otp_verification.dart';
 import 'package:aesd/pages/auth/login_register/update.dart';
 import 'package:aesd/pages/auth/splash_screen.dart';
+import 'package:aesd/pages/ceremonies/ceremony_viewer.dart';
 import 'package:aesd/pages/events/detail.dart';
 import 'package:aesd/pages/home.dart';
 import 'package:aesd/pages/user/profil.dart';
@@ -35,12 +36,13 @@ class Routes {
   static String updateUser = '/user/update';
 
   // Socials
-  static String postDetail = '/postDetail';
-  static String newsDetail = '/newsDetail';
+  static String postDetail = '/post';
+  static String newsDetail = '/news';
   static String subject = '/subject';
-  static String testimonyDetail = '/testimonyDetail';
-  static String churchDetail = '/churchDetail';
+  static String testimonyDetail = '/testimony';
+  static String churchDetail = '/church';
   static String eventDetail = '/event';
+  static String ceremonyDetail = '/ceremony';
 }
 
 final getPage = [
@@ -49,20 +51,30 @@ final getPage = [
   GetPage(name: Routes.auth, page: () => AuthPage()),
   GetPage(name: Routes.forgot, page: () => ForgotPasswordPage()),
   GetPage(name: Routes.verifyEmail, page: () => OtpVerificationPage()),
-  GetPage(
-    name: Routes.changePassword,
-    page: () => UpdatePasswordPage(),
-  ),
+  GetPage(name: Routes.changePassword, page: () => UpdatePasswordPage()),
   GetPage(name: Routes.profil, page: _buildLoggedPage(UserProfil())),
-  GetPage(name: Routes.transactions, page: _buildLoggedPage(TransactionsPage())),
+  GetPage(
+    name: Routes.transactions,
+    page: _buildLoggedPage(TransactionsPage()),
+  ),
   GetPage(name: Routes.wallet, page: _buildLoggedPage(Wallet())),
   GetPage(name: Routes.postDetail, page: _buildLoggedPage(PostDetail())),
   GetPage(name: Routes.newsDetail, page: _buildLoggedPage(NewsPage())),
   GetPage(name: Routes.subject, page: _buildLoggedPage(DiscutionSubjectPage())),
   GetPage(name: Routes.updateUser, page: _buildLoggedPage(UpdateUserPage())),
-  GetPage(name: Routes.testimonyDetail, page: _buildLoggedPage(TestimonyDetail())),
-  GetPage(name: Routes.churchDetail, page: _buildLoggedPage(ChurchDetailPage())),
+  GetPage(
+    name: Routes.testimonyDetail,
+    page: _buildLoggedPage(TestimonyDetail()),
+  ),
+  GetPage(
+    name: Routes.churchDetail,
+    page: _buildLoggedPage(ChurchDetailPage()),
+  ),
   GetPage(name: Routes.eventDetail, page: _buildLoggedPage(EventPage())),
+  GetPage(
+    name: Routes.ceremonyDetail,
+    page: _buildLoggedPage(CeremonyViewer()),
+  ),
 ];
 
 Widget Function() _buildLoggedPage(Widget page) {

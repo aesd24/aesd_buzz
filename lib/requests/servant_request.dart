@@ -1,20 +1,21 @@
 import 'package:aesd/services/dio_service.dart';
 
 class ServantRequest extends DioClient {
-  all({dynamic queryParameters}) async {
+  final String baseRoute = "serviteurs";
+  Future all({dynamic queryParameters}) async {
     final client = await getApiClient();
-    return client.get('/serviteurs');
+    return client.get(baseRoute);
   }
 
-  one(int servantId) async {
+  Future one(int servantId) async {
     final client = await getApiClient();
-    return await client.get('serviteurs/$servantId');
+    return await client.get('$baseRoute/$servantId');
   }
 
-  subscribe(int servantId, bool subscribe) async {
+  Future subscribe(int servantId, bool subscribe) async {
     final client = await getApiClient();
     return await client.post(
-      '/subscribe_serviteurs/$servantId',
+      '$baseRoute/subscribe/$servantId',
       data: {'subscriptionInput': subscribe == true ? 1 : 0},
     );
   }

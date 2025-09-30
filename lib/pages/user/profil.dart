@@ -116,7 +116,7 @@ class _UserProfilState extends State<UserProfil> {
                   backgroundColor:
                       Colors.green, //Theme.of(context).colorScheme.surface,
                   automaticallyImplyLeading: false,
-                  pinned: false,
+                  pinned: true,
                   flexibleSpace: FlexibleSpaceBar(
                     background: Container(
                       color: Colors.green,
@@ -250,11 +250,11 @@ class _UserProfilState extends State<UserProfil> {
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
                                   ),
-                                  if (isSelf)
+                                  /*if (isSelf)
                                     TextButton(
                                       onPressed: () {},
                                       child: Text("Ajouter"),
-                                    ),
+                                    ),*/
                                 ],
                               ),
                               SizedBox(height: 5),
@@ -291,20 +291,20 @@ class _UserProfilState extends State<UserProfil> {
                                   text: "Modifier mon mot de passe",
                                   icon: FontAwesomeIcons.lockOpen,
                                 ),
-                                _customActionButton(
+                                /*_customActionButton(
                                   text: "Voir mes transactions",
                                   icon: FontAwesomeIcons.moneyBillTransfer,
-                                ),
+                                ),*/
                               ],
-                              _customActionButton(
+                              /*_customActionButton(
                                 text: "Ecouter les témoignages",
                                 icon: FontAwesomeIcons.microphoneLines,
-                              ),
+                              ),*/
                               _customActionButton(
                                 text: "Visiter l'église",
                                 icon: FontAwesomeIcons.church,
                               ),
-                              if (user.accountType.code ==
+                              /*if (user.accountType.code ==
                                   Dictionnary.servant.code) ...[
                                 _customActionButton(
                                   text: "Voir les posts",
@@ -315,7 +315,7 @@ class _UserProfilState extends State<UserProfil> {
                                     text: "Payer la dime",
                                     icon: FontAwesomeIcons.circleDollarToSlot,
                                   ),
-                              ],
+                              ],*/
                             ],
                           ),
                         ),

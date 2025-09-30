@@ -34,7 +34,6 @@ class Servant extends ChangeNotifier {
 
   Future subscribe({required int servantId, required bool subscribe}) async {
     final response = await _request.subscribe(servantId, subscribe);
-    print(response);
     if (response.statusCode == 200) {
       return response.data;
     } else {

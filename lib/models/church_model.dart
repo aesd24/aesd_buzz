@@ -76,16 +76,16 @@ class ChurchModel {
           children: [
             // image box
             GestureDetector(
-              onTap: () => Get.to(ImageViewer(imageUrl: image)),
+              onTap: () => Get.to(ImageViewer(imageUrl: logo ?? "")),
               child: Hero(
-                tag: image,
+                tag: logo ?? "",
                 child: ClipRRect(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
                   child: FastCachedImage(
                     height: 200,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    url: image,
+                    url: logo ?? "",
                     loadingBuilder: (context, progress) {
                       return imageShimmerPlaceholder(height: 200);
                     },
