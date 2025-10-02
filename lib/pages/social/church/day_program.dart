@@ -19,17 +19,7 @@ class Program extends StatefulWidget {
 }
 
 class _ProgramState extends State<Program> {
-  var currentProgram = DayProgramModel.fromJson({
-    'day': "Lundi",
-    'program': List.generate(3, (index) {
-      return {
-        'title': "Programme $index",
-        'startTime': "${index + 10}:00:00",
-        'endTime': "${index + 11}:00:00",
-        'place': "Lien $index",
-      };
-    }),
-  });
+  var currentProgram = [];
 
   void init() async {
     try {

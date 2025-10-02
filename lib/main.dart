@@ -5,6 +5,7 @@ import 'package:aesd/provider/event.dart';
 import 'package:aesd/provider/forum.dart';
 import 'package:aesd/provider/news.dart';
 import 'package:aesd/provider/post.dart';
+import 'package:aesd/provider/program.dart';
 import 'package:aesd/provider/proviercolors.dart';
 import 'package:aesd/provider/quiz.dart';
 import 'package:aesd/provider/servant.dart';
@@ -122,6 +123,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => Singer()),
         ChangeNotifierProvider(create: (context) => Testimony()),
         ChangeNotifierProvider(create: (context) => Ceremonies()),
+        ChangeNotifierProvider(create: (context) => ProgramProvider()),
       ],
       child: GetMaterialApp(
         locale: const Locale('fr', 'FR'),

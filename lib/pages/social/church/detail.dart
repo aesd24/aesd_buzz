@@ -29,8 +29,6 @@ class ChurchDetailPage extends StatefulWidget {
 
 class _ChurchDetailPageState extends State<ChurchDetailPage> {
   int? churchId;
-  UserModel? owner;
-  List<UserModel> members = [];
   bool _isLoading = false;
   bool _subscribing = false;
 
@@ -344,7 +342,8 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
                                   children: [
                                     customDataTile(
                                       icon: cusFaIcon(FontAwesomeIcons.userTie),
-                                      text: owner?.name ?? "Inconnu",
+                                      text:
+                                          church.owner?.user.name ?? "Inconnu",
                                     ),
                                     customDataTile(
                                       icon: cusFaIcon(
@@ -398,10 +397,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
                               children: [
                                 Program(churchId: churchId!),
                                 CeremonyShortList(churchId: churchId!),
-                                Community(
-                                  members: members,
-                                  subscribed: subscribed,
-                                ),
+                                Community(),
                               ],
                             ),
                           ),

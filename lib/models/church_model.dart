@@ -4,6 +4,7 @@ import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/components/tiles.dart';
 import 'package:aesd/models/day_program.dart';
 import 'package:aesd/models/servant_model.dart';
+import 'package:aesd/models/user_model.dart';
 import 'package:aesd/pages/social/church/detail.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -21,9 +22,9 @@ class ChurchModel {
   late String? cover;
   late String image;
   late String? type;
-  late List<ServantModel> servants = [];
-  late ServantModel? mainServant;
-  late int mainServantId;
+  List<ServantModel> servants = [];
+  ServantModel? owner;
+  List<UserModel> members = [];
   late DayProgramModel? program;
 
   ChurchModel.fromJson(Map<String, dynamic> json) {
@@ -39,18 +40,9 @@ class ChurchModel {
     description = json['description'];
     phone = json['phone'];
     type = json['type_church'];
-    mainServant =
-        json['main_servant'] == null
-            ? null
-            : ServantModel.fromJson(json['main_servant']);
-    mainServantId = json['owner_servant_id'];
     json['servants']?.forEach((d) {
       servants.add(ServantModel.fromJson(d));
     });
-    program =
-        json['program'] != null
-            ? DayProgramModel.fromJson(json['program'])
-            : null;
   }
 
   Widget buildWidget(BuildContext context) {

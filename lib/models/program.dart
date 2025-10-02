@@ -3,12 +3,14 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ProgramModel {
   late String title;
+  late String day;
   late TimeOfDay startTime;
   late TimeOfDay endTime;
   late String place;
 
   ProgramModel.fromJson(json) {
     title = json['title'];
+    day = json['day'];
 
     var parts = json["startTime"].split(":");
     startTime =

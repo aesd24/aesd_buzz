@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:aesd/models/church_model.dart';
+import 'package:aesd/models/servant_model.dart';
+import 'package:aesd/models/user_model.dart';
 import 'package:aesd/requests/church_request.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +39,6 @@ class Church extends ChangeNotifier {
 
   Future fetchChurches() async {
     final response = await _request.all(page: _currentPage);
-    print(response);
     if (response.statusCode == 200) {
       final churches =
           (response.data['data'] as List)
@@ -56,8 +57,12 @@ class Church extends ChangeNotifier {
   Future fetchChurch(int id) async {
     var response = await _request.one(id);
     if (response.statusCode == 200) {
-      _selectedChurch = ChurchModel.fromJson(response.data['data']['church']);
-      return response.data;
+      final data = response.data['data'];
+      _selectedChurch = ChurchModel.fromJson(data['church']);
+      _selectedChurch!.owner = ServantModel.fromJson(data['owner']);
+      _selectedChurch!.members =
+          (data['members'] as List).map((e) => UserModel.fromJson(e)).toList();
+      return true;
     } else {
       throw Exception("Impossible de récupérer l'église");
     }

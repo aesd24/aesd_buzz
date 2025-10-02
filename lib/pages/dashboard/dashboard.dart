@@ -220,7 +220,7 @@ class _DashboardState extends State<Dashboard> {
                 destination: Wallet(),
               ),*/
               /*customIconButton(
-                destination: ProgramListPage(),
+                destination: ProgramListPage(church: church),
                 color: Colors.purple,
                 icon: FontAwesomeIcons.calendarWeek,
                 label: "Programme",
