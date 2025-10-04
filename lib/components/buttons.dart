@@ -162,9 +162,9 @@ Widget customActionButton(
   );
 }
 
-Widget customBackButton({Color? color}) {
+Widget customBackButton({IconData? icon = FontAwesomeIcons.arrowLeftLong, Color? color}) {
   return IconButton(
     onPressed: () => Get.back(),
-    icon: cusFaIcon(FontAwesomeIcons.arrowLeftLong, color: color),
+    icon: cusFaIcon(icon!, color: color),
   );
 }

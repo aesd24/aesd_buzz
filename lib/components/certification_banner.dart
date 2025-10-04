@@ -1,4 +1,5 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/components/church_banner.dart';
 import 'package:aesd/pages/user/retry_certif.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:flutter/material.dart';
@@ -25,37 +26,40 @@ BannerType? getBannerType(BuildContext context) {
 PreferredSize? getCertificationBanner(BuildContext context) {
   BannerType? banner = getBannerType(context);
 
-  if (banner == null) return null;
-
-  return PreferredSize(
-    preferredSize: Size(double.infinity, 70),
-    child: Expanded(
-      child: GestureDetector(
-        onTap:
-            () =>
-                banner != BannerType.rejectedBanner
-                    ? Get.to(RetryCertifPage())
-                    : null,
-        child: Container(
-          alignment: Alignment.center,
-          margin: EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            border: Border.all(width: 2, color: banner.color),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: ListTile(
-            leading: cusFaIcon(banner.icon, color: banner.color),
-            title: Text(
-              banner.text,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium!.copyWith(color: banner.color),
+  if (banner != null) {
+    return PreferredSize(
+      preferredSize: Size(double.infinity, 70),
+      child: Expanded(
+        child: GestureDetector(
+          onTap:
+              () =>
+                  banner == BannerType.rejectedBanner
+                      ? Get.to(RetryCertifPage())
+                      : null,
+          child: Container(
+            alignment: Alignment.center,
+            margin: EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+              border: Border.all(width: 2, color: banner.color),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: ListTile(
+              leading: cusFaIcon(banner.icon, color: banner.color),
+              title: Text(
+                banner.text,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium!.copyWith(color: banner.color),
+              ),
             ),
           ),
         ),
       ),
-    ),
-  );
+    );
+  }
+  else {
+    return getChurchIssueBanner(context);
+  }
 }
 
 Widget getCertificationIcon(BuildContext context) {
@@ -77,7 +81,7 @@ class BannerType {
   final Color color;
   final String text;
 
-  BannerType({required this.icon, required this.color, required this.text});
+  BannerType({required this.icon, required this.color, this.text = ""});
 
   static final rejectedBanner = BannerType(
     icon: FontAwesomeIcons.triangleExclamation,
@@ -91,4 +95,12 @@ class BannerType {
     text: "Votre compte est en attente de validation.",
     color: notifire.info,
   );
+
+  BannerType copyWith({IconData? icon, Color? color, String? text}) {
+    return BannerType(
+      icon: icon ?? this.icon,
+      color: color ?? this.color,
+      text: text ?? this.text,
+    );
+  }
 }

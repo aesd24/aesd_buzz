@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:aesd/appstaticdata/dictionnary.dart';
 import 'package:aesd/appstaticdata/routes.dart';
 import 'package:aesd/components/icon.dart';
+import 'package:aesd/functions/utilities.dart';
 import 'package:aesd/models/servant_model.dart';
 import 'package:aesd/models/user_model.dart';
 import 'package:aesd/provider/auth.dart';
@@ -301,11 +302,7 @@ class _UserProfilState extends State<UserProfil> {
                                 icon: FontAwesomeIcons.microphoneLines,
                               ),*/
                               _customActionButton(
-                                onPressed:
-                                    () => Get.toNamed(
-                                      Routes.churchDetail,
-                                      arguments: {'churchId': user.church?.id},
-                                    ),
+                                onPressed: () => openUserChurch(user),
                                 text: "Visiter l'église",
                                 icon: FontAwesomeIcons.church,
                               ),

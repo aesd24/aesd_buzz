@@ -1,4 +1,6 @@
+import 'package:aesd/appstaticdata/routes.dart';
 import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/components/bottom_sheets.dart';
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/certification_banner.dart';
 import 'package:aesd/components/divider.dart';
@@ -9,6 +11,7 @@ import 'package:aesd/models/user_model.dart';
 import 'package:aesd/pages/social/church/creation/main.dart';
 import 'package:aesd/pages/social/church/detail.dart';
 import 'package:aesd/pages/wallet/wallet.dart';
+import 'package:aesd/provider/auth.dart';
 import 'package:aesd/provider/church.dart';
 import 'package:aesd/pages/dashboard/ceremony.dart';
 import 'package:aesd/pages/dashboard/community.dart';
@@ -92,7 +95,92 @@ class _DashboardState extends State<Dashboard> {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            textDivider("Liste de vos églises"),
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  textDivider("Liste de vos églises"),
+                  CustomTextButton(
+                    onPressed: () {
+                      if (widget.user.certifStatus !=
+                          CertificationStates.approved) {
+                        return MessageService.showWarningMessage(
+                          "Votre compte n'est pas validé vous n'avez pas les accès requis !",
+                        );
+                      }
+
+                      showModalBottomSheet(
+                        context: context,
+                        backgroundColor: Colors.transparent,
+                        isScrollControlled: true,
+                        builder:
+                            (context) => Container(
+                              height: MediaQuery.of(context).size.height * .45,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(20),
+                                ),
+                                color: notifire.getbgcolor,
+                              ),
+                              child: Scaffold(
+                                backgroundColor: Colors.transparent,
+                                appBar: AppBar(
+                                  leading: customBackButton(
+                                    icon: FontAwesomeIcons.xmark,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(20),
+                                    ),
+                                  ),
+                                ),
+                                body: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 15,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      CustomBottomSheetButtom(
+                                        onPressed:
+                                            () => Get.to(
+                                              MainChurchCreationPage(),
+                                            ),
+                                        text: "Eglise principale",
+                                        image: Image.asset(
+                                          "assets/icons/crown.png",
+                                          height: 100,
+                                          width: 100,
+                                        ),
+                                      ),
+                                      CustomBottomSheetButtom(
+                                        onPressed: () {
+                                          Get.back();
+                                          MessageService.showInfoMessage(
+                                            "Cette fonctionnalité sera bientôt disponible...",
+                                          );
+                                        },
+                                        text: "Eglise secondaire",
+                                        image: Image.asset(
+                                          "assets/icons/second.png",
+                                          height: 100,
+                                          width: 100,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                      );
+                    },
+                    label: "Créer une église",
+                  ),
+                ],
+              ),
+            ),
             Expanded(
               child: Consumer<Church>(
                 builder: (context, churchProvider, child) {
@@ -229,13 +317,13 @@ class _DashboardState extends State<Dashboard> {
                 destination: ChurchEvents(churchId: church.id),
                 color: Colors.amber,
                 icon: FontAwesomeIcons.solidCalendarDays,
-                label: "Evènements"
+                label: "Evènements",
               ),
               customIconButton(
                 destination: CeremoniesManagement(churchId: church.id),
                 color: Colors.red,
                 icon: FontAwesomeIcons.film,
-                label: "Cérémonies"
+                label: "Cérémonies",
               ),
               /*customIconButton(
                 destination: DashboardCommunityPage(churchId: church.id),

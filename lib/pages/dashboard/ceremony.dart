@@ -118,6 +118,7 @@ class _CeremoniesManagementState extends State<CeremoniesManagement> {
                                         ceremonyProvider.ceremonies[index];
                                     return current.card(
                                       context,
+                                      dashboardAccess: true,
                                       onDelete: () => handleDeletion(current),
                                     );
                                   },
