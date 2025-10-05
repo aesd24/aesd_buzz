@@ -5,8 +5,10 @@ import 'package:aesd/components/icon.dart';
 import 'package:aesd/functions/utilities.dart';
 import 'package:aesd/models/servant_model.dart';
 import 'package:aesd/models/user_model.dart';
+import 'package:aesd/pages/social/socialElementsList.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:aesd/provider/servant.dart';
+import 'package:aesd/provider/testimony.dart';
 import 'package:aesd/services/message.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +31,19 @@ class _UserProfilState extends State<UserProfil> {
   bool isSelf = false;
 
   late ServantModel servant;
+
+  Future<dynamic> loadTestimonies() async {
+    try {
+      final results =
+          await Provider.of<Testimony>(
+            context,
+            listen: false,
+          ).getUserTestimonies();
+      return results;
+    } on HttpException {
+      MessageService.showErrorMessage("L'opération à échoué !");
+    }
+  }
 
   void loadServant(int servantId) async {
     try {
@@ -296,11 +311,17 @@ class _UserProfilState extends State<UserProfil> {
                                   text: "Voir mes transactions",
                                   icon: FontAwesomeIcons.moneyBillTransfer,
                                 ),*/
+                                _customActionButton(
+                                  onPressed:
+                                      () => Get.to(() =>
+                                        SocialElementsList(
+                                          loadElements: loadTestimonies,
+                                        ),
+                                      ),
+                                  text: "Ecouter les témoignages",
+                                  icon: FontAwesomeIcons.microphoneLines,
+                                ),
                               ],
-                              /*_customActionButton(
-                                text: "Ecouter les témoignages",
-                                icon: FontAwesomeIcons.microphoneLines,
-                              ),*/
                               _customActionButton(
                                 onPressed: () => openUserChurch(user),
                                 text: "Visiter l'église",

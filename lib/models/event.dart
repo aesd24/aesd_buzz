@@ -2,10 +2,9 @@ import 'package:aesd/appstaticdata/routes.dart';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/image_viewer.dart';
-import 'package:aesd/components/modal.dart';
 import 'package:aesd/components/placeholders.dart';
-import 'package:aesd/components/tiles.dart';
 import 'package:aesd/functions/formatteurs.dart';
+import 'package:aesd/pages/events/create_event.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -25,7 +24,7 @@ class EventModel {
   late int churchId;
   late bool isPublic;
 
-  EventModel.fromJson(json) {
+  EventModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     title = json['titre'];
     description = json['description'];
@@ -40,7 +39,11 @@ class EventModel {
     isPublic = json['est_public'] == 1;
   }
 
-  Widget buildWidget(BuildContext context, {Future Function(int)? onDelete}) {
+  Widget buildWidget(
+    BuildContext context, {
+    Future Function(int)? onDelete,
+    bool dashboardView = false,
+  }) {
     return InkWell(
       onTap: () => Get.toNamed(Routes.eventDetail, arguments: {'eventId': id}),
       child: Padding(
@@ -83,6 +86,59 @@ class EventModel {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Bouton d'option pour modification / suppression
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: PopupMenuButton(
+                          onSelected: (value) {
+                            if (value == "edit") {
+                              Get.to(
+                                EventForm(
+                                  churchId: churchId,
+                                  editMode: true,
+                                  event: this,
+                                ),
+                              );
+                            }
+                            if (value == 'delete') {
+                              if (onDelete != null) onDelete(id);
+                            }
+                          },
+                          itemBuilder:
+                              (context) => [
+                                PopupMenuItem(
+                                  value: "edit",
+                                  child: Row(
+                                    children: [
+                                      cusFaIcon(
+                                        FontAwesomeIcons.pen,
+                                        color: notifire.warning,
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text("Modifier"),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: "delete",
+                                  child: Row(
+                                    children: [
+                                      cusFaIcon(
+                                        FontAwesomeIcons.trashCan,
+                                        color: notifire.danger,
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text("Supprimer"),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                        ),
+                      ),
+                    ),
+
                     // Date et Lieu de l'évènement
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 10),

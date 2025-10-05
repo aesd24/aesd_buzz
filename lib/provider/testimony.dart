@@ -31,6 +31,17 @@ class Testimony extends ChangeNotifier {
     _selectedTestimony = TestimonyModel.fromJson(response.data);
   }
 
+  Future getUserTestimonies() async {
+    final response = await _request.forUser();
+    if (response.statusCode == 200) {
+      final userTestimonies = [];
+      for (var piece in response.data) {
+        userTestimonies.add(TestimonyModel.fromJson(piece));
+      }
+      return userTestimonies;
+    }
+  }
+
   Future create(Map<String, dynamic> data) async {
     final formData = FormData.fromMap({
       'title': data['title'],
