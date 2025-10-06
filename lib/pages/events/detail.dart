@@ -4,7 +4,6 @@ import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/image_viewer.dart';
 import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/functions/formatteurs.dart';
-import 'package:aesd/models/event.dart';
 import 'package:aesd/provider/event.dart';
 import 'package:aesd/services/message.dart';
 import 'package:dio/dio.dart';
@@ -15,9 +14,7 @@ import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 class EventPage extends StatefulWidget {
-  const EventPage({super.key, this.event});
-
-  final EventModel? event;
+  const EventPage({super.key});
 
   @override
   State<EventPage> createState() => _EventPageState();

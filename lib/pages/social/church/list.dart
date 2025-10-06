@@ -56,40 +56,41 @@ class _ChurchListState extends State<ChurchList> {
   Widget build(BuildContext context) {
     return isLoading
         ? ListShimmerPlaceholder()
-        : Stack(
-          children: [
-            Consumer<Church>(
-              builder: (context, provider, child) {
-                if (provider.churches.isEmpty) {
-                  return Center(
-                    child: SingleChildScrollView(
-                      child: RefreshIndicator(
-                        onRefresh: () async => loadChurches(),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            notFoundTile(text: "Aucune eglise trouvée"),
-                          ],
-                        ),
-                      ),
+        : Consumer<Church>(
+          builder: (context, provider, child) {
+            if (provider.churches.isEmpty) {
+              return Center(
+                child: SingleChildScrollView(
+                  child: RefreshIndicator(
+                    onRefresh: () async => loadChurches(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        notFoundTile(text: "Aucune eglise trouvée"),
+                      ],
                     ),
-                  );
-                }
-
-                final churches = provider.churches;
-
-                return RefreshIndicator(
-                  onRefresh: () async => loadChurches(),
-                  child: ListView.builder(
-                    itemCount: churches.length,
-                    itemBuilder: (context, index) {
-                      return churches[index].buildWidget(context);
-                    },
                   ),
-                );
-              },
-            ),
-            Consumer<Auth>(
+                ),
+              );
+            }
+
+            final churches = provider.churches;
+
+            return RefreshIndicator(
+              onRefresh: () async => loadChurches(),
+              child: ListView.builder(
+                itemCount: churches.length,
+                itemBuilder: (context, index) {
+                  return churches[index].buildWidget(context);
+                },
+              ),
+            );
+          },
+        );
+  }
+}
+
+/*Consumer<Auth>(
               builder: (context, provider, child) {
                 final user = provider.user;
                 // bouton flottant pour ajout d'église
@@ -124,8 +125,4 @@ class _ChurchListState extends State<ChurchList> {
                 }
                 return SizedBox();
               },
-            ),
-          ],
-        );
-  }
-}
+            ),*/

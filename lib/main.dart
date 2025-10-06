@@ -71,18 +71,21 @@ class _MyAppState extends State<MyApp> {
         case 'post':
           Get.toNamed(
             Routes.postDetail,
-            arguments: int.parse(message.data['id']),
+            arguments: {'postId': int.parse(message.data['id'])},
           );
           break;
         case 'event':
           Get.toNamed(
             Routes.eventDetail,
-            arguments: int.parse(message.data['id']),
+            arguments: {'eventId': int.parse(message.data['id'])},
           );
           break;
-        // case 'ceremony':
-        //   Get.toNamed(Routes.ceremonyDetail, arguments: int.parse(message.data['id']));
-        //   break;
+        case 'ceremony':
+          Get.toNamed(
+            Routes.ceremonyDetail,
+            arguments: {'ceremonyId': int.parse(message.data['id'])},
+          );
+          break;
         default:
           break;
       }
@@ -105,6 +108,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    _checkInitialMessage();
   }
 
   @override
