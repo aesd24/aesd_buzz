@@ -2,13 +2,15 @@ import 'package:aesd/components/certification_banner.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 BannerType? getBannerType(BuildContext context) {
   final user = Provider.of<Auth>(context, listen: false).user;
   if (user?.church == null) {
-    return BannerType.rejectedBanner.copyWith(
+    return BannerType.waitingBanner.copyWith(
       text: "Vous n'avez pas encore d'église. Créez ou intégrez-en une",
+      icon: FontAwesomeIcons.church,
     );
   }
   return null;

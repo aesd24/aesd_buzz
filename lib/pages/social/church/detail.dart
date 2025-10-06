@@ -6,7 +6,6 @@ import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/modal.dart';
 import 'package:aesd/components/not_found.dart';
 import 'package:aesd/components/placeholders.dart';
-import 'package:aesd/models/user_model.dart';
 import 'package:aesd/provider/church.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:aesd/pages/ceremonies/short_list.dart';

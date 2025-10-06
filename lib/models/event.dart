@@ -87,55 +87,52 @@ class EventModel {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Bouton d'option pour modification / suppression
-                    Align(
+                    if (dashboardView) Align(
                       alignment: Alignment.centerRight,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                        child: PopupMenuButton(
-                          onSelected: (value) {
-                            if (value == "edit") {
-                              Get.to(
-                                EventForm(
-                                  churchId: churchId,
-                                  editMode: true,
-                                  event: this,
+                      child: PopupMenuButton(
+                        onSelected: (value) {
+                          if (value == "edit") {
+                            Get.to(
+                              EventForm(
+                                churchId: churchId,
+                                editMode: true,
+                                event: this,
+                              ),
+                            );
+                          }
+                          if (value == 'delete') {
+                            if (onDelete != null) onDelete(id);
+                          }
+                        },
+                        itemBuilder:
+                            (context) => [
+                              PopupMenuItem(
+                                value: "edit",
+                                child: Row(
+                                  children: [
+                                    cusFaIcon(
+                                      FontAwesomeIcons.pen,
+                                      color: notifire.warning,
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text("Modifier"),
+                                  ],
                                 ),
-                              );
-                            }
-                            if (value == 'delete') {
-                              if (onDelete != null) onDelete(id);
-                            }
-                          },
-                          itemBuilder:
-                              (context) => [
-                                PopupMenuItem(
-                                  value: "edit",
-                                  child: Row(
-                                    children: [
-                                      cusFaIcon(
-                                        FontAwesomeIcons.pen,
-                                        color: notifire.warning,
-                                      ),
-                                      SizedBox(width: 10),
-                                      Text("Modifier"),
-                                    ],
-                                  ),
+                              ),
+                              PopupMenuItem(
+                                value: "delete",
+                                child: Row(
+                                  children: [
+                                    cusFaIcon(
+                                      FontAwesomeIcons.trashCan,
+                                      color: notifire.danger,
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text("Supprimer"),
+                                  ],
                                 ),
-                                PopupMenuItem(
-                                  value: "delete",
-                                  child: Row(
-                                    children: [
-                                      cusFaIcon(
-                                        FontAwesomeIcons.trashCan,
-                                        color: notifire.danger,
-                                      ),
-                                      SizedBox(width: 10),
-                                      Text("Supprimer"),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                        ),
+                              ),
+                            ],
                       ),
                     ),
 

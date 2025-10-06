@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 
 class Church extends ChangeNotifier {
   final int _currentPage = 0;
-  late ChurchPaginator _paginator;
   final ChurchRequest _request = ChurchRequest();
   final List<ChurchModel> _churches = [];
   final List<ChurchModel> _userChurches = [];
@@ -55,7 +54,7 @@ class Church extends ChangeNotifier {
   }
 
   Future fetchChurch(int id) async {
-    var response = await _request.one(id);
+    final response = await _request.one(id);
     if (response.statusCode == 200) {
       final data = response.data['data'];
       _selectedChurch = ChurchModel.fromJson(data['church']);
@@ -105,7 +104,7 @@ class Church extends ChangeNotifier {
       'main_church_id': data['mainChurchId'],
     });
 
-    var response = await _request.create(formData);
+    final response = await _request.create(formData);
     if (response.statusCode == 200) {
       return true;
     } else {
