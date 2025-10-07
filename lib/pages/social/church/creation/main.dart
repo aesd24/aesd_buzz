@@ -48,7 +48,7 @@ class _MainChurchCreationPageState extends State<MainChurchCreationPage> {
 
   // attestation d'existance
   File? _attestationFile;
-  Future<void> getAttentation() async {
+  Future<void> getAttestation() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf'],
@@ -314,7 +314,7 @@ class _MainChurchCreationPageState extends State<MainChurchCreationPage> {
                         // bouton pour charger l'attestion d'existence de l'église
                         if (!widget.editMode) ...[
                           GestureDetector(
-                            onTap: () async => await getAttentation(),
+                            onTap: () async => await getAttestation(),
                             child: Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,

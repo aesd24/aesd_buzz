@@ -1,5 +1,4 @@
 import 'package:aesd/appstaticdata/dictionnary.dart';
-import 'package:aesd/appstaticdata/routes.dart';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
@@ -23,32 +22,46 @@ class UserModel {
 
   Widget buildWidget(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return ListTile(
-      onTap: () {}, //Get.to(UserProfil(user: this)),
-      leading: CircleAvatar(
-        backgroundImage: photo != null ? FastCachedImageProvider(photo!) : null,
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        color: notifire.getContainer,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: notifire.getMaingey.withAlpha(75),
+            blurRadius: 5,
+            spreadRadius: 1,
+          ),
+        ],
       ),
-      title: Text(name, style: textTheme.labelMedium),
-      subtitle: Text(
-        email,
-        style: textTheme.labelSmall!.copyWith(
-          color: Colors.black.withAlpha(100),
+      child: ListTile(
+        onTap: () {}, //Get.to(UserProfil(user: this)),
+        leading: CircleAvatar(
+          backgroundImage:
+              photo != null ? FastCachedImageProvider(photo!) : null,
         ),
+        title: Text(name.length > 25 ? "${name.substring(0, 25)}..." : name),
+        subtitle: Text(email, style: textTheme.bodySmall!.copyWith(
+          color: notifire.getMaingey
+        ), overflow: TextOverflow.clip),
+        trailing:
+            accountType.code == Dictionnary.servant.code
+                ? Container(
+                  padding: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: notifire.getMainColor),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                  child: Text(
+                    'Serviteur',
+                    style: textTheme.labelSmall!.copyWith(
+                      color: notifire.getMainColor,
+                    ),
+                  ),
+                )
+                : null,
       ),
-      trailing:
-          accountType.code == Dictionnary.servant.code
-              ? Container(
-                padding: EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.green),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-                child: Text(
-                  'Serviteur',
-                  style: textTheme.labelSmall!.copyWith(color: Colors.green),
-                ),
-              )
-              : null,
     );
   }
 

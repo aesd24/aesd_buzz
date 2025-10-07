@@ -20,6 +20,7 @@ class Church extends ChangeNotifier {
 
   Future getUserChurches() async {
     final response = await _request.userChurches();
+    print(response);
     if (response.statusCode == 200) {
       final mainChurches = response.data['data']['main_churches'];
       final secondaries = response.data['data']['secondary_churches'];
@@ -121,12 +122,33 @@ class Church extends ChangeNotifier {
     }
   }
 
+  Future retryValidateChurch(int churchId, File attestationFile) async {
+    FormData formData = FormData.fromMap({
+      'attestation_file_path': await MultipartFile.fromFile(
+        attestationFile.path,
+      ),
+    });
+    final response = await _request.retryValidation(churchId, data: formData);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw HttpException("Impossible d'envoyer l'attestation");
+    }
+  }
+
   Future membershipRequest(int churchId) async {
     final response = await _request.requestMembership(churchId: churchId);
     if (response.statusCode == 200) {
       return "Demande d'adhésion soumise";
     } else {
       throw HttpException("Impossible de rejoindre cette église");
+    }
+  }
+
+  Future getMembershipRequests() async {
+    final response = await _request.getMembershipRequests();
+    print(response);
+    if (response.statusCode == 200) {
     }
   }
 }

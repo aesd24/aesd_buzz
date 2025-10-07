@@ -1,10 +1,13 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/components/certification_banner.dart';
+import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/image_viewer.dart';
 import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/components/tiles.dart';
 import 'package:aesd/models/day_program.dart';
 import 'package:aesd/models/servant_model.dart';
 import 'package:aesd/models/user_model.dart';
+import 'package:aesd/pages/dashboard/retryChurchValidity.dart';
 import 'package:aesd/pages/social/church/detail.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +25,7 @@ class ChurchModel {
   late String? cover;
   late String image;
   late String? type;
+  late String? validationState;
   List<ServantModel> servants = [];
   ServantModel? owner;
   List<UserModel> members = [];
@@ -40,6 +44,7 @@ class ChurchModel {
     description = json['description'];
     phone = json['phone'];
     type = json['type_church'];
+    validationState = json['validation_status'];
     json['servants']?.forEach((d) {
       servants.add(ServantModel.fromJson(d));
     });
@@ -125,6 +130,49 @@ class ChurchModel {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildValidationChurchBanner(BuildContext context) {
+    BannerType? banner;
+    if (validationState == "pending") {
+      banner = BannerType.waitingBanner.copyWith(
+        text: "En attente de validation",
+      );
+    } else if (validationState == "rejected") {
+      banner = BannerType.rejectedBanner.copyWith(
+        text: "Réfusé, cliquez pour rééssayer",
+      );
+    }
+    return GestureDetector(
+      onTap: () {
+        if (validationState == "rejected") {
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.transparent,
+            isScrollControlled: true,
+            builder: (context) {
+              return RetryValidateChurch(churchId: id);
+            },
+          );
+        }
+      },
+      child: Container(
+        margin: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(color: banner!.color),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: ListTile(
+          leading: cusFaIcon(banner.icon, color: banner.color),
+          title: Text(
+            banner.text,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium!.copyWith(color: banner.color),
+          ),
         ),
       ),
     );

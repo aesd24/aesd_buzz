@@ -1,4 +1,3 @@
-import 'package:aesd/appstaticdata/routes.dart';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/bottom_sheets.dart';
 import 'package:aesd/components/buttons.dart';
@@ -10,13 +9,11 @@ import 'package:aesd/models/church_model.dart';
 import 'package:aesd/models/user_model.dart';
 import 'package:aesd/pages/social/church/creation/main.dart';
 import 'package:aesd/pages/social/church/detail.dart';
-import 'package:aesd/pages/wallet/wallet.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:aesd/provider/church.dart';
 import 'package:aesd/pages/dashboard/ceremony.dart';
-import 'package:aesd/pages/dashboard/community.dart';
+import 'package:aesd/pages/dashboard/community/main.dart';
 import 'package:aesd/pages/dashboard/events.dart';
-import 'package:aesd/pages/dashboard/programs.dart';
 import 'package:aesd/services/message.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -289,6 +286,10 @@ class _DashboardState extends State<Dashboard> {
               },
             ),
           ),
+
+          if (church.validationState != 'approved')
+            church.buildValidationChurchBanner(context),
+
           Padding(
             padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
             child: Divider(
@@ -325,12 +326,13 @@ class _DashboardState extends State<Dashboard> {
                 icon: FontAwesomeIcons.film,
                 label: "Cérémonies",
               ),
-              /*customIconButton(
-                destination: DashboardCommunityPage(churchId: church.id),
+              customIconButton(
+                destination: DashboardCommunityPage(),
+                arg: {"churchId": church.id},
                 color: Colors.blue,
                 icon: FontAwesomeIcons.peopleGroup,
                 label: "Communauté",
-              ),*/
+              ),
             ],
           ),
         ],
@@ -343,9 +345,13 @@ class _DashboardState extends State<Dashboard> {
     required IconData icon,
     Color color = Colors.blue,
     Widget? destination,
+    dynamic arg,
   }) {
     return TextButton.icon(
-      onPressed: destination != null ? () => Get.to(destination) : null,
+      onPressed:
+          destination != null
+              ? () => Get.to(destination, arguments: arg)
+              : null,
       icon: FaIcon(icon, size: 18),
       label: Text(label),
       style: ButtonStyle(

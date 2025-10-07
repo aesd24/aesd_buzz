@@ -17,6 +17,20 @@ class ButtonType {
     required this.iconColor,
   });
 
+  ButtonType copyWith({
+    Widget? icon,
+    Color? foreColor,
+    Color? backColor,
+    Color? iconColor,
+  }) {
+    return ButtonType(
+      icon: icon ?? this.icon,
+      foreColor: foreColor ?? this.foreColor,
+      backColor: backColor ?? this.backColor,
+      iconColor: iconColor ?? this.iconColor,
+    );
+  }
+
   static final ButtonType success = ButtonType(
     icon: cusFaIcon(FontAwesomeIcons.check, color: Colors.white),
     foreColor: Colors.white,
@@ -162,7 +176,10 @@ Widget customActionButton(
   );
 }
 
-Widget customBackButton({IconData? icon = FontAwesomeIcons.arrowLeftLong, Color? color}) {
+Widget customBackButton({
+  IconData? icon = FontAwesomeIcons.arrowLeftLong,
+  Color? color,
+}) {
   return IconButton(
     onPressed: () => Get.back(),
     icon: cusFaIcon(icon!, color: color),
