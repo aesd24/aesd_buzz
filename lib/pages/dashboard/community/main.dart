@@ -101,7 +101,10 @@ class _DashboardCommunityPageState extends State<DashboardCommunityPage> {
                     ),
 
                     CustomTextButton(
-                      onPressed: () {},
+                      onPressed:
+                          () => MessageService.showInfoMessage(
+                            "Bientôt disponible...",
+                          ),
                       label: "Rechercher un fidèle",
                     ),
                   ],

@@ -41,6 +41,18 @@ class ChurchRequest extends DioClient {
     return await client.get("membership-requests/adhesion");
   }
 
+  Future acceptMembershipRequest(int requestId) async {
+    // renvoie la liste des demandes d'adhésion
+    final client = await getApiClient();
+    return await client.get("membership-requests/$requestId/approuve");
+  }
+
+  Future rejectMembershipRequest(int requestId) async {
+    // renvoie la liste des demandes d'adhésion
+    final client = await getApiClient();
+    return await client.get("membership-requests//$requestId/reject");
+  }
+
   Future retryValidation(int churchId, {required Object data}) async {
     // renvoyer l'attention d'existence de l'église
     final client = await getApiClient();

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:aesd/models/church_model.dart';
+import 'package:aesd/models/membership_request.dart';
 import 'package:aesd/models/servant_model.dart';
 import 'package:aesd/models/user_model.dart';
 import 'package:aesd/requests/church_request.dart';
@@ -147,8 +148,34 @@ class Church extends ChangeNotifier {
 
   Future getMembershipRequests() async {
     final response = await _request.getMembershipRequests();
-    print(response);
     if (response.statusCode == 200) {
+      print(response.data);
+      final data = response.data['data'];
+      final List<MembershipRequestModel> requests = [];
+      for (var request in data) {
+        requests.add(MembershipRequestModel.fromJson(request));
+      }
+      return requests;
+    } else {
+      throw HttpException("Impossible de récupérer les demandes d'adhésion");
+    }
+  }
+
+  Future acceptMembershipRequest(int requestId) async {
+    final response = await _request.acceptMembershipRequest(requestId);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw HttpException("Impossible d'accepter la demande d'adhésion");
+    }
+  }
+
+  Future rejectMembershipRequest(int requestId) async {
+    final response = await _request.rejectMembershipRequest(requestId);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw HttpException("Impossible de rejeter la demande d'adhésion");
     }
   }
 }
