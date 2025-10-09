@@ -1,6 +1,6 @@
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/divider.dart';
-import 'package:aesd/pages/program/create.dart';
+import 'package:aesd/pages/dashboard/programs/create.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -57,7 +57,7 @@ class _ChurchProgramState extends State<ChurchProgram> {
               textDivider("Programme hebdomadaire"),
               CustomTextButton(
                 label: "Ajouter",
-                onPressed: () => Get.to(CreateProgramForm()),
+                onPressed: () {} //Get.to(CreateProgramForm()),
               ),
             ],
           ),

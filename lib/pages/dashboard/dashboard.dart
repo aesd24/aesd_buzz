@@ -7,6 +7,7 @@ import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/not_found.dart';
 import 'package:aesd/models/church_model.dart';
 import 'package:aesd/models/user_model.dart';
+import 'package:aesd/pages/dashboard/programs/list.dart';
 import 'package:aesd/pages/social/church/creation/main.dart';
 import 'package:aesd/pages/social/church/detail.dart';
 import 'package:aesd/provider/auth.dart';
@@ -308,12 +309,13 @@ class _DashboardState extends State<Dashboard> {
                 color: Colors.green,
                 destination: Wallet(),
               ),*/
-              /*customIconButton(
-                destination: ProgramListPage(church: church),
+              customIconButton(
+                destination: ProgramListPage(),
+                arg: {"churchId": church.id},
                 color: Colors.purple,
                 icon: FontAwesomeIcons.calendarWeek,
                 label: "Programme",
-              ),*/
+              ),
               customIconButton(
                 destination: ChurchEvents(churchId: church.id),
                 color: Colors.amber,

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:aesd/models/day_program.dart';
 import 'package:aesd/models/program.dart';
 import 'package:aesd/requests/program_request.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class ProgramProvider extends ChangeNotifier {
@@ -18,7 +19,8 @@ class ProgramProvider extends ChangeNotifier {
   Future getChurchPrograms(int churchId) async {
     final programsByDayMap = {};
     final response = await _handler.getAll(churchId);
-    for (var progJson in response.data['programmes']) {
+    print(response.data);
+    for (var progJson in response.data['data']['programmes']) {
       final program = ProgramModel.fromJson(progJson);
       final day = program.day;
 
@@ -33,21 +35,31 @@ class ProgramProvider extends ChangeNotifier {
       dayPrograms.add(DayProgramModel(day: day, program: programsList));
     });
 
-    if (response.statusCode) {
+    if (response.statusCode == 200) {
       return true;
     } else {
       throw HttpException("Impossible de récupérer les programmes");
     }
   }
 
-  Future getDayPrograms(int churchId, String day) async {
-    final response = await _handler.getAll(churchId);
-  }
-
   Future getProgram(int programId) async {
     final response = await _handler.getOne(programId);
     if (response.statusCode) {
       _selectedProgram = ProgramModel.fromJson(response.data);
+    }
+  }
+
+  Future createProgram(Map<String, dynamic> data) async {
+    if (data['file'] != null) {
+      data['file'] = await MultipartFile.fromFile(data['file'].path);
+    }
+    final formData = FormData.fromMap(data);
+    final response = await _handler.create(formData);
+    print(response);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw HttpException("Impossible de créer le programme");
     }
   }
 }
