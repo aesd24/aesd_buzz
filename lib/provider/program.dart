@@ -17,9 +17,8 @@ class ProgramProvider extends ChangeNotifier {
   DayProgramModel? get selectedDayProgram => _selectedDayProgram;
 
   Future getChurchPrograms(int churchId) async {
-    final programsByDayMap = {};
+    final Map<String, List<ProgramModel>> programsByDayMap = {};
     final response = await _handler.getAll(churchId);
-    print(response.data);
     for (var progJson in response.data['data']['programmes']) {
       final program = ProgramModel.fromJson(progJson);
       final day = program.day;
@@ -28,7 +27,7 @@ class ProgramProvider extends ChangeNotifier {
       if (!programsByDayMap.containsKey(day)) {
         programsByDayMap[day] = [];
       }
-      programsByDayMap[day].add(program);
+      programsByDayMap[day]?.add(program);
     }
 
     programsByDayMap.forEach((day, programsList) {
@@ -55,8 +54,8 @@ class ProgramProvider extends ChangeNotifier {
     }
     final formData = FormData.fromMap(data);
     final response = await _handler.create(formData);
-    print(response);
-    if (response.statusCode == 200) {
+    print(response.statusCode);
+    if (response.statusCode == 201) {
       return true;
     } else {
       throw HttpException("Impossible de créer le programme");

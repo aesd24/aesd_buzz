@@ -70,6 +70,7 @@ dependencies:
   video_player: ^2.0.0
   chewie: ^1.8.3
   date_field: ^6.0.0
+  accordion: ^2.6.0
 
 dev_dependencies:
   flutter_test:

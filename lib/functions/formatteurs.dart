@@ -1,8 +1,9 @@
 import 'package:intl/intl.dart';
 
-String? getTimePart(DateTime? date, {bool withSeconds = false}) {
-  if (date == null) return "${date!.hour}:${date.minute}";
-  return null;
+String getTimePart(DateTime date) {
+  final time =
+      "${date.hour < 10 ? '0${date.hour}' : date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}";
+  return time;
 }
 
 String formatDate(DateTime date, {bool withTime = true}) {

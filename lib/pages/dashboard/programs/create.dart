@@ -6,7 +6,6 @@ import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/fields.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/functions/formatteurs.dart';
-import 'package:aesd/functions/formatteurs.dart';
 import 'package:aesd/provider/program.dart';
 import 'package:aesd/services/message.dart';
 import 'package:date_field/date_field.dart';
@@ -50,21 +49,6 @@ class _CreateProgramFormState extends State<CreateProgramForm> {
   File? image;
 
   Future _handleSubmit() async {
-    if (day.isEmpty) {
-      MessageService.showWarningMessage("Choisissez le jour du programme");
-      return;
-    }
-
-    if (startTime == null) {
-      MessageService.showWarningMessage("Renseignez l'heure de début");
-      return;
-    }
-
-    if (endTime == null) {
-      MessageService.showWarningMessage("Renseignez l'heure de fin");
-      return;
-    }
-
     if (_formKey.currentState!.validate()) {
       await createProgram();
     }
@@ -79,15 +63,18 @@ class _CreateProgramFormState extends State<CreateProgramForm> {
         "title": _titleController.text,
         "description": descriptionController.text,
         "day": day,
-        "start_time": getTimePart(startTime),
-        "end_time": getTimePart(endTime),
+        "start_time": getTimePart(startTime!),
+        "end_time": getTimePart(endTime!),
         "church_id": widget.churchId,
         "file": image,
       };
       await Provider.of<ProgramProvider>(
         context,
         listen: false,
-      ).createProgram(data);
+      ).createProgram(data).then((value) {
+        MessageService.showSuccessMessage("Programme ajouté avec succès !");
+        Get.back();
+      });
     } catch (e) {
       e.printError();
     } finally {
@@ -191,6 +178,7 @@ class _CreateProgramFormState extends State<CreateProgramForm> {
                         child: Text(weekDays[index]),
                       );
                     }),
+                    validate: true,
                     value: day,
                     onChanged: (value) {
                       day = value ?? "";
@@ -199,11 +187,9 @@ class _CreateProgramFormState extends State<CreateProgramForm> {
                   CustomFormTextField(
                     label: "Titre du programme",
                     controller: _titleController,
+                    validate: true,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Renseignez le titre du programme";
-                      }
-                      if (value.length < 5) {
+                      if (value!.length < 5) {
                         return "Le titre doit contenir au moins 5 caractères";
                       }
                       return null;
@@ -260,6 +246,7 @@ class _CreateProgramFormState extends State<CreateProgramForm> {
 
                   MultilineField(
                     label: "Description du programme",
+                    validate: true,
                     controller: descriptionController,
                   ),
                 ],

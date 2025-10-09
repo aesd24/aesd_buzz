@@ -1,7 +1,6 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/not_found.dart';
-import 'package:aesd/models/day_program.dart';
 import 'package:aesd/pages/dashboard/programs/create.dart';
 import 'package:aesd/provider/program.dart';
 import 'package:aesd/services/message.dart';
@@ -20,7 +19,6 @@ class ProgramListPage extends StatefulWidget {
 class _ProgramListPageState extends State<ProgramListPage> {
   int? churchId;
   bool _isLoading = false;
-  final List<DayProgramModel> _programs = [];
 
   Future init(int churchId) async {
     try {
@@ -63,25 +61,28 @@ class _ProgramListPageState extends State<ProgramListPage> {
         centerTitle: true,
         title: Text("Programme", style: TextStyle(fontSize: 20)),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(15),
-        child:
-            _programs.isEmpty
-                ? Center(
-                  child: notFoundTile(
-                    text: "Aucun programme à afficher pour le moment.",
-                  ),
-                )
-                : ListView.builder(
-                  itemCount: _programs.length,
-                  itemBuilder: (context, index) {
-                    final current = _programs[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: current.getWidget(context),
-                    );
-                  },
-                ),
+      body: Consumer<ProgramProvider>(
+        builder: (context, provider, child) {
+          if (provider.dayPrograms.isEmpty) {
+            return Center(
+              child: notFoundTile(text: "Aucun programme disponible"),
+            );
+          }
+
+          return Padding(
+            padding: const EdgeInsets.all(15),
+            child: ListView.builder(
+              itemCount: provider.dayPrograms.length,
+              itemBuilder: (context, index) {
+                final current = provider.dayPrograms[index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: current.getWidget(context),
+                );
+              },
+            ),
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'heroBtn',

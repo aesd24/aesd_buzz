@@ -7,7 +7,11 @@ class DayProgramModel {
 
   DayProgramModel({required this.day, required this.program});
 
-  getWidget(BuildContext context) {
+  Widget buildWidget(BuildContext context) {
+    return Placeholder();
+  }
+
+  Widget getWidget(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(10),
       width: double.infinity,
