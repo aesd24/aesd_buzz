@@ -8,7 +8,7 @@ Widget imageShimmerPlaceholder({
 }) {
   return Shimmer.fromColors(
     baseColor: Colors.grey.withAlpha(150),
-    highlightColor: Colors.white.withAlpha(50),
+    highlightColor: notifire.getbgcolor.withAlpha(50),
     enabled: true,
     child: _buildPlaceholderBox(height: height, width: width),
   );

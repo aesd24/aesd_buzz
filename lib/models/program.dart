@@ -1,3 +1,5 @@
+import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/functions/formatteurs.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -25,7 +27,6 @@ class ProgramModel {
   String? image;
   late TimeOfDay startTime;
   late TimeOfDay endTime;
-  late DateTime date;
 
   ProgramModel.fromJson(Map<String, dynamic> json) {
     id = json['programme_id'];
@@ -35,7 +36,6 @@ class ProgramModel {
     image = json['file'];
     startTime = parseTime(json['start_time']);
     endTime = parseTime(json['end_time']);
-    date = DateTime.parse(json['created_at']);
   }
 
   Widget getTile(BuildContext context) {
@@ -44,27 +44,10 @@ class ProgramModel {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                  "${startTime.hour}:${startTime.minute} - ${endTime.hour}:${endTime.minute}"),
-              Row(
-                children: [
-                  const FaIcon(
-                    FontAwesomeIcons.locationPin,
-                    size: 15,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(
-                    width: 5,
-                  ),
-                ],
-              )
-            ],
-          ),
-          const SizedBox(height: 10),
-          Text(title, style: Theme.of(context).textTheme.labelLarge)
+          Text("${formatTime(startTime)} - ${formatTime(endTime)}", style: Theme.of(context).textTheme.labelMedium!.copyWith(
+            color: notifire.getMaingey
+          ),),
+          Text(title, style: Theme.of(context).textTheme.labelLarge),
         ],
       ),
     );

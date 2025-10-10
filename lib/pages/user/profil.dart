@@ -30,6 +30,7 @@ class _UserProfilState extends State<UserProfil> {
   bool subscribed = false;
   bool isSelf = false;
 
+  late UserModel user;
   late ServantModel servant;
 
   Future<dynamic> loadTestimonies() async {
@@ -109,7 +110,7 @@ class _UserProfilState extends State<UserProfil> {
     Size size = MediaQuery.of(context).size;
     return Consumer<Auth>(
       builder: (context, provider, child) {
-        final user = Get.arguments['user'] as UserModel;
+        user = Get.arguments['user'] as UserModel;
         isSelf = user.id == provider.user!.id;
         return LoadingOverlay(
           progressIndicator: CircularProgressIndicator(

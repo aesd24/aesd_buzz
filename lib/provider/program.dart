@@ -17,6 +17,7 @@ class ProgramProvider extends ChangeNotifier {
   DayProgramModel? get selectedDayProgram => _selectedDayProgram;
 
   Future getChurchPrograms(int churchId) async {
+    dayPrograms.clear();
     final Map<String, List<ProgramModel>> programsByDayMap = {};
     final response = await _handler.getAll(churchId);
     for (var progJson in response.data['data']['programmes']) {

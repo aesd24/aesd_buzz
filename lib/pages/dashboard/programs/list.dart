@@ -77,7 +77,10 @@ class _ProgramListPageState extends State<ProgramListPage> {
                 final current = provider.dayPrograms[index];
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: current.getWidget(context),
+                  child: current.buildWidget(
+                    context,
+                    reloader: () => setState(() {}),
+                  ),
                 );
               },
             ),
