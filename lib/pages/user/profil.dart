@@ -7,6 +7,7 @@ import 'package:aesd/models/servant_model.dart';
 import 'package:aesd/models/user_model.dart';
 import 'package:aesd/pages/social/socialElementsList.dart';
 import 'package:aesd/provider/auth.dart';
+import 'package:aesd/provider/post.dart';
 import 'package:aesd/provider/servant.dart';
 import 'package:aesd/provider/testimony.dart';
 import 'package:aesd/services/message.dart';
@@ -40,6 +41,18 @@ class _UserProfilState extends State<UserProfil> {
             context,
             listen: false,
           ).getUserTestimonies();
+      return results;
+    } on HttpException {
+      MessageService.showErrorMessage("L'opération à échoué !");
+    }
+  }
+
+  Future<dynamic> loadPosts(int userId) async {
+    try {
+      final results = await Provider.of<PostProvider>(
+        context,
+        listen: false,
+      ).getUserPosts(userId);
       return results;
     } on HttpException {
       MessageService.showErrorMessage("L'opération à échoué !");
@@ -314,8 +327,8 @@ class _UserProfilState extends State<UserProfil> {
                                 ),*/
                                 _customActionButton(
                                   onPressed:
-                                      () => Get.to(() =>
-                                        SocialElementsList(
+                                      () => Get.to(
+                                        () => SocialElementsList(
                                           loadElements: loadTestimonies,
                                         ),
                                       ),
@@ -328,18 +341,26 @@ class _UserProfilState extends State<UserProfil> {
                                 text: "Visiter l'église",
                                 icon: FontAwesomeIcons.church,
                               ),
-                              /*if (user.accountType.code ==
+                              if (user.accountType.code ==
                                   Dictionnary.servant.code) ...[
-                                _customActionButton(
+                                /*_customActionButton(
+                                  onPressed:
+                                      () => Get.to(
+                                        () => SocialElementsList(
+                                          loadElements:
+                                              () async =>
+                                                  await loadPosts(user.id!),
+                                        ),
+                                      ),
                                   text: "Voir les posts",
                                   icon: FontAwesomeIcons.solidMessage,
-                                ),
-                                if (!isSelf)
+                                ),*/
+                                /*if (!isSelf)
                                   _customActionButton(
                                     text: "Payer la dime",
                                     icon: FontAwesomeIcons.circleDollarToSlot,
-                                  ),
-                              ],*/
+                                  ),*/
+                              ],
                             ],
                           ),
                         ),

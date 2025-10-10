@@ -3,6 +3,7 @@ import 'package:aesd/components/not_found.dart';
 import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/services/message.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SocialElementsList extends StatefulWidget {
   const SocialElementsList({super.key, this.loadElements});
@@ -25,6 +26,7 @@ class _SocialElementsListState extends State<SocialElementsList> {
           setState(() => elements = value);
         });
       } catch (e) {
+        e.printError();
         MessageService.showErrorMessage("Oups quelque chose s'est mal passé");
       } finally {
         setState(() => _isLoading = false);

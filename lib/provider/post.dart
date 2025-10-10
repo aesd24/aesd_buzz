@@ -28,7 +28,6 @@ class PostProvider extends ChangeNotifier {
 
   Future likePost(int id) async {
     final response = await _request.likePost(id);
-    print(response);
     if (response.statusCode == 200) {
       return response.data;
     } else {
@@ -70,6 +69,21 @@ class PostProvider extends ChangeNotifier {
     print(response);
     if (response.statusCode != 200) {
       throw HttpException(response.data['message']);
+    }
+  }
+
+  Future getUserPosts(int userId) async {
+    final response = await _request.getUserPosts(userId);
+    print(response);
+    if (response.statusCode == 200) {
+      final List<PostModel> results = [];
+      for (var post in response.data['posts']) {
+        results.add(PostModel.fromJson(post));
+      }
+      notifyListeners();
+      return results;
+    } else {
+      throw HttpException("Impossible de charger les posts");
     }
   }
 }

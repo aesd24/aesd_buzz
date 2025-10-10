@@ -29,4 +29,9 @@ class PostRequest extends DioClient {
       'comment': comment
     });
   }
+
+  Future getUserPosts(int userId) async {
+    final client = await getApiClient();
+    return client.get('$baseRoute/servants/$userId/posts');
+  }
 }
