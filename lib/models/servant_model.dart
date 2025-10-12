@@ -29,11 +29,7 @@ class ServantModel {
 
   Widget buildCard(BuildContext context) {
     return GestureDetector(
-      onTap:
-          () => Get.toNamed(
-            Routes.profil,
-            arguments: {'user': user, 'servantId': id},
-          ),
+      onTap: () => Get.toNamed(Routes.profil, arguments: {'userId': user!.id}),
       child: Container(
         padding: EdgeInsets.all(15),
         margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
