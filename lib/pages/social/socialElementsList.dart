@@ -25,10 +25,10 @@ class _SocialElementsListState extends State<SocialElementsList> {
         await widget.loadElements!().then((value) {
           setState(() => elements = value);
         });
-      } catch (e) {
+      } /*catch (e) {
         e.printError();
         MessageService.showErrorMessage("Oups quelque chose s'est mal passé");
-      } finally {
+      }*/ finally {
         setState(() => _isLoading = false);
       }
     }

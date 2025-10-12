@@ -1,15 +1,15 @@
 import 'package:aesd/appstaticdata/dictionnary.dart';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
+import 'package:aesd/models/servant_model.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:get/get.dart';
 
 import 'church_model.dart';
 
 class UserModel {
-  late int? id;
+  late int id;
   late String name;
   late String email;
   late String phone;
@@ -19,6 +19,7 @@ class UserModel {
   late String? certifStatus;
   late DateTime? certifiedAt;
   late ChurchModel? church;
+  late ServantModel? servant;
 
   Widget buildWidget(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -42,9 +43,11 @@ class UserModel {
               photo != null ? FastCachedImageProvider(photo!) : null,
         ),
         title: Text(name.length > 25 ? "${name.substring(0, 25)}..." : name),
-        subtitle: Text(email, style: textTheme.bodySmall!.copyWith(
-          color: notifire.getMaingey
-        ), overflow: TextOverflow.clip),
+        subtitle: Text(
+          email,
+          style: textTheme.bodySmall!.copyWith(color: notifire.getMaingey),
+          overflow: TextOverflow.clip,
+        ),
         trailing:
             accountType.code == Dictionnary.servant.code
                 ? Container(
@@ -90,10 +93,12 @@ class UserModel {
   UserModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
-    email = json['email'] ?? "";
-    adress = json['adresse'] ?? "";
-    phone = json['phone'] ?? "";
+    email = json['email'];
+    adress = json['adresse'];
+    phone = json['phone'];
     photo = json['profile_photo'];
+    servant =
+        json['details'] != null ? ServantModel.fromJson(json['details']) : null;
     accountType = Dictionnary.accountTypes.firstWhere(
       (element) => element.code == json['account_type'],
     );

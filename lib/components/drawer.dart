@@ -6,6 +6,8 @@ import 'package:aesd/components/certification_banner.dart';
 import 'package:aesd/functions/utilities.dart';
 import 'package:aesd/pages/dashboard/dashboard.dart';
 import 'package:aesd/provider/auth.dart';
+import 'package:aesd/provider/servant.dart';
+import 'package:aesd/services/message.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -15,8 +17,37 @@ import 'package:provider/provider.dart';
 
 import 'icon.dart';
 
-class AppMenuDrawer extends StatelessWidget {
+class AppMenuDrawer extends StatefulWidget {
   const AppMenuDrawer({super.key});
+
+  @override
+  State<AppMenuDrawer> createState() => _AppMenuDrawerState();
+}
+
+class _AppMenuDrawerState extends State<AppMenuDrawer> {
+  List<int> subscribInfos = [0, 0];
+
+  Future getSubscribtionStats() async {
+    try {
+      await Provider.of<Servant>(
+        context,
+        listen: false,
+      ).getSubscribtionStats().then((value) {
+        setState(() {
+          subscribInfos[0] = value['subscribed'];
+          subscribInfos[1] = value['subscribers'];
+        });
+      });
+    } catch (e) {
+      MessageService.showErrorMessage("Une erreur est survenue !");
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getSubscribtionStats();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,12 +107,12 @@ class AppMenuDrawer extends StatelessWidget {
                               spacing: 10,
                               runSpacing: 5,
                               children: [
-                                Text("0 Abonnements"),
+                                Text("${subscribInfos[0]} Abonnements"),
                                 CircleAvatar(
                                   radius: 3,
                                   backgroundColor: notifire.getTextColor1,
                                 ),
-                                Text("0 Abonnés"),
+                                Text("${subscribInfos[1]} Abonnés"),
                               ],
                             ),
                           ),
@@ -112,7 +143,7 @@ class AppMenuDrawer extends StatelessWidget {
                                 onTap:
                                     () => Get.toNamed(
                                       Routes.profil,
-                                      arguments: {'user': provider.user!},
+                                      arguments: {'userId': provider.user!.id},
                                     ),
                                 leading: cusFaIcon(FontAwesomeIcons.solidUser),
                                 title: Text(

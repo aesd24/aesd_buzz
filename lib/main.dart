@@ -11,6 +11,7 @@ import 'package:aesd/provider/quiz.dart';
 import 'package:aesd/provider/servant.dart';
 import 'package:aesd/provider/singer.dart';
 import 'package:aesd/provider/testimony.dart';
+import 'package:aesd/provider/user.dart';
 import 'package:aesd/services/message.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -117,6 +118,7 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(create: (context) => ColorNotifire()),
         ChangeNotifierProvider(create: (context) => Auth()),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => Church()),
         ChangeNotifierProvider(create: (context) => PostProvider()),
         ChangeNotifierProvider(create: (context) => Forum()),

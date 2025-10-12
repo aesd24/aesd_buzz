@@ -13,7 +13,7 @@ class ServantModel {
   late int id;
   late bool isMain;
   late Type call;
-  late UserModel user;
+  late UserModel? user;
   late ChurchModel? church;
 
   ServantModel.fromJson(Map<String, dynamic> json) {
@@ -22,7 +22,7 @@ class ServantModel {
     call = Dictionnary.servantCalls.firstWhere(
       (element) => element.code == json['appel'],
     );
-    user = UserModel.fromJson(json['user']);
+    user = json['user'] != null ? UserModel.fromJson(json['user']) : null;
     church =
         json['church'] != null ? ChurchModel.fromJson(json['church']) : null;
   }
@@ -63,11 +63,11 @@ class ServantModel {
                       radius: 17,
                       backgroundColor: notifire.getMainColor,
                       backgroundImage:
-                          user.photo != null
-                              ? FastCachedImageProvider(user.photo!)
+                          user!.photo != null
+                              ? FastCachedImageProvider(user!.photo!)
                               : null,
                       child:
-                          user.photo != null
+                          user!.photo != null
                               ? null
                               : cusFaIcon(
                                 FontAwesomeIcons.solidUser,
@@ -76,7 +76,7 @@ class ServantModel {
                     ),
                     SizedBox(width: 10),
                     Flexible(
-                      child: Text(user.name, overflow: TextOverflow.clip),
+                      child: Text(user!.name, overflow: TextOverflow.clip),
                     ),
                   ],
                 ),
@@ -141,14 +141,14 @@ class ServantModel {
                 CircleAvatar(
                   radius: 27,
                   backgroundImage:
-                      user.photo != null ? NetworkImage(user.photo!) : null,
+                      user!.photo != null ? NetworkImage(user!.photo!) : null,
                 ),
                 SizedBox(width: 13),
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(user.name, style: textTheme.titleMedium),
+                    Text(user!.name, style: textTheme.titleMedium),
                     Row(
                       children: [
                         Text("Serviteur"),

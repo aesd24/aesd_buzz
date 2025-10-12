@@ -342,7 +342,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
                                     customDataTile(
                                       icon: cusFaIcon(FontAwesomeIcons.userTie),
                                       text:
-                                          church.owner?.user.name ?? "Inconnu",
+                                          church.owner?.user?.name ?? "Inconnu",
                                     ),
                                     customDataTile(
                                       icon: cusFaIcon(

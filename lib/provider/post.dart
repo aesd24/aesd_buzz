@@ -74,7 +74,6 @@ class PostProvider extends ChangeNotifier {
 
   Future getUserPosts(int userId) async {
     final response = await _request.getUserPosts(userId);
-    print(response);
     if (response.statusCode == 200) {
       final List<PostModel> results = [];
       for (var post in response.data['posts']) {

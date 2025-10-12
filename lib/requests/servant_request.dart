@@ -19,4 +19,9 @@ class ServantRequest extends DioClient {
       data: {'subscriptionInput': subscribe == true ? 1 : 0},
     );
   }
+
+  Future stats() async {
+    final client = await getApiClient();
+    return await client.get('serviteur/stats-abonnements');
+  }
 }
