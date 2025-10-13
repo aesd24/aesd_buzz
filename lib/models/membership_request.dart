@@ -114,7 +114,10 @@ class MembershipRequestModel {
                 recognizer:
                     TapGestureRecognizer()
                       ..onTap = () {
-                        MessageService.showInfoMessage("Bientôt disponible...");
+                        Get.toNamed(
+                          Routes.profil,
+                          arguments: {"userId": requesterId},
+                        );
                       },
                 style: Theme.of(
                   context,
