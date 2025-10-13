@@ -1,8 +1,9 @@
 import 'dart:io';
+import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/not_found.dart';
-import 'package:aesd/models/day_program.dart';
-import 'package:aesd/models/event.dart';
+import 'package:aesd/pages/social/socialElementsList.dart';
 import 'package:aesd/provider/event.dart';
+import 'package:aesd/provider/program.dart';
 import 'package:aesd/services/message.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -19,14 +20,19 @@ class Program extends StatefulWidget {
 }
 
 class _ProgramState extends State<Program> {
-  var currentProgram = [];
+  bool _isLoading = false;
 
   void init() async {
     try {
+      setState(() => _isLoading = true);
       await Provider.of<Event>(
         context,
         listen: false,
       ).getEvents(churchId: widget.churchId);
+      await Provider.of<ProgramProvider>(
+        context,
+        listen: false,
+      ).getChurchPrograms(widget.churchId);
     } on HttpException catch (e) {
       MessageService.showErrorMessage(e.message);
     } on DioException {
@@ -36,7 +42,25 @@ class _ProgramState extends State<Program> {
     } catch (e) {
       e.printError();
       MessageService.showErrorMessage("Une erreur inattendue s'est produite !");
+    } finally {
+      setState(() => _isLoading = false);
     }
+  }
+
+  Future loadPrograms() async {
+    await Provider.of<ProgramProvider>(
+      context,
+      listen: false,
+    ).getChurchPrograms(widget.churchId);
+    return Provider.of<ProgramProvider>(context, listen: false).dayPrograms;
+  }
+
+  Future loadEvents() async {
+    await Provider.of<Event>(
+      context,
+      listen: false,
+    ).getEvents(churchId: widget.churchId);
+    return Provider.of<Event>(context, listen: false).events;
   }
 
   @override
@@ -47,15 +71,40 @@ class _ProgramState extends State<Program> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) return Center(child: CircularProgressIndicator());
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Liste des événements",
-            style: Theme.of(
-              context,
-            ).textTheme.labelLarge!.copyWith(fontWeight: FontWeight.bold),
+          _buildHeaderRow(
+            text: "Programme",
+            onTap:
+                () => Get.to(
+                  SocialElementsList(loadElements: () => loadPrograms()),
+                ),
+          ),
+          Consumer<ProgramProvider>(
+            builder: (context, provider, child) {
+              if (provider.dayPrograms.isEmpty) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: notFoundTile(text: "Aucun programme à afficher"),
+                );
+              }
+              final program = provider.dayPrograms.last;
+              return program.buildWidget(context);
+            },
+          ),
+
+          SizedBox(height: 10),
+
+          _buildHeaderRow(
+            text: "Evénements",
+            onTap:
+                () => Get.to(
+                  SocialElementsList(loadElements: () => loadEvents()),
+                ),
           ),
           Consumer<Event>(
             builder: (context, provider, child) {
@@ -68,13 +117,36 @@ class _ProgramState extends State<Program> {
               }
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Column(
-                  children: List.generate(events.length, (index) {
-                    return events[index].buildWidget(context);
-                  }),
-                ),
+                child: provider.events[0].buildWidget(context),
               );
             },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderRow({required String text, void Function()? onTap}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            text,
+            style: Theme.of(
+              context,
+            ).textTheme.labelLarge!.copyWith(fontWeight: FontWeight.bold),
+          ),
+          InkWell(
+            onTap: onTap,
+            child: Text(
+              "voir plus",
+              style: TextStyle(
+                color: notifire.getMainColor,
+                decoration: TextDecoration.underline,
+              ),
+            ),
           ),
         ],
       ),

@@ -48,15 +48,18 @@ class _SocialElementsListState extends State<SocialElementsList> {
     return Scaffold(
       appBar: AppBar(leading: customBackButton()),
       body:
-          elements.isEmpty
-              ? notFoundTile(text: "Aucun élément trouvé !")
-              : ListView.builder(
-                itemCount: elements.length,
-                itemBuilder: (context, index) {
-                  final element = elements[index];
-                  return element.buildWidget(context);
-                },
-              ),
+          Padding(
+            padding: EdgeInsets.all(10),
+            child: elements.isEmpty
+                ? notFoundTile(text: "Aucun élément trouvé !")
+                : ListView.builder(
+                  itemCount: elements.length,
+                  itemBuilder: (context, index) {
+                    final element = elements[index];
+                    return element.buildWidget(context);
+                  },
+                ),
+          ),
     );
   }
 }

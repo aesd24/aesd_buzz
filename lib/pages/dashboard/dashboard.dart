@@ -8,6 +8,7 @@ import 'package:aesd/components/not_found.dart';
 import 'package:aesd/models/church_model.dart';
 import 'package:aesd/models/user_model.dart';
 import 'package:aesd/pages/dashboard/programs/list.dart';
+import 'package:aesd/pages/social/church/creation/annexe.dart';
 import 'package:aesd/pages/social/church/creation/main.dart';
 import 'package:aesd/pages/social/church/detail.dart';
 import 'package:aesd/provider/auth.dart';
@@ -154,12 +155,8 @@ class _DashboardState extends State<Dashboard> {
                                         ),
                                       ),
                                       CustomBottomSheetButtom(
-                                        onPressed: () {
-                                          Get.back();
-                                          MessageService.showInfoMessage(
-                                            "Cette fonctionnalité sera bientôt disponible...",
-                                          );
-                                        },
+                                        onPressed:
+                                            () => Get.to(AnnexeChurchForm()),
                                         text: "Eglise secondaire",
                                         image: Image.asset(
                                           "assets/icons/second.png",
