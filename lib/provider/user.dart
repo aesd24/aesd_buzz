@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:aesd/appstaticdata/dictionnary.dart';
 import 'package:aesd/models/user_model.dart';
 import 'package:aesd/requests/user_request.dart';
 import 'package:flutter/material.dart';

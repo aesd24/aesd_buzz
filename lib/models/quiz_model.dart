@@ -11,30 +11,37 @@ class QuizModel {
   late DateTime createdAt;
   late DateTime expiryDate;
   late int questionCount;
+  late bool hasPlayed;
   List questions = [];
 
   QuizModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     title = json['intitule'];
     createdAt = DateTime.parse(json['created_at']);
-    //expiryDate = DateTime.parse(json['expiryDate']);
+    expiryDate = DateTime.parse(json['expiry_date']);
     //description = json['description'];
     questions = json['questions'] ?? [];
+    hasPlayed = json['has_played'] ?? false;
     questionCount = json['questions_count'] ?? json['questions'].length;
   }
 
   GestureDetector toTile() => GestureDetector(
-    onTap:
-        () => Get.to(
-          QuizMainPage(quiz: this),
-        ), //=> Get.to(QuizMainPage(quiz: this)),
+    onTap: () {
+      if (!hasPlayed) {
+        Get.to(QuizMainPage(quiz: this));
+      }
+    }, //=> Get.to(QuizMainPage(quiz: this)),
     child: Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
-        color: notifire.getContainer,
+        color: hasPlayed ? notifire.getMaingey.withAlpha(75) : notifire.getContainer,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(color: notifire.getMaingey.withAlpha(100), blurRadius: 5, spreadRadius: 1),
+        boxShadow: hasPlayed ? null : [
+          BoxShadow(
+            color: notifire.getMaingey.withAlpha(100),
+            blurRadius: 5,
+            spreadRadius: 1,
+          ),
         ],
       ),
       child: ListTile(
