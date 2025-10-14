@@ -62,4 +62,25 @@ class ProgramProvider extends ChangeNotifier {
       throw HttpException("Impossible de créer le programme");
     }
   }
+
+  Future deleteAnyProgram(int programId) async {
+    final response = await _handler.deleteAny(programId);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw HttpException("Impossible de supprimer le programme");
+    }
+  }
+
+  Future deleteProgramsOfDay({
+    required String day,
+    required int churchId,
+  }) async {
+    final response = await _handler.deleteAllOfDay(day, churchId: churchId);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw HttpException("Impossible de supprimer les programmes");
+    }
+  }
 }

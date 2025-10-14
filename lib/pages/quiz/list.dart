@@ -91,12 +91,14 @@ class _QuizzesListState extends State<QuizzesList> {
                       onRefresh: () async => await loadQuizzes(),
                       child:
                           quizProvider.allQuizzes.isNotEmpty
-                              ? ListView.builder(
-                                itemCount: quizProvider.allQuizzes.length,
-                                itemBuilder: (context, index) {
-                                  final quiz = quizProvider.allQuizzes[index];
-                                  return quiz.toTile();
-                                },
+                              ? Expanded(
+                                child: ListView.builder(
+                                  itemCount: quizProvider.allQuizzes.length,
+                                  itemBuilder: (context, index) {
+                                    final quiz = quizProvider.allQuizzes[index];
+                                    return quiz.toTile();
+                                  },
+                                ),
                               )
                               : Center(
                                 child: notFoundTile(

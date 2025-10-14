@@ -44,12 +44,6 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    getSubscribtionStats();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Drawer(
       child: SafeArea(
@@ -58,6 +52,7 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
           child: Consumer<Auth>(
             builder: (context, provider, child) {
               final user = provider.user!;
+              if (user.accountType == Dictionnary.servant) getSubscribtionStats();
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

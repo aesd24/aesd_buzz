@@ -72,10 +72,12 @@ class CustomElevatedButton extends StatefulWidget {
   const CustomElevatedButton({
     super.key,
     required this.text,
+    this.color,
     this.icon,
     this.onPressed,
   });
 
+  final Color? color;
   final String text;
   final Widget? icon;
   final void Function()? onPressed;
@@ -96,7 +98,9 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
           shape: WidgetStatePropertyAll(
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           ),
-          backgroundColor: WidgetStatePropertyAll(appMainColor),
+          backgroundColor: WidgetStatePropertyAll(
+            widget.color ?? appMainColor,
+          ),
           overlayColor: WidgetStatePropertyAll(Colors.white38),
           elevation: WidgetStatePropertyAll(0),
           fixedSize: WidgetStatePropertyAll(Size.fromHeight(60)),
@@ -140,20 +144,23 @@ class _CustomTextButtonState extends State<CustomTextButton> {
     if (widget.disabled) {
       type = type.disabled;
     }
-    return TextButton.icon(
-      icon: widget.icon ?? type.icon,
-      iconAlignment: IconAlignment.end,
-      onPressed: !widget.disabled ? widget.onPressed : null,
-      label: Text(widget.label),
-      style: ButtonStyle(
-        backgroundColor: WidgetStatePropertyAll(type.backColor),
-        iconColor: WidgetStatePropertyAll(type.iconColor),
-        foregroundColor: WidgetStatePropertyAll(type.foreColor),
-        fixedSize: WidgetStatePropertyAll(Size.fromHeight(34)),
-        overlayColor: WidgetStatePropertyAll(
-          widget.disabled ? Colors.transparent : Colors.white38,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 5),
+      child: TextButton.icon(
+        icon: widget.icon ?? type.icon,
+        iconAlignment: IconAlignment.end,
+        onPressed: !widget.disabled ? widget.onPressed : null,
+        label: Text(widget.label),
+        style: ButtonStyle(
+          backgroundColor: WidgetStatePropertyAll(type.backColor),
+          iconColor: WidgetStatePropertyAll(type.iconColor),
+          foregroundColor: WidgetStatePropertyAll(type.foreColor),
+          fixedSize: WidgetStatePropertyAll(Size.fromHeight(34)),
+          overlayColor: WidgetStatePropertyAll(
+            widget.disabled ? Colors.transparent : Colors.white38,
+          ),
+          elevation: WidgetStatePropertyAll(0),
         ),
-        elevation: WidgetStatePropertyAll(0),
       ),
     );
   }

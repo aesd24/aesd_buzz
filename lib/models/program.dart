@@ -1,4 +1,5 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/components/icon.dart';
 import 'package:aesd/functions/formatteurs.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -38,16 +39,29 @@ class ProgramModel {
     endTime = parseTime(json['end_time']);
   }
 
-  Widget getTile(BuildContext context) {
+  Widget getTile(BuildContext context, {void Function()? onDelete}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("${formatTime(startTime)} - ${formatTime(endTime)}", style: Theme.of(context).textTheme.labelMedium!.copyWith(
-            color: notifire.getMaingey
-          ),),
-          Text(title, style: Theme.of(context).textTheme.labelLarge),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "${formatTime(startTime)} - ${formatTime(endTime)}",
+                style: Theme.of(
+                  context,
+                ).textTheme.labelMedium!.copyWith(color: notifire.getMaingey),
+              ),
+              Text(title, style: Theme.of(context).textTheme.labelLarge),
+            ],
+          ),
+          if (onDelete != null) IconButton(
+            onPressed: onDelete,
+            icon: cusFaIcon(FontAwesomeIcons.trashCan, color: notifire.danger),
+          ),
         ],
       ),
     );

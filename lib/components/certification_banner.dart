@@ -1,3 +1,4 @@
+import 'package:aesd/appstaticdata/dictionnary.dart';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/church_banner.dart';
 import 'package:aesd/pages/user/retry_certif.dart';
@@ -14,13 +15,14 @@ BannerType? getBannerType(BuildContext context) {
 
   if (user == null) return null;
 
-  if (user.certifStatus == CertificationStates.pending) {
-    return BannerType.waitingBanner;
-  } else if (user.certifStatus == CertificationStates.rejected) {
-    return BannerType.rejectedBanner;
-  } else {
-    return null;
+  if (user.accountType == Dictionnary.servant){
+    if (user.certifStatus == CertificationStates.pending) {
+      return BannerType.waitingBanner;
+    } else if (user.certifStatus == CertificationStates.rejected) {
+      return BannerType.rejectedBanner;
+    }
   }
+  return null;
 }
 
 PreferredSize? getCertificationBanner(BuildContext context) {

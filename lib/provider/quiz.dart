@@ -11,23 +11,31 @@ class Quiz extends ChangeNotifier {
   QuizModel? _selectedQuiz;
   QuizModel? get selectedQuiz => _selectedQuiz;
 
-  getAll() async {
+  Future<void> getAll() async {
     final response = await _request.getAll();
     if (response.statusCode == 200) {
       _allQuizzes.clear();
-      List quizzes = response.data;
-      quizzes.map((e) => _allQuizzes.add(QuizModel.fromJson(e))).toList();
-      print(_allQuizzes);
+      (response.data['data'] as List)
+          .map((e) => _allQuizzes.add(QuizModel.fromJson(e)))
+          .toList();
     } else {
       throw HttpException('Impossible de charger les quizzes');
     }
     notifyListeners();
   }
 
-  getAny(int quizId) async {
+  Future getCorrectAnswers(int quizId) async {
+    final response = await _request.correctAnswers(quizId);
+    print(response);
+    if (response.statusCode == 200) {
+    } else {
+      throw HttpException('Impossible de charger ce quiz');
+    }
+  }
+
+  Future<void> getAny(int quizId) async {
     final response = await _request.getAny(quizId);
     if (response.statusCode == 200) {
-      print(response.data);
       _selectedQuiz = QuizModel.fromJson(response.data['data']);
     } else {
       throw HttpException('Impossible de charger ce quiz');
@@ -35,16 +43,14 @@ class Quiz extends ChangeNotifier {
     notifyListeners();
   }
 
-  sendResponses(int quizId, {
+  Future sendResponses(
+    int quizId, {
     required Map<String, List<int>> answers,
-    required String timeElapsed
+    required String timeElapsed,
   }) async {
     final response = await _request.sendResponses(
       quizId: quizId,
-      results: {
-        "reponses": answers,
-        "time_remaining": timeElapsed
-      }
+      results: {"reponses": answers, "time_remaining": timeElapsed},
     );
     print(response);
     if (response.statusCode == 200) {

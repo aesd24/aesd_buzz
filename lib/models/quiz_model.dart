@@ -11,6 +11,7 @@ class QuizModel {
   late DateTime createdAt;
   late DateTime expiryDate;
   late int questionCount;
+  bool isAvailable = false;
   late bool hasPlayed;
   List questions = [];
 
@@ -18,11 +19,12 @@ class QuizModel {
     id = json['id'];
     title = json['intitule'];
     createdAt = DateTime.parse(json['created_at']);
-    expiryDate = DateTime.parse(json['expiry_date']);
+    expiryDate = DateTime.parse(json['date']);
     //description = json['description'];
     questions = json['questions'] ?? [];
     hasPlayed = json['has_played'] ?? false;
     questionCount = json['questions_count'] ?? json['questions'].length;
+    isAvailable = DateTime.now().isBefore(expiryDate);
   }
 
   GestureDetector toTile() => GestureDetector(

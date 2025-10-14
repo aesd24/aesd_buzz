@@ -22,4 +22,16 @@ class ProgramRequest extends DioClient {
     final client = await getApiClient(contentType: "Multipart/form-data");
     return await client.post('$baseRoute/$id', data: data);
   }
+
+  Future deleteAny(int id) async {
+    final client = await getApiClient();
+    return await client.delete('$baseRoute/church/$baseRoute/$id');
+  }
+
+  Future deleteAllOfDay(String day, {required int churchId}) async {
+    final client = await getApiClient();
+    return await client.delete(
+      '$baseRoute/church/$churchId/$baseRoute/day/$day',
+    );
+  }
 }

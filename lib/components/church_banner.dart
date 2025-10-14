@@ -1,3 +1,4 @@
+import 'package:aesd/appstaticdata/dictionnary.dart';
 import 'package:aesd/components/certification_banner.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/provider/auth.dart';
@@ -7,11 +8,13 @@ import 'package:provider/provider.dart';
 
 BannerType? getBannerType(BuildContext context) {
   final user = Provider.of<Auth>(context, listen: false).user;
-  if (user?.church == null) {
-    return BannerType.waitingBanner.copyWith(
-      text: "Vous n'avez pas encore d'église. Créez ou intégrez-en une",
-      icon: FontAwesomeIcons.church,
-    );
+  if (user != null && user.accountType == Dictionnary.servant) {
+    if (user.church == null) {
+      return BannerType.waitingBanner.copyWith(
+        text: "Vous n'avez pas encore d'église. Créez ou intégrez-en une",
+        icon: FontAwesomeIcons.church,
+      );
+    }
   }
   return null;
 }

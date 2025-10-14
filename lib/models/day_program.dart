@@ -11,12 +11,16 @@ class DayProgramModel {
 
   DayProgramModel({required this.day, required this.program});
 
-  Widget buildWidget(BuildContext context, {void Function()? reloader}) {
+  Widget buildWidget(
+    BuildContext context, {
+    void Function()? reloader,
+    void Function(String)? onDeleteDay,
+    void Function(int)? onDeleteProgram,
+  }) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 5),
       padding: EdgeInsets.symmetric(horizontal: 5, vertical: 7),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
         border: Border(
           left: BorderSide(color: notifire.getMainColor, width: 3),
         ),
@@ -34,25 +38,39 @@ class DayProgramModel {
                 ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
               ),
               if (reloader != null)
-                InkWell(
-                  radius: 100,
-                  borderRadius: BorderRadius.circular(100),
-                  overlayColor: WidgetStatePropertyAll(
-                    notifire.getMaingey.withAlpha(100),
-                  ),
-                  onTap: () {
-                    isExtended = !isExtended;
-                    reloader();
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(7),
-                    child: cusFaIcon(
-                      isExtended
-                          ? FontAwesomeIcons.chevronUp
-                          : FontAwesomeIcons.chevronDown,
-                      size: 15,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (onDeleteDay != null)
+                      IconButton(
+                        onPressed: () => onDeleteDay(day),
+                        icon: cusFaIcon(
+                          FontAwesomeIcons.trashCan,
+                          color: notifire.danger,
+                        ),
+                      ),
+
+                    InkWell(
+                      radius: 100,
+                      borderRadius: BorderRadius.circular(100),
+                      overlayColor: WidgetStatePropertyAll(
+                        notifire.getMaingey.withAlpha(100),
+                      ),
+                      onTap: () {
+                        isExtended = !isExtended;
+                        reloader();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(7),
+                        child: cusFaIcon(
+                          isExtended
+                              ? FontAwesomeIcons.chevronUp
+                              : FontAwesomeIcons.chevronDown,
+                          size: 15,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
             ],
           ),
@@ -70,46 +88,16 @@ class DayProgramModel {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: List.generate(program.length, (index) {
                   var current = program[index];
-                  return current.getTile(context);
+                  return current.getTile(
+                    context,
+                    onDelete:
+                        onDeleteProgram != null
+                            ? () => onDeleteProgram(current.id)
+                            : null,
+                  );
                 }),
               ),
             ),
-        ],
-      ),
-    );
-  }
-
-  Widget getWidget(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.green, width: 1.5),
-        borderRadius: BorderRadius.circular(7),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: 5),
-            child: Text(
-              day,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
-            ),
-          ),
-          Column(
-            children: List.generate(program.length, (index) {
-              var current = program[index];
-              return Column(
-                children: [
-                  current.getTile(context),
-                  if (index != 2) const Divider(),
-                ],
-              );
-            }),
-          ),
         ],
       ),
     );
