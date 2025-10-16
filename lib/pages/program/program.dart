@@ -57,7 +57,7 @@ class _ChurchProgramState extends State<ChurchProgram> {
               textDivider("Programme hebdomadaire"),
               CustomTextButton(
                 label: "Ajouter",
-                onPressed: () {} //Get.to(CreateProgramForm()),
+                onPressed: () {} //Get.to(() =>CreateProgramForm()),
               ),
             ],
           ),

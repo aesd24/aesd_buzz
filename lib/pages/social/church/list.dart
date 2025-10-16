@@ -109,7 +109,7 @@ class _ChurchListState extends State<ChurchList> {
                               "Votre compte n'est pas validé vous n'avez pas les accès requis !",
                             );
                           }
-                          Get.to(MainChurchCreationPage());
+                          Get.to(() =>MainChurchCreationPage());
                         },
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100),

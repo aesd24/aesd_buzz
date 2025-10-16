@@ -1,7 +1,6 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/icon.dart';
-import 'package:aesd/pages/quiz/correction.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:aesd/functions/formatteurs.dart';
@@ -81,7 +80,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
                                     () => MessageService.showInfoMessage(
                                       "Bientôt disponible...",
                                     ),
-                                /*() => Get.to(
+                                /*() => Get.to(() =>
                                       QuizCorrectResponses(quizId: quiz!.id),
                                     )*/
                                 label: "Afficher les bonnes reponses",
@@ -136,7 +135,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
                           onPressed:
                               (quiz!.hasPlayed || !quiz!.isAvailable)
                                   ? null
-                                  : () => Get.to(AnswerPage(quiz: quiz!)),
+                                  : () => Get.to(() =>AnswerPage(quiz: quiz!)),
                         ),
                       ),
                       Spacer(),

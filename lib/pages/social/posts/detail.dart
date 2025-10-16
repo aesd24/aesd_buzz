@@ -193,7 +193,7 @@ class _PostDetailState extends State<PostDetail> {
                                           if (post.image != null) ...[
                                             GestureDetector(
                                               onTap:
-                                                  () => Get.to(
+                                                  () => Get.to(() =>
                                                     ImageViewer(
                                                       imageUrl: post.image!,
                                                     ),

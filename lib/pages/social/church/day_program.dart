@@ -22,7 +22,7 @@ class Program extends StatefulWidget {
 class _ProgramState extends State<Program> {
   bool _isLoading = false;
 
-  void init() async {
+  Future init() async {
     try {
       setState(() => _isLoading = true);
       await Provider.of<Event>(
@@ -39,9 +39,6 @@ class _ProgramState extends State<Program> {
       MessageService.showErrorMessage(
         "Erreur réseau. Veuillez vérifier votre connexion internet.",
       );
-    } catch (e) {
-      e.printError();
-      MessageService.showErrorMessage("Une erreur inattendue s'est produite !");
     } finally {
       setState(() => _isLoading = false);
     }
@@ -66,7 +63,9 @@ class _ProgramState extends State<Program> {
   @override
   void initState() {
     super.initState();
-    init();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await init();
+    });
   }
 
   @override
@@ -80,7 +79,7 @@ class _ProgramState extends State<Program> {
           _buildHeaderRow(
             text: "Programme",
             onTap:
-                () => Get.to(
+                () => Get.to(() =>
                   SocialElementsList(loadElements: () => loadPrograms()),
                 ),
           ),
@@ -102,7 +101,7 @@ class _ProgramState extends State<Program> {
           _buildHeaderRow(
             text: "Evénements",
             onTap:
-                () => Get.to(
+                () => Get.to(() =>
                   SocialElementsList(loadElements: () => loadEvents()),
                 ),
           ),

@@ -79,7 +79,7 @@ class _EventPageState extends State<EventPage> {
                       // Partie de l'image et des titres
                       GestureDetector(
                         onTap:
-                            () => Get.to(
+                            () => Get.to(() =>
                               ImageViewer(imageUrl: event.imageUrl ?? ''),
                             ),
                         child: Container(

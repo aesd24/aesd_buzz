@@ -26,7 +26,6 @@ class _QuizCorrectResponsesState extends State<QuizCorrectResponses> {
       ).getCorrectAnswers(widget.quizId);
     } catch (e) {
       e.printError();
-      MessageService.showErrorMessage("Une erreur est survenue");
     } finally {
       setState(() => isLoading = false);
     }

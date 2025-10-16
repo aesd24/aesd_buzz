@@ -82,7 +82,7 @@ class _CommunityState extends State<Community> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: ListTile(
-                      onTap: () => Get.to(MessageOnPage()),
+                      onTap: () => Get.to(() =>MessageOnPage()),
                       leading: CircleAvatar(
                         backgroundColor: Colors.blueGrey.shade100,
                         child: FaIcon(

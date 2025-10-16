@@ -18,24 +18,18 @@ class ProgramProvider extends ChangeNotifier {
 
   Future getChurchPrograms(int churchId) async {
     dayPrograms.clear();
-    final Map<String, List<ProgramModel>> programsByDayMap = {};
     final response = await _handler.getAll(churchId);
-    for (var progJson in response.data['data']['programmes']) {
-      final program = ProgramModel.fromJson(progJson);
-      final day = program.day;
-
-      // Si le jour n'existe pas encore dans la map, l'initialiser
-      if (!programsByDayMap.containsKey(day)) {
-        programsByDayMap[day] = [];
-      }
-      programsByDayMap[day]?.add(program);
-    }
-
-    programsByDayMap.forEach((day, programsList) {
-      dayPrograms.add(DayProgramModel(day: day, program: programsList));
-    });
-
     if (response.statusCode == 200) {
+      final map = response.data['data']['programmes'] as Map<String, dynamic>;
+      map.forEach((key, value) {
+        dayPrograms.add(
+          DayProgramModel(
+            day: key,
+            program:
+                (value as List).map((e) => ProgramModel.fromJson(e)).toList(),
+          ),
+        );
+      });
       return true;
     } else {
       throw HttpException("Impossible de récupérer les programmes");

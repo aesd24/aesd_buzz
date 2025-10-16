@@ -2,7 +2,6 @@ import 'package:aesd/appstaticdata/routes.dart';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/modal.dart';
-import 'package:aesd/services/message.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

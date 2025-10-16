@@ -248,7 +248,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
                                               : CustomTextButton(
                                                 onPressed:
                                                     () => handleSubscribtion(
-                                                      churchId!,
+                                                      church.id,
                                                       !subscribed,
                                                       user.accountType.code,
                                                     ),
@@ -394,8 +394,8 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
                             padding: const EdgeInsets.all(15),
                             child: TabBarView(
                               children: [
-                                Program(churchId: churchId!),
-                                CeremonyShortList(churchId: churchId!),
+                                Program(churchId: church.id),
+                                CeremonyShortList(churchId: church.id),
                                 Community(),
                               ],
                             ),

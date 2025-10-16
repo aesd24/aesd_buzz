@@ -98,7 +98,7 @@ class UserModel {
     phone = json['phone'];
     photo = json['profile_photo'];
     servant =
-        json['servant'] != null ? ServantModel.fromJson(json['details']) : null;
+        json['servant'] != null ? ServantModel.fromJson(json['servant']) : null;
     accountType = Dictionnary.accountTypes.firstWhere(
       (element) => element.code == json['account_type'],
     );

@@ -104,7 +104,7 @@ class _NewsPageState extends State<NewsPage> {
                                       alignment: Alignment.bottomRight,
                                       child: TextButton.icon(
                                         onPressed:
-                                            () => Get.to(
+                                            () => Get.to(() =>
                                               ImageViewer(
                                                 imageUrl: actu.imageUrl!,
                                               ),

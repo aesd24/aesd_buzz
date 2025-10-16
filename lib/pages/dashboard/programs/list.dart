@@ -31,10 +31,10 @@ class _ProgramListPageState extends State<ProgramListPage> {
         context,
         listen: false,
       ).getChurchPrograms(churchId);
-    } catch (e) {
+    }/* catch (e) {
       e.printError();
       MessageService.showErrorMessage("Une erreur est survenue");
-    } finally {
+    }*/ finally {
       setState(() => _isLoading = false);
     }
   }

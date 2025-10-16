@@ -116,7 +116,7 @@ class _WalletState extends State<Wallet> {
                           color: Colors.white,
                         ),
                         backColor: themeColors.primary,
-                        onTap: () => Get.to(SendPage()),
+                        onTap: () => Get.to(() =>SendPage()),
                       ),
                       customTransactionButton(
                         title: "Retirer",
@@ -125,7 +125,7 @@ class _WalletState extends State<Wallet> {
                           color: Colors.white,
                         ),
                         backColor: themeColors.primary,
-                        onTap: () => Get.to(WithDrawingPage()),
+                        onTap: () => Get.to(() =>WithDrawingPage()),
                       ),
                     ],
                   ),
@@ -150,7 +150,7 @@ class _WalletState extends State<Wallet> {
                       ),
                       const Spacer(),
                       TextButton(
-                        onPressed: () => Get.to(TransactionsPage()),
+                        onPressed: () => Get.to(() =>TransactionsPage()),
                         child: Text(
                           "Tout voir",
                           style: Theme.of(context).textTheme.labelLarge!

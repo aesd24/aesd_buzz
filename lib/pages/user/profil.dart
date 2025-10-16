@@ -35,10 +35,10 @@ class _UserProfilState extends State<UserProfil> {
     try {
       setState(() => isLoading = true);
       await Provider.of<UserProvider>(context, listen: false).getUser(userId);
-    } catch (e) {
+    } /*catch (e) {
       e.printError();
       MessageService.showErrorMessage("Une erreur est survenue");
-    } finally {
+    }*/ finally {
       setState(() => isLoading = false);
     }
   }
@@ -339,8 +339,7 @@ class _UserProfilState extends State<UserProfil> {
                                 ),*/
                                   _customActionButton(
                                     onPressed:
-                                        () => Get.to(
-                                          () => SocialElementsList(
+                                        () => Get.to(() => SocialElementsList(
                                             loadElements: loadTestimonies,
                                           ),
                                         ),
@@ -357,8 +356,7 @@ class _UserProfilState extends State<UserProfil> {
                                     Dictionnary.servant.code) ...[
                                   _customActionButton(
                                     onPressed:
-                                        () => Get.to(
-                                          () => SocialElementsList(
+                                        () => Get.to(() => SocialElementsList(
                                             loadElements:
                                                 () async => await loadPosts(
                                                   user.servant!.id,
