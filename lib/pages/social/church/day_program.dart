@@ -52,13 +52,13 @@ class _ProgramState extends State<Program> {
     return Provider.of<ProgramProvider>(context, listen: false).dayPrograms;
   }
 
-  Future loadEvents() async {
+  /*Future loadEvents() async {
     await Provider.of<Event>(
       context,
       listen: false,
     ).getEvents(churchId: widget.churchId);
     return Provider.of<Event>(context, listen: false).events;
-  }
+  }*/
 
   @override
   void initState() {
@@ -76,13 +76,15 @@ class _ProgramState extends State<Program> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeaderRow(
-            text: "Programme",
-            onTap:
-                () => Get.to(() =>
-                  SocialElementsList(loadElements: () => loadPrograms()),
-                ),
+          Text(
+            "Programme",
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
           ),
+
+          SizedBox(height: 20),
+
           Consumer<ProgramProvider>(
             builder: (context, provider, child) {
               if (provider.dayPrograms.isEmpty) {
@@ -91,14 +93,22 @@ class _ProgramState extends State<Program> {
                   child: notFoundTile(text: "Aucun programme à afficher"),
                 );
               }
-              final program = provider.dayPrograms.last;
-              return program.buildWidget(context);
+              final programs = provider.dayPrograms;
+              return Column(
+                children: List.generate(programs.length, (index) {
+                  final program = programs[index];
+                  return program.buildWidget(
+                    context,
+                    reloader: () => setState(() {}),
+                  );
+                }),
+              );
             },
           ),
 
           SizedBox(height: 10),
 
-          _buildHeaderRow(
+          /*_buildHeaderRow(
             text: "Evénements",
             onTap:
                 () => Get.to(() =>
@@ -119,7 +129,7 @@ class _ProgramState extends State<Program> {
                 child: provider.events[0].buildWidget(context),
               );
             },
-          ),
+          ),*/
         ],
       ),
     );

@@ -70,17 +70,23 @@ class _MainPageState extends State<MainPage> {
           width: 40,
         ),
         centerTitle: true,
-        bottom: getCertificationBanner(context),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child:
-            [
-              SocialPage(),
-              ForumMain(),
-              QuizHome(),
-              TestimoniesList(),
-            ][_pageIndex],
+      body: Column(
+        children: [
+          getCertificationBanner(context) ?? SizedBox(),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child:
+                  [
+                    SocialPage(),
+                    ForumMain(),
+                    QuizHome(),
+                    TestimoniesList(),
+                  ][_pageIndex],
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _pageIndex,

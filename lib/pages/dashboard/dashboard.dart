@@ -89,11 +89,12 @@ class _DashboardState extends State<Dashboard> {
               ),
             ),
           ],
-          bottom: getCertificationBanner(context),
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            getCertificationBanner(context) ?? const SizedBox(),
+
             Padding(
               padding: const EdgeInsets.all(10),
               child: Row(
@@ -144,8 +145,8 @@ class _DashboardState extends State<Dashboard> {
                                     children: [
                                       CustomBottomSheetButtom(
                                         onPressed:
-                                            () => Get.to(() =>
-                                              MainChurchCreationPage(),
+                                            () => Get.to(
+                                              () => MainChurchCreationPage(),
                                             ),
                                         text: "Eglise principale",
                                         image: Image.asset(
@@ -156,7 +157,9 @@ class _DashboardState extends State<Dashboard> {
                                       ),
                                       CustomBottomSheetButtom(
                                         onPressed:
-                                            () => Get.to(() =>AnnexeChurchForm()),
+                                            () => Get.to(
+                                              () => AnnexeChurchForm(),
+                                            ),
                                         text: "Eglise secondaire",
                                         image: Image.asset(
                                           "assets/icons/second.png",
@@ -234,13 +237,16 @@ class _DashboardState extends State<Dashboard> {
             trailing: PopupMenuButton(
               onSelected: (value) {
                 if (value == "profil") {
-                  Get.to(() =>
-                    ChurchDetailPage(),
+                  Get.to(
+                    () => ChurchDetailPage(),
                     arguments: {"churchId": church.id},
                   );
                 } else if (value == "update") {
-                  Get.to(() =>
-                    MainChurchCreationPage(editMode: true, churchId: church.id),
+                  Get.to(
+                    () => MainChurchCreationPage(
+                      editMode: true,
+                      churchId: church.id,
+                    ),
                   );
                 } else if (value == "delete") {
                   MessageService.showInfoMessage("Bientôt disponible...");
@@ -349,7 +355,7 @@ class _DashboardState extends State<Dashboard> {
     return TextButton.icon(
       onPressed:
           destination != null
-              ? () => Get.to(() =>destination, arguments: arg)
+              ? () => Get.to(() => destination, arguments: arg)
               : null,
       icon: FaIcon(icon, size: 18),
       label: Text(label),

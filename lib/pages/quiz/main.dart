@@ -40,10 +40,10 @@ class _QuizMainPageState extends State<QuizMainPage> {
       MessageService.showErrorMessage(
         "Erreur réseau. Vérifiez votre connexion internet",
       );
-    } /*catch(e) {
+    } catch(e) {
       print(e);
       MessageService.showErrorMessage("Une erreur inattendu s'est produite !");
-    }*/ finally {
+    } finally {
       setState(() {
         isLoading = false;
       });

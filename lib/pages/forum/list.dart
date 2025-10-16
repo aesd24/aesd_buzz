@@ -55,13 +55,13 @@ class _ForumMainState extends State<ForumMain> {
     ) : Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
+        /*Padding(
           padding: EdgeInsets.all(10),
           child: CustomFormTextField(
             label: "Recherche",
             prefix: cusIcon(Icons.search)
           )
-        ),
+        ),*/
         Expanded(
           child: Consumer<Forum>(
             builder: (context, forum, child) {

@@ -15,7 +15,7 @@ BannerType? getBannerType(BuildContext context) {
 
   if (user == null) return null;
 
-  if (user.accountType == Dictionnary.servant){
+  if (user.accountType == Dictionnary.servant) {
     if (user.certifStatus == CertificationStates.pending) {
       return BannerType.waitingBanner;
     } else if (user.certifStatus == CertificationStates.rejected) {
@@ -25,41 +25,35 @@ BannerType? getBannerType(BuildContext context) {
   return null;
 }
 
-PreferredSize? getCertificationBanner(BuildContext context) {
+Widget? getCertificationBanner(BuildContext context) {
   BannerType? banner = getBannerType(context);
 
   if (banner != null) {
-    return PreferredSize(
-      preferredSize: Size(double.infinity, 70),
-      child: Expanded(
-        child: GestureDetector(
-          onTap:
-              () =>
-                  banner == BannerType.rejectedBanner
-                      ? Get.to(RetryCertifPage())
-                      : null,
-          child: Container(
-            alignment: Alignment.center,
-            margin: EdgeInsets.symmetric(horizontal: 10),
-            decoration: BoxDecoration(
-              border: Border.all(width: 2, color: banner.color),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: ListTile(
-              leading: cusFaIcon(banner.icon, color: banner.color),
-              title: Text(
-                banner.text,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium!.copyWith(color: banner.color),
-              ),
-            ),
+    return GestureDetector(
+      onTap:
+          () =>
+              banner == BannerType.rejectedBanner
+                  ? Get.to(RetryCertifPage())
+                  : null,
+      child: Container(
+        alignment: Alignment.center,
+        margin: EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          border: Border.all(width: 2, color: banner.color),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: ListTile(
+          leading: cusFaIcon(banner.icon, color: banner.color),
+          title: Text(
+            banner.text,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium!.copyWith(color: banner.color),
           ),
         ),
       ),
     );
-  }
-  else {
+  } else {
     return getChurchIssueBanner(context);
   }
 }
