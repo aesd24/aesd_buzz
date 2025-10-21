@@ -1,6 +1,8 @@
 import 'package:aesd/pages/quiz/list.dart';
 import 'package:aesd/pages/quiz/ranking.dart';
+import 'package:aesd/provider/quiz.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class QuizHome extends StatefulWidget {
   const QuizHome({super.key});
@@ -28,10 +30,16 @@ class _QuizHomeState extends State<QuizHome> {
               child: TabBarView(
                 children: [
                   QuizzesList(),
-                  QuizRankingPage(),
-                ]
+                  QuizRankingPage(
+                    dataLoader:
+                        Provider.of<Quiz>(
+                          context,
+                          listen: false,
+                        ).getMonthRanking,
+                  ),
+                ],
               ),
-            )
+            ),
           ],
         ),
       ),

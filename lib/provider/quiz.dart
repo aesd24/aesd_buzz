@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:aesd/models/quiz_model.dart';
+import 'package:aesd/models/ranking.dart';
 import 'package:aesd/requests/quiz_request.dart';
 import 'package:flutter/material.dart';
 
@@ -57,6 +58,28 @@ class Quiz extends ChangeNotifier {
       return response.data;
     } else {
       throw HttpException("L'envoi des réponses a échoué");
+    }
+  }
+
+  Future getMonthRanking() async {
+    final response = await _request.monthRanking();
+    if (response.statusCode == 200) {
+      return (response.data['data'] as List)
+          .map((element) => RankingModel.globalFromJson(element))
+          .toList();
+    } else {
+      throw HttpException("Impossible d'obtenir le classement");
+    }
+  }
+
+  Future getQuizRanking(int quizId) async {
+    final response = await _request.quizRanking(quizId);
+    if (response.statusCode == 200) {
+      return (response.data['data'] as List)
+          .map((element) => RankingModel.singleFromJson(element))
+          .toList();
+    } else {
+      throw HttpException("Impossible d'obtenir le classement");
     }
   }
 }

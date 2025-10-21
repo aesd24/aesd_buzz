@@ -19,7 +19,7 @@ class QuizModel {
     id = json['id'];
     title = json['intitule'];
     createdAt = DateTime.parse(json['created_at']);
-    expiryDate = DateTime.parse(json['date']);
+    expiryDate = DateTime.parse(json['date']).add(Duration(days: 1));
     //description = json['description'];
     questions = json['questions'] ?? [];
     hasPlayed = json['has_played'] ?? false;
@@ -27,35 +27,55 @@ class QuizModel {
     isAvailable = DateTime.now().isBefore(expiryDate);
   }
 
-  GestureDetector toTile() => GestureDetector(
+  GestureDetector toTile(BuildContext context) => GestureDetector(
     onTap: () {
-      if (!hasPlayed) {
-        Get.to(QuizMainPage(quiz: this));
-      }
+      Get.to(QuizMainPage(quiz: this));
     }, //=> Get.to(QuizMainPage(quiz: this)),
     child: Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       decoration: BoxDecoration(
-        color: hasPlayed ? notifire.getMaingey.withAlpha(75) : notifire.getContainer,
+        color:
+            hasPlayed
+                ? notifire.getMaingey.withAlpha(30)
+                : notifire.getContainer,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: hasPlayed ? null : [
-          BoxShadow(
-            color: notifire.getMaingey.withAlpha(100),
-            blurRadius: 5,
-            spreadRadius: 1,
-          ),
-        ],
+        boxShadow:
+            hasPlayed
+                ? null
+                : [
+                  BoxShadow(
+                    color: notifire.getMaingey.withAlpha(100),
+                    blurRadius: 5,
+                    spreadRadius: 1,
+                  ),
+                ],
       ),
       child: ListTile(
         title: Text(
           title,
-          style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color:
+                hasPlayed
+                    ? notifire.getMainText.withAlpha(100)
+                    : notifire.getMainColor,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         subtitle: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("$questionCount Questions"),
-            Text(formatDate(createdAt, withTime: false)),
+            Text(
+              "$questionCount Questions",
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                color: hasPlayed ? notifire.getMaingey : null,
+              ),
+            ),
+            Text(
+              formatDate(createdAt, withTime: false),
+              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                color: hasPlayed ? notifire.getMaingey : null,
+              ),
+            ),
           ],
         ),
       ),

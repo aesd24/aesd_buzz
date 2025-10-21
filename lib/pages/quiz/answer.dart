@@ -1,5 +1,5 @@
-// answer.dart
 import 'dart:async';
+import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/modal.dart';
@@ -79,107 +79,147 @@ class _AnswerPageState extends State<AnswerPage> {
           isFinish, // L'utilisateur ne peut quitter que si le quiz est terminé
       onPopInvokedWithResult: _handlePopAttempt, // Gérer la tentative de pop
       child: Scaffold(
+        appBar: AppBar(
+          leading: customBackButton(),
+          title: Text(
+            widget.quiz.title,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  cusFaIcon(FontAwesomeIcons.clock),
+                  SizedBox(width: 5),
+                  Text(getTimeInString(timeLeft)),
+                ],
+              ),
+            ),
+          ],
+        ),
         body: Padding(
           padding: const EdgeInsets.all(10),
           child: SingleChildScrollView(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: EdgeInsets.all(20),
-                  margin: EdgeInsets.symmetric(vertical: 25),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(getTimeInString(timeLeft)),
-                      Text(
-                        "Question ${questionIndex + 1}/${widget.quiz.questions.length}",
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: LinearProgressIndicator(
+                    value: (questionIndex + 1) / widget.quiz.questionCount,
+                    minHeight: 3,
+                    backgroundColor: notifire.getMaingey,
+                    valueColor: AlwaysStoppedAnimation(notifire.getMainColor),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(5),
+                    child: Text(
+                      "Question ${questionIndex + 1} sur ${widget.quiz.questionCount}",
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: 30),
+
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Text(
+                      currentQuestion.label,
+                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
                 Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 30.0),
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          currentQuestion.label,
-                          style: Theme.of(context).textTheme.titleLarge!
-                              .copyWith(fontWeight: FontWeight.bold),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 20),
-                      decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Colors.grey),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        children: List.generate(
-                          currentQuestion.options.length,
-                          (index) {
-                            var currentOption = currentQuestion.options[index];
-                            return currentOption.toTile(
-                              title: currentOption.label,
-                              value: currentOption.id,
-                              groupValue: choices,
-                              onChange: (value) {
-                                setState(() {
-                                  if (choices.contains(value)) {
-                                    choices.remove(value);
-                                  } else {
-                                    choices.add(value);
-                                  }
-                                });
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    CustomElevatedButton(
-                      onPressed: () {
-                        if (choices.isNotEmpty) {
-                          playerAnswers[currentQuestion.id.toString()] =
-                              choices;
-                          choices = [];
-
-                          if (questionIndex <
-                              widget.quiz.questions.length - 1) {
-                            setState(() {
-                              questionIndex++;
-                              _updateCurrentQuestion();
-                            });
+                  children: List.generate(currentQuestion.options.length, (
+                    index,
+                  ) {
+                    final current = currentQuestion.options[index];
+                    return current.toTile(
+                      value: current.id,
+                      title: current.label,
+                      groupValue: choices,
+                      onChange: (value) {
+                        setState(() {
+                          if (choices.contains(value)) {
+                            choices.remove(value);
                           } else {
-                            setState(() {
-                              isFinish =
-                                  true; // IMPORTANT : Mettre à jour isFinish
-                            });
-                            _timer.cancel();
-                            // canPop deviendra true, permettant la navigation vers la page suivante
-                            // sans que _handlePopAttempt n'intervienne pour bloquer.
-                            Get.off(
-                              () => QuizResultPage(
-                                quizId: widget.quiz.id,
-                                answers: playerAnswers,
-                                timeElapse: timeLeft,
-                              ),
+                            choices.add(value);
+                          }
+                        });
+                      },
+                    );
+                  }),
+                ),
+                const SizedBox(height: 30),
+                Row(
+                  children: [
+                    if (questionIndex > 0) ...[
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            questionIndex--;
+                            _updateCurrentQuestion();
+                            choices =
+                                playerAnswers[currentQuestion.id.toString()] ??
+                                [];
+                          });
+                        },
+                        icon: cusFaIcon(FontAwesomeIcons.arrowLeft),
+                      ),
+                      SizedBox(width: 30),
+                    ],
+                    Expanded(
+                      child: CustomElevatedButton(
+                        onPressed: () {
+                          if (choices.isNotEmpty) {
+                            playerAnswers[currentQuestion.id.toString()] =
+                                choices;
+
+                            if (questionIndex <
+                                widget.quiz.questions.length - 1) {
+                              setState(() {
+                                questionIndex++;
+                                _updateCurrentQuestion();
+                                choices =
+                                    playerAnswers[questionIndex.toString()] ??
+                                    [];
+                              });
+                            } else {
+                              setState(() {
+                                isFinish =
+                                    true; // IMPORTANT : Mettre à jour isFinish
+                              });
+                              _timer.cancel();
+                              // canPop deviendra true, permettant la navigation vers la page suivante
+                              // sans que _handlePopAttempt n'intervienne pour bloquer.
+                              Get.off(
+                                () => QuizResultPage(
+                                  quizId: widget.quiz.id,
+                                  answers: playerAnswers,
+                                  timeElapse: timeLeft,
+                                ),
+                              );
+                            }
+                          } else {
+                            MessageService.showWarningMessage(
+                              "Choisissez d'abord une option",
                             );
                           }
-                        } else {
-                          MessageService.showWarningMessage(
-                            "Choisissez d'abord une option",
-                          );
-                        }
-                      },
-                      text: "Suivant",
-                      icon: cusFaIcon(
-                        FontAwesomeIcons.arrowRight,
-                        color: Colors.white,
+                        },
+                        text: "Suivant",
+                        icon: cusFaIcon(
+                          FontAwesomeIcons.arrowRight,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],

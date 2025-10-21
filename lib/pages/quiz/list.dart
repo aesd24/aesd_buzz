@@ -74,26 +74,20 @@ class _QuizzesListState extends State<QuizzesList> {
           padding: const EdgeInsets.all(10),
           child: Consumer<Quiz>(
             builder: (context, quizProvider, child) {
-              return Expanded(
-                child: RefreshIndicator(
-                  onRefresh: () async => await loadQuizzes(),
-                  child:
-                  quizProvider.allQuizzes.isNotEmpty
-                      ? Expanded(
-                    child: ListView.builder(
-                      itemCount: quizProvider.allQuizzes.length,
-                      itemBuilder: (context, index) {
-                        final quiz = quizProvider.allQuizzes[index];
-                        return quiz.toTile();
-                      },
-                    ),
-                  )
-                      : Center(
-                    child: notFoundTile(
-                        text: "Aucun quiz disponible"
-                    ),
-                  ),
-                ),
+              return RefreshIndicator(
+                onRefresh: () async => await loadQuizzes(),
+                child:
+                    quizProvider.allQuizzes.isNotEmpty
+                        ? ListView.builder(
+                          itemCount: quizProvider.allQuizzes.length,
+                          itemBuilder: (context, index) {
+                            final quiz = quizProvider.allQuizzes[index];
+                            return quiz.toTile(context);
+                          },
+                        )
+                        : Center(
+                          child: notFoundTile(text: "Aucun quiz disponible"),
+                        ),
               );
             },
           ),

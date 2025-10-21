@@ -1,6 +1,7 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/icon.dart';
+import 'package:aesd/pages/quiz/ranking.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:aesd/functions/formatteurs.dart';
@@ -40,7 +41,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
       MessageService.showErrorMessage(
         "Erreur réseau. Vérifiez votre connexion internet",
       );
-    } catch(e) {
+    } catch (e) {
       print(e);
       MessageService.showErrorMessage("Une erreur inattendu s'est produite !");
     } finally {
@@ -61,7 +62,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
     return LoadingOverlay(
       isLoading: isLoading,
       child: Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(leading: customBackButton()),
         body:
             quiz == null
                 ? Center(child: Text("Impossible de charger le quiz"))
@@ -88,8 +89,45 @@ class _QuizMainPageState extends State<QuizMainPage> {
 
                             CustomTextButton(
                               onPressed:
-                                  () => MessageService.showInfoMessage(
-                                    "Bientôt disponible...",
+                                  () => showModalBottomSheet(
+                                    context: context,
+                                    builder:
+                                        (context) => Container(
+                                          height:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.height *
+                                              .75,
+                                          padding: EdgeInsets.only(top: 7),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(20),
+                                            ),
+                                            color: notifire.getbgcolor,
+                                          ),
+                                          child: Scaffold(
+                                            backgroundColor: Colors.transparent,
+                                            appBar: AppBar(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              leading: customBackButton(
+                                                icon: FontAwesomeIcons.xmark,
+                                              ),
+                                              title: Text("Classement"),
+                                              centerTitle: true,
+                                            ),
+                                            body: Padding(
+                                              padding: const EdgeInsets.all(7),
+                                              child: QuizRankingPage(
+                                                dataLoader:
+                                                    () => Provider.of<Quiz>(
+                                                      context,
+                                                      listen: false,
+                                                    ).getQuizRanking(quiz!.id),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                   ),
                               label: "Classement",
                               type: ButtonType.info.copyWith(
@@ -117,12 +155,20 @@ class _QuizMainPageState extends State<QuizMainPage> {
                         "Expire le ${formatDate(quiz!.expiryDate, withTime: false)}",
                       ),
                       SizedBox(height: 20),
-                      parametersTile(
-                        context,
-                        label: "Nombre de questions",
-                        value: quiz!.questionCount,
+                      Wrap(
+                        spacing: 15,
+                        runSpacing: 10,
+                        children: [
+                          parametersTile(
+                            context,
+                            text: "${quiz!.questionCount} questions",
+                            icon: cusFaIcon(
+                              FontAwesomeIcons.solidCircleQuestion,
+                            ),
+                          ),
+                        ],
                       ),
-                      // parametersTile(context, label: "J'ai participé", value: "Non"),
+                      // parametersTile(context, text: "J'ai participé", icon: "Non"),
                       // parametersTile(context, label: "Mon score", value: "--"),
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
@@ -135,7 +181,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
                           onPressed:
                               (quiz!.hasPlayed || !quiz!.isAvailable)
                                   ? null
-                                  : () => Get.to(() =>AnswerPage(quiz: quiz!)),
+                                  : () => Get.to(() => AnswerPage(quiz: quiz!)),
                         ),
                       ),
                       Spacer(),
@@ -162,26 +208,17 @@ class _QuizMainPageState extends State<QuizMainPage> {
 
   Widget parametersTile(
     BuildContext context, {
-    required String label,
-    required dynamic value,
+    required String text,
+    required Widget icon,
   }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 5),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-      decoration: BoxDecoration(
-        border: Border.all(width: 1, color: Colors.grey),
-        borderRadius: BorderRadius.circular(5),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: Theme.of(context).textTheme.titleMedium),
-          Text(
-            value.toString(),
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
-          ),
+          icon,
+          SizedBox(width: 5),
+          Text(text, style: Theme.of(context).textTheme.titleMedium),
         ],
       ),
     );
