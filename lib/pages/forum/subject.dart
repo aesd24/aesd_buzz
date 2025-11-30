@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/not_found.dart';
 import 'package:aesd/functions/formatteurs.dart';
@@ -124,7 +125,7 @@ class _DiscutionSubjectPageState extends State<DiscutionSubjectPage> {
                 body: Center(
                   child: notFoundTile(
                     icon: FontAwesomeIcons.personCircleExclamation,
-                    text: "Impossible de récupérer le sujet"
+                    text: "Impossible de récupérer le sujet",
                   ),
                 ),
               );
@@ -146,7 +147,7 @@ class _DiscutionSubjectPageState extends State<DiscutionSubjectPage> {
                       pinned: true,
                       actions: [
                         Text(
-                          formatDate(subject.createdAt),
+                          formatDate(subject.createdAt, withTime: false),
                           style: Theme.of(context).textTheme.labelMedium!
                               .copyWith(color: Colors.white60),
                         ),
@@ -225,7 +226,13 @@ class _DiscutionSubjectPageState extends State<DiscutionSubjectPage> {
                                               left: 8.0,
                                             ),
                                             child: Text(
-                                              "Contexte de la discution",
+                                              "Contexte de la discussion",
+                                              style:
+                                                  Theme.of(
+                                                    context,
+                                                  ).textTheme.titleMedium!.copyWith(
+                                                    color: notifire.getMainText
+                                                  ),
                                             ),
                                           ),
                                         ],
@@ -233,10 +240,13 @@ class _DiscutionSubjectPageState extends State<DiscutionSubjectPage> {
                                     ),
                                     Text(
                                       subject.body,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall!
-                                          .copyWith(color: Colors.black87),
+                                      style: Theme.of(
+                                        context
+                                      ).textTheme.bodyMedium!.copyWith(
+                                        color: notifire.getMainText.withAlpha(
+                                          200,
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),

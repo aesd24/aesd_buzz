@@ -39,9 +39,6 @@ class _ChurchListState extends State<ChurchList> {
     } on HttpException catch (e) {
       e.printError();
       MessageService.showErrorMessage(e.message);
-    } catch (e) {
-      e.printError();
-      MessageService.showErrorMessage("Une erreur inattendue est survenue !");
     } finally {
       setState(() {
         isLoading = false;
@@ -59,44 +56,41 @@ class _ChurchListState extends State<ChurchList> {
   Widget build(BuildContext context) {
     return isLoading
         ? ListShimmerPlaceholder()
-        : Stack(
-          children: [
-            Consumer<Church>(
-              builder: (context, provider, child) {
-                if (provider.churches.isEmpty) {
-                  return Center(
-                    child: SingleChildScrollView(
-                      child: RefreshIndicator(
-                        onRefresh: () async => loadChurches(),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [notFoundTile(text: "Aucune eglise trouvée")],
-                        ),
-                      ),
+        : Consumer<Church>(
+          builder: (context, provider, child) {
+            if (provider.churches.isEmpty) {
+              return Center(
+                child: SingleChildScrollView(
+                  child: RefreshIndicator(
+                    onRefresh: () async => loadChurches(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        notFoundTile(text: "Aucune eglise trouvée"),
+                      ],
                     ),
-                  );
-                }
-
-                final churches = provider.churches;
-
-                return SingleChildScrollView(
-                  child: Column(
-                    children: List.generate(5, (index) {
-                      return RefreshIndicator(
-                        onRefresh: () async => loadChurches(),
-                        child: ListView.builder(
-                          itemCount: churches.length,
-                          itemBuilder: (context, index) {
-                            return churches[index].buildWidget(context);
-                          },
-                        ),
-                      );
-                    }),
                   ),
-                );
-              },
-            ),
-            Consumer<Auth>(
+                ),
+              );
+            }
+
+            final churches = provider.churches;
+
+            return RefreshIndicator(
+              onRefresh: () async => loadChurches(),
+              child: ListView.builder(
+                itemCount: churches.length,
+                itemBuilder: (context, index) {
+                  return churches[index].buildWidget(context);
+                },
+              ),
+            );
+          },
+        );
+  }
+}
+
+/*Consumer<Auth>(
               builder: (context, provider, child) {
                 final user = provider.user;
                 // bouton flottant pour ajout d'église
@@ -108,7 +102,15 @@ class _ChurchListState extends State<ChurchList> {
                       padding: const EdgeInsets.all(8.0),
                       child: FloatingActionButton(
                         backgroundColor: notifire.getMainColor,
-                        onPressed: () => Get.to(MainChurchCreationPage()),
+                        onPressed: () {
+                          if (user.certifStatus !=
+                              CertificationStates.approved) {
+                            return MessageService.showWarningMessage(
+                              "Votre compte n'est pas validé vous n'avez pas les accès requis !",
+                            );
+                          }
+                          Get.to(() =>MainChurchCreationPage());
+                        },
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100),
                         ),
@@ -122,9 +124,5 @@ class _ChurchListState extends State<ChurchList> {
                   );
                 }
                 return SizedBox();
-              }
-            )
-          ],
-        );
-  }
-}
+              },
+            ),*/

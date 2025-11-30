@@ -1,7 +1,61 @@
+import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/functions/camera_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'icon.dart';
+
+class CustomBottomSheetButtom extends StatelessWidget {
+  const CustomBottomSheetButtom({
+    super.key,
+    required this.image,
+    required this.text,
+    this.onPressed
+  });
+
+  final String text;
+  final Widget image;
+  final void Function()? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Column(
+        children: [
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: notifire.getContainer,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: notifire.getMaingey.withAlpha(75),
+                      blurRadius: 5,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(left: -15, child: image),
+            ],
+          ),
+          SizedBox(height: 10),
+          Flexible(
+            child: Text(
+              text,
+              overflow: TextOverflow.clip,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 void pickModeSelectionBottomSheet({
   required BuildContext context,

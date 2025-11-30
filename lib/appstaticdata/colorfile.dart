@@ -22,6 +22,9 @@ Color  darkiconcolor = const Color(0xffcccecc);
 Color containerColor = Colors.white;
 Color darkContainerColor = Colors.black;
 
+Color onContainer = Colors.black;
+Color onDarkContainer = Colors.white;
+
 Color continercolo1r = Colors.grey.shade100;
 Color darkcontinercolo1r = const Color(0xff293526);
 

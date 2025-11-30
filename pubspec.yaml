@@ -70,10 +70,12 @@ dependencies:
   video_player: ^2.0.0
   chewie: ^1.8.3
   date_field: ^6.0.0
+  accordion: ^2.6.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.4
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

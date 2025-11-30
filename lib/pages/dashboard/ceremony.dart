@@ -97,7 +97,7 @@ class _CeremoniesManagementState extends State<CeremoniesManagement> {
                 text: "Ajouter une cérémonie",
                 icon: FaIcon(FontAwesomeIcons.film, color: Colors.white),
                 onPressed:
-                    () => Get.to(CeremonyForm(churchId: widget.churchId)),
+                    () => Get.to(() =>CeremonyForm(churchId: widget.churchId)),
               ),
               CustomFormTextField(
                 prefix: Icon(Icons.search),
@@ -118,6 +118,7 @@ class _CeremoniesManagementState extends State<CeremoniesManagement> {
                                         ceremonyProvider.ceremonies[index];
                                     return current.card(
                                       context,
+                                      dashboardAccess: true,
                                       onDelete: () => handleDeletion(current),
                                     );
                                   },

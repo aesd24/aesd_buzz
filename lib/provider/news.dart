@@ -22,7 +22,7 @@ class News extends ChangeNotifier {
       news.map((e) => _newsList.add(NewsModel.fromJson(e))).toList();
       notifyListeners();
     } else {
-      throw HttpException("Impossible de récupérer les actualités.");
+      throw HttpException(response.data['message']);
     }
   }
 

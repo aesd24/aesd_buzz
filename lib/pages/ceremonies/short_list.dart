@@ -57,7 +57,7 @@ class _CeremonyShortListState extends State<CeremonyShortList> {
           Align(
             alignment: Alignment.centerRight,
             child: TextButton.icon(
-              onPressed: () => Get.to(CeremonyList()),
+              onPressed: () => Get.to(() =>CeremonyList()),
               label: const Text("Voir plus"),
               icon: const Icon(Icons.add),
               iconAlignment: IconAlignment.end,

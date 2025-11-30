@@ -99,7 +99,7 @@ class _ChurchEventsState extends State<ChurchEvents> {
                 text: "Ajouter un évènement",
                 icon: FaIcon(FontAwesomeIcons.film, color: Colors.white),
                 onPressed:
-                    () => Get.to(
+                    () => Get.to(() =>
                       EventForm(churchId: widget.churchId),
                     ),
               ),

@@ -1,26 +1,35 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:aesd/models/church_model.dart';
+import 'package:aesd/models/membership_request.dart';
+import 'package:aesd/models/servant_model.dart';
+import 'package:aesd/models/user_model.dart';
 import 'package:aesd/requests/church_request.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class Church extends ChangeNotifier {
   final int _currentPage = 0;
-  late ChurchPaginator _paginator;
   final ChurchRequest _request = ChurchRequest();
   final List<ChurchModel> _churches = [];
   final List<ChurchModel> _userChurches = [];
+  ChurchModel? _selectedChurch;
 
+  ChurchModel? get selectedChurch => _selectedChurch;
   List<ChurchModel> get churches => _churches;
   List<ChurchModel> get userChurches => _userChurches;
 
   Future getUserChurches() async {
     final response = await _request.userChurches();
+    print(response);
     if (response.statusCode == 200) {
-      var data = response.data['data']['churches'];
+      final mainChurches = response.data['data']['main_churches'];
+      final secondaries = response.data['data']['secondary_churches'];
       _userChurches.clear();
-      for (var church in data) {
+      for (var church in mainChurches) {
+        _userChurches.add(ChurchModel.fromJson(church));
+      }
+      for (var church in secondaries) {
         _userChurches.add(ChurchModel.fromJson(church));
       }
     } else {
@@ -32,21 +41,29 @@ class Church extends ChangeNotifier {
   Future fetchChurches() async {
     final response = await _request.all(page: _currentPage);
     if (response.statusCode == 200) {
-      final data = response.data;
-      _paginator = ChurchPaginator.fromJson(data);
+      final churches =
+          (response.data['data'] as List)
+              .map((e) => ChurchModel.fromJson(e))
+              .toList();
+      //_paginator = ChurchPaginator.fromJson(data);
       if (_churches.isNotEmpty && _currentPage == 0) {
         _churches.clear();
       }
-      _churches.addAll(_paginator.churches);
+      _churches.addAll(churches);
 
       notifyListeners();
     }
   }
 
   Future fetchChurch(int id) async {
-    var response = await _request.one(id);
+    final response = await _request.one(id);
     if (response.statusCode == 200) {
-      return response.data;
+      final data = response.data['data'];
+      _selectedChurch = ChurchModel.fromJson(data['church']);
+      _selectedChurch!.owner = ServantModel.fromJson(data['owner']);
+      _selectedChurch!.members =
+          (data['members'] as List).map((e) => UserModel.fromJson(e)).toList();
+      return true;
     } else {
       throw Exception("Impossible de récupérer l'église");
     }
@@ -67,7 +84,9 @@ class Church extends ChangeNotifier {
     if (response.statusCode == 200) {
       return true;
     } else {
-      throw const HttpException("La modification de l'église à échoué. Rééssayez");
+      throw const HttpException(
+        "La modification de l'église à échoué. Rééssayez",
+      );
     }
   }
 
@@ -80,14 +99,15 @@ class Church extends ChangeNotifier {
       'description': data['description'],
       'type_church': data['churchType'],
       'logo': await MultipartFile.fromFile(data['image'].path),
-      'attestation_file_path':
-          await MultipartFile.fromFile(data['attestation_file'].path),
+      'attestation_file_path': await MultipartFile.fromFile(
+        data['attestation_file'].path,
+      ),
       'is_main': data['isMain'],
-      'main_church_id': data['mainChurchId']
+      'main_church_id': data['mainChurchId'],
     });
 
-    var response = await _request.create(formData);
-    if (response.statusCode == 201) {
+    final response = await _request.create(formData);
+    if (response.statusCode == 200) {
       return true;
     } else {
       throw const HttpException("La création de l'église à échoué. Rééssayez");
@@ -100,6 +120,62 @@ class Church extends ChangeNotifier {
       return response.data['message'];
     } else {
       throw const HttpException("L'inscription à l'église à échoué.");
+    }
+  }
+
+  Future retryValidateChurch(int churchId, File attestationFile) async {
+    FormData formData = FormData.fromMap({
+      'attestation_file_path': await MultipartFile.fromFile(
+        attestationFile.path,
+      ),
+    });
+    final response = await _request.retryValidation(churchId, data: formData);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw HttpException("Impossible d'envoyer l'attestation");
+    }
+  }
+
+  Future membershipRequest(int churchId) async {
+    final response = await _request.requestMembership(churchId: churchId);
+    if (response.statusCode == 200) {
+      return "Demande d'adhésion soumise";
+    } else {
+      throw HttpException("Impossible de rejoindre cette église");
+    }
+  }
+
+  Future getMembershipRequests() async {
+    final response = await _request.getMembershipRequests();
+    if (response.statusCode == 200) {
+      print(response.data);
+      final data = response.data['data'];
+      final List<MembershipRequestModel> requests = [];
+      for (var request in data) {
+        requests.add(MembershipRequestModel.fromJson(request));
+      }
+      return requests;
+    } else {
+      throw HttpException("Impossible de récupérer les demandes d'adhésion");
+    }
+  }
+
+  Future acceptMembershipRequest(int requestId) async {
+    final response = await _request.acceptMembershipRequest(requestId);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw HttpException("Impossible d'accepter la demande d'adhésion");
+    }
+  }
+
+  Future rejectMembershipRequest(int requestId) async {
+    final response = await _request.rejectMembershipRequest(requestId);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw HttpException("Impossible de rejeter la demande d'adhésion");
     }
   }
 }

@@ -16,7 +16,7 @@ class PostModel {
   late int id;
   late String content;
   late String? image;
-  late UserModel author;
+  late UserModel? author;
   late DateTime date;
   bool liked = false;
   late int comments;
@@ -26,7 +26,7 @@ class PostModel {
     id = json['id'];
     content = json['contenu'];
     image = json['image'];
-    author = UserModel.fromJson(json['user']);
+    author = json['user'] != null ? UserModel.fromJson(json['user']) : null;
     date = DateTime.parse(json['created_at']);
     liked = json['liked'] ?? false;
     comments = json['comments_count'];
@@ -35,7 +35,7 @@ class PostModel {
 
   Widget buildWidget(
     BuildContext context, {
-    required void Function(PostModel post) onLike,
+     void Function(PostModel post)? onLike,
   }) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -112,7 +112,7 @@ class PostModel {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      author.buildTile(),
+                      if (author != null) author!.buildTile(),
                       Text(
                         getPostFormattedDate(date),
                         style: textTheme.bodySmall!.copyWith(
@@ -125,7 +125,7 @@ class PostModel {
                   SizedBox(height: 20),
 
                   // likes / comments (actions)
-                  Row(
+                  if (onLike != null) Row(
                     //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       customActionButton(

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:aesd/models/quiz_model.dart';
+import 'package:aesd/models/ranking.dart';
 import 'package:aesd/requests/quiz_request.dart';
 import 'package:flutter/material.dart';
 
@@ -11,23 +12,31 @@ class Quiz extends ChangeNotifier {
   QuizModel? _selectedQuiz;
   QuizModel? get selectedQuiz => _selectedQuiz;
 
-  getAll() async {
+  Future<void> getAll() async {
     final response = await _request.getAll();
     if (response.statusCode == 200) {
       _allQuizzes.clear();
-      List quizzes = response.data;
-      quizzes.map((e) => _allQuizzes.add(QuizModel.fromJson(e))).toList();
-      print(_allQuizzes);
+      (response.data['data'] as List)
+          .map((e) => _allQuizzes.add(QuizModel.fromJson(e)))
+          .toList();
     } else {
       throw HttpException('Impossible de charger les quizzes');
     }
     notifyListeners();
   }
 
-  getAny(int quizId) async {
+  Future getCorrectAnswers(int quizId) async {
+    final response = await _request.correctAnswers(quizId);
+    print(response);
+    if (response.statusCode == 200) {
+    } else {
+      throw HttpException('Impossible de charger ce quiz');
+    }
+  }
+
+  Future<void> getAny(int quizId) async {
     final response = await _request.getAny(quizId);
     if (response.statusCode == 200) {
-      print(response.data);
       _selectedQuiz = QuizModel.fromJson(response.data['data']);
     } else {
       throw HttpException('Impossible de charger ce quiz');
@@ -35,22 +44,42 @@ class Quiz extends ChangeNotifier {
     notifyListeners();
   }
 
-  sendResponses(int quizId, {
+  Future sendResponses(
+    int quizId, {
     required Map<String, List<int>> answers,
-    required String timeElapsed
+    required String timeElapsed,
   }) async {
     final response = await _request.sendResponses(
       quizId: quizId,
-      results: {
-        "reponses": answers,
-        "time_remaining": timeElapsed
-      }
+      results: {"reponses": answers, "time_remaining": timeElapsed},
     );
     print(response);
     if (response.statusCode == 200) {
-      //print(response.data);
+      return response.data;
     } else {
       throw HttpException("L'envoi des réponses a échoué");
+    }
+  }
+
+  Future getMonthRanking() async {
+    final response = await _request.monthRanking();
+    if (response.statusCode == 200) {
+      return (response.data['data'] as List)
+          .map((element) => RankingModel.globalFromJson(element))
+          .toList();
+    } else {
+      throw HttpException("Impossible d'obtenir le classement");
+    }
+  }
+
+  Future getQuizRanking(int quizId) async {
+    final response = await _request.quizRanking(quizId);
+    if (response.statusCode == 200) {
+      return (response.data['data'] as List)
+          .map((element) => RankingModel.singleFromJson(element))
+          .toList();
+    } else {
+      throw HttpException("Impossible d'obtenir le classement");
     }
   }
 }

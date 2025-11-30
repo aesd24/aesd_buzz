@@ -222,72 +222,36 @@ class _EventFormState extends State<EventForm> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 10, bottom: 25),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                isPublic
-                                    ? "L'évènement sera tout publique"
-                                    : "L'évènement sera interne à l'église",
-                                overflow: TextOverflow.clip,
-                              ),
-                            ),
-                            Switch(
-                              value: isPublic,
-                              onChanged: (value) {
-                                setState(() {
-                                  isPublic = value;
-                                });
-                              },
-                            ),
-                          ],
+                        child: CheckboxListTile(
+                          title: Text(
+                            "Evénement public ?",
+                            overflow: TextOverflow.clip,
+                          ),
+                          value: isPublic,
+                          onChanged:
+                              (value) => setState(() => isPublic = !isPublic),
                         ),
                       ),
                       // partie de l'affiche
                       if (!widget.editMode)
                         imagePath == null
-                            ? GestureDetector(
-                              onTap: () async {
+                            ? rectanglePictureContainer(
+                              label: "Ajouter l'affiche de l'événement",
+                              icon: FontAwesomeIcons.image,
+                              onPressed: () async {
                                 // selectionner une photo depuis la galérie
-                                File? file = await pickImage();
+                                File? file = await pickImage(camera: false);
                                 if (file != null) {
                                   imagePath = file.path;
                                   setState(() {});
                                 }
                               },
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(10),
-                                margin: const EdgeInsets.only(bottom: 10),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(
-                                    width: 1.5,
-                                    color: Colors.green,
-                                  ),
-                                ),
-                                alignment: Alignment.center,
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.photo_size_select_actual_rounded,
-                                      color: Colors.green,
-                                    ),
-                                    SizedBox(width: 15),
-                                    Text("Ajouter l'affiche de l'évènement"),
-                                  ],
-                                ),
-                              ),
                             )
                             : rectanglePictureContainer(
                               label: "Ajoutez une image",
                               image: File(imagePath!),
                               onPressed: () async {
-                                File? pickedFile = await pickImage(
-                                  camera: true,
-                                );
+                                File? pickedFile = await pickImage(camera: false);
                                 if (pickedFile != null) {
                                   setState(() {
                                     imagePath = pickedFile.path;

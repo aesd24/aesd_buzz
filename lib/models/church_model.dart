@@ -1,9 +1,14 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/components/certification_banner.dart';
+import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/image_viewer.dart';
 import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/components/tiles.dart';
 import 'package:aesd/models/day_program.dart';
 import 'package:aesd/models/servant_model.dart';
+import 'package:aesd/models/user_model.dart';
+import 'package:aesd/pages/dashboard/retryChurchValidity.dart';
+import 'package:aesd/pages/social/church/detail.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -20,9 +25,10 @@ class ChurchModel {
   late String? cover;
   late String image;
   late String? type;
-  late List<ServantModel> servants = [];
-  late ServantModel? mainServant;
-  late int mainServantId;
+  late String? validationState;
+  List<ServantModel> servants = [];
+  ServantModel? owner;
+  List<UserModel> members = [];
   late DayProgramModel? program;
 
   ChurchModel.fromJson(Map<String, dynamic> json) {
@@ -38,25 +44,17 @@ class ChurchModel {
     description = json['description'];
     phone = json['phone'];
     type = json['type_church'];
-    mainServant =
-        json['main_servant'] == null
-            ? null
-            : ServantModel.fromJson(json['main_servant']);
-    mainServantId = json['owner_servant_id'];
+    validationState = json['validation_status'];
     json['servants']?.forEach((d) {
       servants.add(ServantModel.fromJson(d));
     });
-    program =
-        json['program'] != null
-            ? DayProgramModel.fromJson(json['program'])
-            : null;
   }
 
-  Widget buildWidget(
-      BuildContext context) {
+  Widget buildWidget(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return GestureDetector(
-      onTap: () => {},
+      onTap:
+          () => Get.to(() => ChurchDetailPage(), arguments: {'churchId': id}),
       child: Container(
         margin: EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -64,9 +62,9 @@ class ChurchModel {
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
-              color: notifire.getMainColor.withAlpha(30),
+              color: notifire.getMaingey.withAlpha(75),
               spreadRadius: 2,
-              blurRadius: 3,
+              blurRadius: 5,
               offset: Offset(0, 2),
             ),
           ],
@@ -75,18 +73,16 @@ class ChurchModel {
           children: [
             // image box
             GestureDetector(
-              onTap: () => Get.to(ImageViewer(imageUrl: image)),
+              onTap: () => Get.to(ImageViewer(imageUrl: logo ?? "")),
               child: Hero(
-                tag: image,
+                tag: logo ?? "",
                 child: ClipRRect(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(10),
-                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
                   child: FastCachedImage(
                     height: 200,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    url: image,
+                    url: logo ?? "",
                     loadingBuilder: (context, progress) {
                       return imageShimmerPlaceholder(height: 200);
                     },
@@ -123,13 +119,60 @@ class ChurchModel {
                         "(+225) $phone",
                       ),
                       textIconTile(context, FontAwesomeIcons.at, email),
-                      textIconTile(context, FontAwesomeIcons.locationDot, address),
+                      textIconTile(
+                        context,
+                        FontAwesomeIcons.locationDot,
+                        address,
+                      ),
                     ],
                   ),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildValidationChurchBanner(BuildContext context) {
+    BannerType? banner;
+    if (validationState == "pending") {
+      banner = BannerType.waitingBanner.copyWith(
+        text: "En attente de validation",
+      );
+    } else if (validationState == "rejected") {
+      banner = BannerType.rejectedBanner.copyWith(
+        text: "Réfusé, cliquez pour rééssayer",
+      );
+    }
+    return GestureDetector(
+      onTap: () {
+        if (validationState == "rejected") {
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.transparent,
+            isScrollControlled: true,
+            builder: (context) {
+              return RetryValidateChurch(churchId: id);
+            },
+          );
+        }
+      },
+      child: Container(
+        margin: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(color: banner!.color),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: ListTile(
+          leading: cusFaIcon(banner.icon, color: banner.color),
+          title: Text(
+            banner.text,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium!.copyWith(color: banner.color),
+          ),
         ),
       ),
     );

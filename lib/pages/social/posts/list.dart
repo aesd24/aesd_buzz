@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:aesd/appstaticdata/dictionnary.dart';
+import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/not_found.dart';
 import 'package:aesd/components/placeholders.dart';
@@ -146,25 +147,32 @@ class _PostListState extends State<PostList> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: FloatingActionButton(
-                onPressed:
-                    () => showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder:
-                          (context) => CreatePost(
-                            canPickImage: true,
-                            onSubmit: (createObj) => onCreate(createObj),
-                            pictureValidator: (pic, content) {
-                              if (pic == null &&
-                                  (content == null || content.isEmpty)) {
-                                throw Exception(
-                                  "Le post ne peut être vide. Ajoutez une image ou du texte",
-                                );
-                              }
-                            },
-                          ),
-                    ),
+                backgroundColor: notifire.getMainColor,
+                onPressed: () {
+                  if (user!.certifStatus != CertificationStates.approved) {
+                    return MessageService.showWarningMessage(
+                      "Votre compte n'est pas validé vous n'avez pas les accès requis !",
+                    );
+                  }
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder:
+                        (context) => CreatePost(
+                          canPickImage: true,
+                          onSubmit: (createObj) => onCreate(createObj),
+                          pictureValidator: (pic, content) {
+                            if (pic == null &&
+                                (content == null || content.isEmpty)) {
+                              throw Exception(
+                                "Le post ne peut être vide. Ajoutez une image ou du texte",
+                              );
+                            }
+                          },
+                        ),
+                  );
+                },
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(100),
                 ),

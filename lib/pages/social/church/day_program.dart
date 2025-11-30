@@ -1,7 +1,9 @@
 import 'dart:io';
-import 'package:aesd/models/day_program.dart';
-import 'package:aesd/models/event.dart';
+import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/components/not_found.dart';
+import 'package:aesd/pages/social/socialElementsList.dart';
 import 'package:aesd/provider/event.dart';
+import 'package:aesd/provider/program.dart';
 import 'package:aesd/services/message.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -18,88 +20,142 @@ class Program extends StatefulWidget {
 }
 
 class _ProgramState extends State<Program> {
-  var currentProgram = DayProgramModel.fromJson({
-    'day': "Lundi",
-    'program': List.generate(3, (index) {
-      return {
-        'title': "Programme $index",
-        'startTime': "${index + 10}:00:00",
-        'endTime': "${index + 11}:00:00",
-        'place': "Lien $index",
-      };
-    }),
-  });
+  bool _isLoading = false;
 
-  /* var lastEvent = EventModel.fromJson({
-    'id': 0,
-    'titre':"Intitulé de l'évènement 1",
-    'date_debut': DateTime.now(),
-    'date_fin': DateTime.now(),
-  }); */
-
-  void init() async {
+  Future init() async {
     try {
+      setState(() => _isLoading = true);
       await Provider.of<Event>(
         context,
         listen: false,
       ).getEvents(churchId: widget.churchId);
+      await Provider.of<ProgramProvider>(
+        context,
+        listen: false,
+      ).getChurchPrograms(widget.churchId);
     } on HttpException catch (e) {
       MessageService.showErrorMessage(e.message);
     } on DioException {
       MessageService.showErrorMessage(
         "Erreur réseau. Veuillez vérifier votre connexion internet.",
       );
-    } catch (e) {
-      e.printError();
-      MessageService.showErrorMessage("Une erreur inattendue s'est produite !");
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
+
+  Future loadPrograms() async {
+    await Provider.of<ProgramProvider>(
+      context,
+      listen: false,
+    ).getChurchPrograms(widget.churchId);
+    return Provider.of<ProgramProvider>(context, listen: false).dayPrograms;
+  }
+
+  /*Future loadEvents() async {
+    await Provider.of<Event>(
+      context,
+      listen: false,
+    ).getEvents(churchId: widget.churchId);
+    return Provider.of<Event>(context, listen: false).events;
+  }*/
 
   @override
   void initState() {
     super.initState();
-    init();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await init();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) return Center(child: CircularProgressIndicator());
+
     return SingleChildScrollView(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Programme du jour",
-                style: Theme.of(
-                  context,
-                ).textTheme.labelLarge!.copyWith(fontWeight: FontWeight.bold),
-              ),
-              /* TextButton.icon(
-                  onPressed: () => null,//NavigationService.push(context, destination: ),
-                  icon: const Icon(Icons.keyboard_arrow_right),
-                  iconAlignment: IconAlignment.end,
-                  label: const Text("Tout voir")) */
-            ],
+          Text(
+            "Programme",
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
           ),
-          Consumer<Event>(
-            builder: (context, eventProvider, child) {
-              EventModel? lastEvent;
-              if (eventProvider.events.isNotEmpty) {
-                lastEvent = eventProvider.events.last;
+
+          SizedBox(height: 20),
+
+          Consumer<ProgramProvider>(
+            builder: (context, provider, child) {
+              if (provider.dayPrograms.isEmpty) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: notFoundTile(text: "Aucun programme à afficher"),
+                );
               }
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child:
-                    lastEvent != null
-                        ? lastEvent.buildWidget(context)
-                        : Text("Aucun événement pour le moment..."),
+              final programs = provider.dayPrograms;
+              return Column(
+                children: List.generate(programs.length, (index) {
+                  final program = programs[index];
+                  return program.buildWidget(
+                    context,
+                    reloader: () => setState(() {}),
+                  );
+                }),
               );
             },
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 15),
-            child: currentProgram.getWidget(context),
+
+          SizedBox(height: 10),
+
+          /*_buildHeaderRow(
+            text: "Evénements",
+            onTap:
+                () => Get.to(() =>
+                  SocialElementsList(loadElements: () => loadEvents()),
+                ),
+          ),
+          Consumer<Event>(
+            builder: (context, provider, child) {
+              final events = provider.events;
+              if (events.isEmpty) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: notFoundTile(text: "Aucun événement à afficher"),
+                );
+              }
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: provider.events[0].buildWidget(context),
+              );
+            },
+          ),*/
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeaderRow({required String text, void Function()? onTap}) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            text,
+            style: Theme.of(
+              context,
+            ).textTheme.labelLarge!.copyWith(fontWeight: FontWeight.bold),
+          ),
+          InkWell(
+            onTap: onTap,
+            child: Text(
+              "voir plus",
+              style: TextStyle(
+                color: notifire.getMainColor,
+                decoration: TextDecoration.underline,
+              ),
+            ),
           ),
         ],
       ),

@@ -9,6 +9,18 @@ class Servant extends ChangeNotifier {
 
   List<ServantModel> get servants => _servants;
 
+  Future getSubscribtionStats() async {
+    final response = await _request.stats();
+    if (response.statusCode == 200) {
+      return {
+        'subscribed': response.data['nombre_abonnes'],
+        'subscribers': response.data['nombre_abonnements'],
+      };
+    } else {
+      throw HttpException(response.data['message']);
+    }
+  }
+
   Future getServant({required int servantId}) async {
     final response = await _request.one(servantId);
     if (response.statusCode == 200) {
@@ -34,7 +46,6 @@ class Servant extends ChangeNotifier {
 
   Future subscribe({required int servantId, required bool subscribe}) async {
     final response = await _request.subscribe(servantId, subscribe);
-    print(response);
     if (response.statusCode == 200) {
       return response.data;
     } else {

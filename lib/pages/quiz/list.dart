@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:aesd/components/fields.dart';
 import 'package:aesd/components/not_found.dart';
 import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/models/quiz_model.dart';
@@ -8,7 +7,6 @@ import 'package:aesd/services/message.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:loading_overlay/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
 class QuizzesList extends StatefulWidget {
@@ -74,40 +72,24 @@ class _QuizzesListState extends State<QuizzesList> {
         ? ListShimmerPlaceholder()
         : Padding(
           padding: const EdgeInsets.all(10),
-          child: Column(
-            children: [
-              CustomFormTextField(
-                label: "Recherche",
-                prefix: const Icon(Icons.search),
-                controller: _searchController,
-                onChanged: (value) {
-                  setState(() {});
-                },
-              ),
-              Consumer<Quiz>(
-                builder: (context, quizProvider, child) {
-                  return Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: () async => await loadQuizzes(),
-                      child:
-                          quizProvider.allQuizzes.isNotEmpty
-                              ? ListView.builder(
-                                itemCount: quizProvider.allQuizzes.length,
-                                itemBuilder: (context, index) {
-                                  final quiz = quizProvider.allQuizzes[index];
-                                  return quiz.toTile();
-                                },
-                              )
-                              : Center(
-                                child: notFoundTile(
-                                  text: "Aucun quiz disponible"
-                                ),
-                              ),
-                    ),
-                  );
-                },
-              ),
-            ],
+          child: Consumer<Quiz>(
+            builder: (context, quizProvider, child) {
+              return RefreshIndicator(
+                onRefresh: () async => await loadQuizzes(),
+                child:
+                    quizProvider.allQuizzes.isNotEmpty
+                        ? ListView.builder(
+                          itemCount: quizProvider.allQuizzes.length,
+                          itemBuilder: (context, index) {
+                            final quiz = quizProvider.allQuizzes[index];
+                            return quiz.toTile(context);
+                          },
+                        )
+                        : Center(
+                          child: notFoundTile(text: "Aucun quiz disponible"),
+                        ),
+              );
+            },
           ),
         );
   }
