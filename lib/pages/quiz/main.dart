@@ -30,9 +30,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
 
   Future<void> loadQuiz() async {
     try {
-      setState(() {
-        isLoading = true;
-      });
+      setState(() => isLoading = true);
       await Provider.of<Quiz>(context, listen: false).getAny(widget.quiz.id);
       quiz = Provider.of<Quiz>(context, listen: false).selectedQuiz;
     } on HttpException catch (e) {
@@ -45,9 +43,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
       print(e);
       MessageService.showErrorMessage("Une erreur inattendu s'est produite !");
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      setState(() => isLoading = false);
     }
   }
 
@@ -61,165 +57,616 @@ class _QuizMainPageState extends State<QuizMainPage> {
   Widget build(BuildContext context) {
     return LoadingOverlay(
       isLoading: isLoading,
+      progressIndicator: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation(Colors.purple.shade400),
+        strokeWidth: 3,
+      ),
       child: Scaffold(
-        appBar: AppBar(leading: customBackButton()),
-        body:
-            quiz == null
-                ? Center(child: Text("Impossible de charger le quiz"))
-                : Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 20),
-                        child: Row(
-                          children: [
-                            if (!quiz!.isAvailable)
-                              CustomTextButton(
-                                onPressed:
-                                    () => MessageService.showInfoMessage(
-                                      "Bientôt disponible...",
-                                    ),
-                                /*() => Get.to(() =>
-                                      QuizCorrectResponses(quizId: quiz!.id),
-                                    )*/
-                                label: "Afficher les bonnes reponses",
-                              ),
-
-                            CustomTextButton(
-                              onPressed:
-                                  () => showModalBottomSheet(
-                                    context: context,
-                                    builder:
-                                        (context) => Container(
-                                          height:
-                                              MediaQuery.of(
-                                                context,
-                                              ).size.height *
-                                              .75,
-                                          padding: EdgeInsets.only(top: 7),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.vertical(
-                                              top: Radius.circular(20),
-                                            ),
-                                            color: notifire.getbgcolor,
-                                          ),
-                                          child: Scaffold(
-                                            backgroundColor: Colors.transparent,
-                                            appBar: AppBar(
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              leading: customBackButton(
-                                                icon: FontAwesomeIcons.xmark,
-                                              ),
-                                              title: Text("Classement"),
-                                              centerTitle: true,
-                                            ),
-                                            body: Padding(
-                                              padding: const EdgeInsets.all(7),
-                                              child: QuizRankingPage(
-                                                dataLoader:
-                                                    () => Provider.of<Quiz>(
-                                                      context,
-                                                      listen: false,
-                                                    ).getQuizRanking(quiz!.id),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                  ),
-                              label: "Classement",
-                              type: ButtonType.info.copyWith(
-                                icon: cusFaIcon(
-                                  FontAwesomeIcons.crown,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Text(
-                          quiz!.title,
-                          style: Theme.of(context).textTheme.titleLarge!
-                              .copyWith(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Text(
-                        "Du ${formatDate(quiz!.createdAt, withTime: false)}",
-                      ),
-                      Text(
-                        "Expire le ${formatDate(quiz!.expiryDate, withTime: false)}",
-                      ),
-                      SizedBox(height: 20),
-                      Wrap(
-                        spacing: 15,
-                        runSpacing: 10,
-                        children: [
-                          parametersTile(
-                            context,
-                            text: "${quiz!.questionCount} questions",
-                            icon: cusFaIcon(
-                              FontAwesomeIcons.solidCircleQuestion,
-                            ),
-                          ),
-                        ],
-                      ),
-                      // parametersTile(context, text: "J'ai participé", icon: "Non"),
-                      // parametersTile(context, label: "Mon score", value: "--"),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: CustomElevatedButton(
-                          color:
-                              (quiz!.hasPlayed || !quiz!.isAvailable)
-                                  ? notifire.getMaingey
-                                  : null,
-                          text: "Commencer",
-                          onPressed:
-                              (quiz!.hasPlayed || !quiz!.isAvailable)
-                                  ? null
-                                  : () => Get.to(() => AnswerPage(quiz: quiz!)),
-                        ),
-                      ),
-                      Spacer(),
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 20),
-                        child: Text(
-                          "Une fois ouvert, vous devrez terminer"
-                          " le quiz avant de quitter la page.",
-                          style: Theme.of(
-                            context,
-                          ).textTheme.bodySmall!.copyWith(
-                            color: Colors.red,
-                            fontStyle: FontStyle.italic,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
+        body: quiz == null
+            ? Center(child: Text("Impossible de charger le quiz"))
+            : Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.purple.shade50,
+                      Colors.pink.shade50,
+                      Colors.blue.shade50,
                     ],
                   ),
                 ),
+                child: SafeArea(
+                  child: Column(
+                    children: [
+                      // AppBar moderne
+                      _buildModernAppBar(),
+
+                      // Contenu
+                      Expanded(
+                        child: SingleChildScrollView(
+                          padding: EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Hero Card
+                              _buildHeroCard(),
+
+                              SizedBox(height: 24),
+
+                              // Informations du quiz
+                              _buildQuizInfo(),
+
+                              SizedBox(height: 24),
+
+                              // Statistiques
+                              _buildStatsGrid(),
+
+                              SizedBox(height: 24),
+
+                              // Bouton de classement
+                              _buildRankingButton(),
+
+                              SizedBox(height: 24),
+
+                              // Warning
+                              _buildWarning(),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      // Bouton d'action fixe
+                      _buildActionButton(),
+                    ],
+                  ),
+                ),
+              ),
       ),
     );
   }
 
-  Widget parametersTile(
-    BuildContext context, {
-    required String text,
-    required Widget icon,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+  Widget _buildModernAppBar() {
+    return Container(
+      padding: EdgeInsets.all(16),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          icon,
-          SizedBox(width: 5),
-          Text(text, style: Theme.of(context).textTheme.titleMedium),
+          // Bouton retour
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => Get.back(),
+                borderRadius: BorderRadius.circular(12),
+                child: Icon(
+                  FontAwesomeIcons.arrowLeft,
+                  size: 18,
+                  color: notifire.getMainText,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              'Détails du Quiz',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: notifire.getMainText,
+              ),
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHeroCard() {
+    return Container(
+      padding: EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.purple.shade400, Colors.pink.shade400],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.purple.withOpacity(0.4),
+            blurRadius: 20,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Icône et badge
+          Row(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Center(
+                  child: Text(
+                    '📖',
+                    style: TextStyle(fontSize: 30),
+                  ),
+                ),
+              ),
+              Spacer(),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: quiz!.isAvailable
+                      ? Colors.green.shade400
+                      : Colors.orange.shade400,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      quiz!.isAvailable
+                          ? FontAwesomeIcons.check
+                          : FontAwesomeIcons.clock,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                    SizedBox(width: 6),
+                    Text(
+                      quiz!.isAvailable ? 'Disponible' : 'Expiré',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: 20),
+
+          // Titre
+          Text(
+            quiz!.title,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+
+          SizedBox(height: 12),
+
+          // Dates
+          Row(
+            children: [
+              Icon(
+                FontAwesomeIcons.calendarDays,
+                color: Colors.white.withOpacity(0.8),
+                size: 14,
+              ),
+              SizedBox(width: 8),
+              Text(
+                "Créé le ${formatDate(quiz!.createdAt, withTime: false)}",
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.9),
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 6),
+          Row(
+            children: [
+              Icon(
+                FontAwesomeIcons.clock,
+                color: Colors.white.withOpacity(0.8),
+                size: 14,
+              ),
+              SizedBox(width: 8),
+              Text(
+                "Expire le ${formatDate(quiz!.expiryDate, withTime: false)}",
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.9),
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuizInfo() {
+    return Container(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'À propos',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: notifire.getMainText,
+            ),
+          ),
+          SizedBox(height: 16),
+          _buildInfoRow(
+            FontAwesomeIcons.solidCircleQuestion,
+            'Questions',
+            '${quiz!.questionCount} questions',
+            Colors.purple.shade400,
+          ),
+          SizedBox(height: 12),
+          _buildInfoRow(
+            FontAwesomeIcons.trophy,
+            'Récompense',
+            '${quiz!.questionCount * 4} points',
+            Colors.amber.shade600,
+          ),
+          SizedBox(height: 12),
+          _buildInfoRow(
+            quiz!.hasPlayed
+                ? FontAwesomeIcons.check
+                : FontAwesomeIcons.clock,
+            'Statut',
+            quiz!.hasPlayed ? 'Déjà participé' : 'Pas encore joué',
+            quiz!.hasPlayed ? Colors.green.shade400 : Colors.orange.shade400,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value, Color color) {
+    return Row(
+      children: [
+        Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: color, size: 18),
+        ),
+        SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 12,
+                ),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: notifire.getMainText,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatsGrid() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Statistiques',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: notifire.getMainText,
+          ),
+        ),
+        SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _buildStatCard(
+                '🎯',
+                'Précision',
+                '85%',
+                Colors.blue.shade400,
+              ),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: _buildStatCard(
+                '⚡',
+                'Rapidité',
+                'Moyen',
+                Colors.orange.shade400,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatCard(String emoji, String label, String value, Color color) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(emoji, style: TextStyle(fontSize: 32)),
+          SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.grey.shade600,
+              fontSize: 12,
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: notifire.getMainText,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRankingButton() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.amber.shade400, Colors.orange.shade500],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.amber.withOpacity(0.3),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => Container(
+              height: MediaQuery.of(context).size.height * .75,
+              decoration: BoxDecoration(
+                color: notifire.getbgcolor,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () => Get.back(),
+                          icon: Icon(FontAwesomeIcons.xmark),
+                        ),
+                        Expanded(
+                          child: Text(
+                            "Classement",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 48),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: QuizRankingPage(
+                      dataLoader: () => Provider.of<Quiz>(
+                        context,
+                        listen: false,
+                      ).getQuizRanking(quiz!.id),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  FontAwesomeIcons.crown,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                SizedBox(width: 12),
+                Text(
+                  'Voir le classement',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWarning() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.red.shade50,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.red.shade200),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            FontAwesomeIcons.circleExclamation,
+            color: Colors.red.shade600,
+            size: 20,
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              "Une fois ouvert, vous devrez terminer le quiz avant de quitter la page.",
+              style: TextStyle(
+                color: Colors.red.shade700,
+                fontSize: 13,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton() {
+    final canStart = !quiz!.hasPlayed && quiz!.isAvailable;
+    
+    return Container(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 20,
+            offset: Offset(0, -5),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Container(
+          height: 56,
+          decoration: BoxDecoration(
+            gradient: canStart
+                ? LinearGradient(
+                    colors: [Colors.purple.shade400, Colors.pink.shade400],
+                  )
+                : null,
+            color: canStart ? null : notifire.getMaingey,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: canStart
+                ? [
+                    BoxShadow(
+                      color: Colors.purple.withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: canStart ? () => Get.to(() => AnswerPage(quiz: quiz!)) : null,
+              borderRadius: BorderRadius.circular(16),
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      canStart
+                          ? FontAwesomeIcons.play
+                          : FontAwesomeIcons.lock,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                    SizedBox(width: 12),
+                    Text(
+                      canStart
+                          ? 'Commencer le Quiz'
+                          : quiz!.hasPlayed
+                              ? 'Déjà participé'
+                              : 'Quiz non disponible',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
