@@ -1,8 +1,19 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+String getTimePart(DateTime date) {
+  final time =
+      "${date.hour < 10 ? '0${date.hour}' : date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}";
+  return time;
+}
 
 String formatDate(DateTime date, {bool withTime = true}) {
   if (withTime) return DateFormat('d MMM yyyy à HH:mm', 'fr_FR').format(date);
   return DateFormat('d MMM yyyy', 'fr_FR').format(date);
+}
+
+String formatTime(TimeOfDay time) {
+  return "${time.hour < 10 ? '0${time.hour}' : time.hour}:${time.minute < 10 ? '0${time.minute}' : time.minute}";
 }
 
 String getTimeInString(

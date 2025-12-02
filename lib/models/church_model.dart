@@ -1,11 +1,15 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/components/certification_banner.dart';
+import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/image_viewer.dart';
 import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/components/tiles.dart';
 import 'package:aesd/models/day_program.dart';
 import 'package:aesd/models/servant_model.dart';
-import 'package:fast_cached_network_image/fast_cached_network_image.dart'
-    show FastCachedImage, FastCachedImageProvider;
+import 'package:aesd/models/user_model.dart';
+import 'package:aesd/pages/dashboard/retryChurchValidity.dart';
+import 'package:aesd/pages/social/church/detail.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -21,9 +25,10 @@ class ChurchModel {
   late String? cover;
   late String image;
   late String? type;
-  late List<ServantModel> servants = [];
-  late ServantModel? mainServant;
-  late int mainServantId;
+  late String? validationState;
+  List<ServantModel> servants = [];
+  ServantModel? owner;
+  List<UserModel> members = [];
   late DayProgramModel? program;
 
   ChurchModel.fromJson(Map<String, dynamic> json) {
@@ -39,38 +44,17 @@ class ChurchModel {
     description = json['description'];
     phone = json['phone'];
     type = json['type_church'];
-    mainServant =
-        json['main_servant'] == null
-            ? null
-            : ServantModel.fromJson(json['main_servant']);
-    mainServantId = json['owner_servant_id'];
+    validationState = json['validation_status'];
     json['servants']?.forEach((d) {
       servants.add(ServantModel.fromJson(d));
     });
-    program =
-        json['program'] != null
-            ? DayProgramModel.fromJson(json['program'])
-            : null;
   }
-
-  toJson() => {
-    'id': id,
-    'name': name,
-    'image': image,
-    'email': email,
-    'logo_url': logo,
-    'cover_url': cover,
-    'adresse': address,
-    'description': description,
-    'phone': phone,
-    'servant': mainServant,
-  };
 
   Widget buildWidget(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return GestureDetector(
       onTap:
-          () => {}, //Get.toNamed(Routes.postDetail, arguments: {'postId': id}),
+          () => Get.to(() => ChurchDetailPage(), arguments: {'churchId': id}),
       child: Container(
         margin: EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -78,52 +62,31 @@ class ChurchModel {
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withAlpha(30),
+              color: notifire.getMaingey.withAlpha(75),
               spreadRadius: 2,
-              blurRadius: 3,
-              offset: Offset(2, 3),
+              blurRadius: 5,
+              offset: Offset(0, 2),
             ),
           ],
         ),
         child: Column(
           children: [
-
             // image box
-            SizedBox(
-              height: 200,
-              child: GestureDetector(
-                onTap: () => Get.to(ImageViewer(imageUrl: image)),
-                child: Stack(
-                  children: [
-                    Hero(
-                      tag: image,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(10),
-                        ),
-                        child: FastCachedImage(
-                          fit: BoxFit.cover,
-                          url: image,
-                          loadingBuilder: (context, progress) {
-                            return imageShimmerPlaceholder(height: 200);
-                          },
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 5,
-                      left: 5,
-                      child: CircleAvatar(
-                        backgroundColor: notifire.getContainer,
-                        radius: 33,
-                        child: CircleAvatar(
-                          radius: 30,
-                          backgroundColor: notifire.getMaingey,
-                          backgroundImage: FastCachedImageProvider(logo!),
-                        ),
-                      ),
-                    ),
-                  ],
+            GestureDetector(
+              onTap: () => Get.to(ImageViewer(imageUrl: logo ?? "")),
+              child: Hero(
+                tag: logo ?? "",
+                child: ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                  child: FastCachedImage(
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    url: logo ?? "",
+                    loadingBuilder: (context, progress) {
+                      return imageShimmerPlaceholder(height: 200);
+                    },
+                  ),
                 ),
               ),
             ),
@@ -133,34 +96,83 @@ class ChurchModel {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Nom de l'église
+                  // Contenu du post
                   Padding(
                     padding: const EdgeInsets.only(bottom: 15),
                     child: Text(
                       name,
                       style: textTheme.titleMedium!.copyWith(
-                        color: notifire.getmaintext,
+                        color: notifire.getMainText,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
 
-                  // Adresse de l'église
-                  infoTile(
-                    context,
-                    text: address,
-                    icon: FontAwesomeIcons.locationDot,
-                  ),
-
-                  // Numéro de téléphone
-                  infoTile(
-                    context,
-                    text: phone,
-                    icon: FontAwesomeIcons.phone,
+                  //mainServant.buildTile(),
+                  Wrap(
+                    spacing: 5,
+                    runSpacing: 5,
+                    children: [
+                      textIconTile(
+                        context,
+                        FontAwesomeIcons.phone,
+                        "(+225) $phone",
+                      ),
+                      textIconTile(context, FontAwesomeIcons.at, email),
+                      textIconTile(
+                        context,
+                        FontAwesomeIcons.locationDot,
+                        address,
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildValidationChurchBanner(BuildContext context) {
+    BannerType? banner;
+    if (validationState == "pending") {
+      banner = BannerType.waitingBanner.copyWith(
+        text: "En attente de validation",
+      );
+    } else if (validationState == "rejected") {
+      banner = BannerType.rejectedBanner.copyWith(
+        text: "Réfusé, cliquez pour rééssayer",
+      );
+    }
+    return GestureDetector(
+      onTap: () {
+        if (validationState == "rejected") {
+          showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.transparent,
+            isScrollControlled: true,
+            builder: (context) {
+              return RetryValidateChurch(churchId: id);
+            },
+          );
+        }
+      },
+      child: Container(
+        margin: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(color: banner!.color),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: ListTile(
+          leading: cusFaIcon(banner.icon, color: banner.color),
+          title: Text(
+            banner.text,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium!.copyWith(color: banner.color),
+          ),
         ),
       ),
     );

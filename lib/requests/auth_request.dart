@@ -48,4 +48,9 @@ class AuthRequest extends DioClient {
     final client = await getApiClient();
     return await client.post('update-profile', data: formData);
   }
+
+  Future retryCertificationRequest(FormData formData) async {
+    final client = await getApiClient();
+    return await client.post('serviteurs/resubmit-documents', data: formData);
+  }
 }

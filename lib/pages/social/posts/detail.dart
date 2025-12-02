@@ -9,6 +9,7 @@ import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/functions/formatteurs.dart';
 import 'package:aesd/models/post_model.dart';
 import 'package:aesd/pages/social/create_form.dart';
+import 'package:aesd/provider/auth.dart';
 import 'package:aesd/provider/post.dart';
 import 'package:aesd/services/message.dart';
 import 'package:dio/dio.dart';
@@ -38,9 +39,10 @@ class _PostDetailState extends State<PostDetail> {
       MessageService.showErrorMessage(
         "Erreur réseau. vérifiez votre connexion internet",
       );
-    } catch (e) {
+    } /*catch (e) {
+      e.printError();
       MessageService.showErrorMessage("Une erreur inattendu s'est produite !");
-    } finally {
+    }*/ finally {
       setState(() {
         isLoading = false;
       });
@@ -68,6 +70,30 @@ class _PostDetailState extends State<PostDetail> {
     } catch (e) {
       e.printError();
       MessageService.showErrorMessage("Une erreur s'est produite");
+    }
+  }
+
+  Future makeComment(int postId, String comment) async {
+    try {
+      await Provider.of<PostProvider>(
+        context,
+        listen: false,
+      ).makeComment(postId, comment).then((value) async {
+        await Provider.of<PostProvider>(
+          context,
+          listen: false,
+        ).postDetail(postId);
+        MessageService.showSuccessMessage("Commentaire envoyé !");
+      });
+    } on DioException {
+      MessageService.showErrorMessage(
+        "Erreur réseau. vérifiez votre connexion internet",
+      );
+    } on HttpException catch (e) {
+      MessageService.showErrorMessage(e.message);
+    } catch (e) {
+      MessageService.showErrorMessage("Une erreur inattendu s'est produite !");
+      e.printError();
     }
   }
 
@@ -106,6 +132,7 @@ class _PostDetailState extends State<PostDetail> {
                       );
                     }
                     final post = provider.selectedPost!;
+                    post.author ??= Provider.of<Auth>(context, listen: false).user!;
                     return Stack(
                       children: [
                         SingleChildScrollView(
@@ -124,13 +151,13 @@ class _PostDetailState extends State<PostDetail> {
                                           backgroundColor:
                                               notifire.getMainColor,
                                           backgroundImage:
-                                              post.author.photo != null
+                                              post.author!.photo != null
                                                   ? FastCachedImageProvider(
-                                                    post.author.photo!,
+                                                    post.author!.photo!,
                                                   )
                                                   : null,
                                           child:
-                                              post.author.photo != null
+                                              post.author!.photo != null
                                                   ? null
                                                   : cusFaIcon(
                                                     FontAwesomeIcons.solidUser,
@@ -143,7 +170,7 @@ class _PostDetailState extends State<PostDetail> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(post.author.name),
+                                              Text(post.author!.name),
                                               Text(
                                                 formatDate(post.date),
                                                 style: textTheme.bodySmall!
@@ -166,7 +193,7 @@ class _PostDetailState extends State<PostDetail> {
                                           if (post.image != null) ...[
                                             GestureDetector(
                                               onTap:
-                                                  () => Get.to(
+                                                  () => Get.to(() =>
                                                     ImageViewer(
                                                       imageUrl: post.image!,
                                                     ),
@@ -239,17 +266,20 @@ class _PostDetailState extends State<PostDetail> {
                                             backgroundColor: Colors.transparent,
                                             builder:
                                                 (context) => CreatePost(
-                                                  onSubmit: (createObj) {},
+                                                  onSubmit: (createObj) async {
+                                                    await makeComment(
+                                                      post.id,
+                                                      createObj.content,
+                                                    );
+                                                    Get.back();
+                                                  },
                                                 ),
                                           ),
                                     ),
                                   ],
                                 ),
                               ),
-                              Divider(
-                                color: notifire.getMainText.withAlpha(170),
-                                thickness: 2,
-                              ),
+                              Divider(color: notifire.getMaingey, thickness: 1),
                               Column(
                                 children: List.generate(
                                   provider.comments.length,

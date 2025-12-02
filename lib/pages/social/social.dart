@@ -1,3 +1,4 @@
+import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/pages/social/church/list.dart';
 import 'package:aesd/pages/social/event/list.dart';
 import 'package:aesd/pages/social/new/list.dart';
@@ -16,7 +17,7 @@ class SocialPage extends StatefulWidget {
 class _SocialPageState extends State<SocialPage> {
   String ElementsDisplayed = "post";
   final List _elements = [
-    "Evenements",
+    //"Evenements",
     "Actualités",
     "Posts",
     "Eglises",
@@ -36,8 +37,8 @@ class _SocialPageState extends State<SocialPage> {
             tabAlignment: TabAlignment.start,
             dividerColor: Colors.transparent,
             isScrollable: true,
-            labelColor: Colors.blue,
-            indicatorColor: Colors.blue,
+            labelColor: notifire.getMainColor,
+            indicatorColor: notifire.getMainColor,
             tabs: List.generate(_elements.length, (index) {
               return Tab(
                 child: Text(_elements[index]),
@@ -51,7 +52,7 @@ class _SocialPageState extends State<SocialPage> {
           Expanded(
             child: TabBarView(
               children: [
-                EventsList(),
+                //EventsList(),
                 NewsList(),
                 PostList(),
                 ChurchList(),

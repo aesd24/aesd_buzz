@@ -1,7 +1,10 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/components/certification_banner.dart';
 import 'package:aesd/components/drawer.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/pages/forum/list.dart';
+import 'package:aesd/pages/quiz/home.dart';
+import 'package:aesd/pages/quiz/list.dart';
 import 'package:aesd/pages/social/social.dart';
 import 'package:aesd/pages/testimony/list.dart';
 import 'package:aesd/provider/auth.dart';
@@ -68,15 +71,22 @@ class _MainPageState extends State<MainPage> {
         ),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child:
-            [
-              SocialPage(),
-              ForumMain(),
-              Placeholder(),
-              TestimoniesList(),
-            ][_pageIndex],
+      body: Column(
+        children: [
+          getCertificationBanner(context) ?? SizedBox(),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child:
+                  [
+                    SocialPage(),
+                    ForumMain(),
+                    QuizHome(),
+                    TestimoniesList(),
+                  ][_pageIndex],
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _pageIndex,

@@ -213,14 +213,15 @@ class _TestimonyDetailState extends State<TestimonyDetail> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    if (_isLoading) {
+      return Scaffold(body: SafeArea(child: ListShimmerPlaceholder()));
+    }
     return Consumer<Testimony>(
       builder: (context, provider, child) {
         final testimony = provider.selectedTestimony!;
         final mainColor =
             testimony.mediaType == 'audio' ? Colors.blue : Colors.deepPurple;
-        return _isLoading
-            ? Scaffold(body: SafeArea(child: ListShimmerPlaceholder()))
-            : !_testimonyReady
+        return !_testimonyReady
             ? Scaffold(
               appBar: AppBar(leading: customBackButton()),
               body: Center(

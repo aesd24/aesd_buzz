@@ -47,12 +47,18 @@ class UserCreate {
     "description": description,
     "appel": call,
     "manager": manager,
-    "profile_photo": accountType == Dictionnary.servant.code ?
-      await MultipartFile.fromFile(idPicture!.path) : null,
-    "id_card_recto": accountType == Dictionnary.servant.code ?
-      await MultipartFile.fromFile(idCardRecto!.path) : null,
-    "id_card_verso": accountType == Dictionnary.servant.code ?
-      await MultipartFile.fromFile(idCardVerso!.path) : null,
+    "profile_photo":
+        accountType == Dictionnary.servant.code
+            ? await MultipartFile.fromFile(idPicture!.path)
+            : null,
+    "id_card_recto":
+        accountType == Dictionnary.servant.code
+            ? await MultipartFile.fromFile(idCardRecto!.path)
+            : null,
+    "id_card_verso":
+        accountType == Dictionnary.servant.code
+            ? await MultipartFile.fromFile(idCardVerso!.path)
+            : null,
   });
 }
 
@@ -74,5 +80,19 @@ class UserLogin {
     "password": password,
     "device_token": deviceToken,
     "device_name": deviceName,
+  });
+}
+
+class UserCertif {
+  late File? idPicture;
+  late File? idCardRecto;
+  late File? idCardVerso;
+
+  UserCertif({this.idPicture, this.idCardRecto, this.idCardVerso});
+
+  Future<FormData> getFormData() async => FormData.fromMap({
+    "profile_photo": await MultipartFile.fromFile(idPicture!.path),
+    "id_card_recto": await MultipartFile.fromFile(idCardRecto!.path),
+    "id_card_verso": await MultipartFile.fromFile(idCardVerso!.path),
   });
 }

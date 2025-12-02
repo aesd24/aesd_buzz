@@ -1,13 +1,17 @@
 import 'package:aesd/provider/auth.dart';
+import 'package:aesd/provider/ceremonies.dart';
 import 'package:aesd/provider/church.dart';
 import 'package:aesd/provider/event.dart';
 import 'package:aesd/provider/forum.dart';
 import 'package:aesd/provider/news.dart';
 import 'package:aesd/provider/post.dart';
+import 'package:aesd/provider/program.dart';
 import 'package:aesd/provider/proviercolors.dart';
+import 'package:aesd/provider/quiz.dart';
 import 'package:aesd/provider/servant.dart';
 import 'package:aesd/provider/singer.dart';
 import 'package:aesd/provider/testimony.dart';
+import 'package:aesd/provider/user.dart';
 import 'package:aesd/services/message.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -66,14 +70,23 @@ class _MyAppState extends State<MyApp> {
     if (message.data.containsKey('id')) {
       switch (message.data['type']) {
         case 'post':
-          Get.toNamed(Routes.postDetail, arguments: int.parse(message.data['id']));
+          Get.toNamed(
+            Routes.postDetail,
+            arguments: {'postId': int.parse(message.data['id'])},
+          );
           break;
-        /*case 'event':
-          Get.toNamed(Routes.eventDetail, arguments: int.parse(message.data['id']));
+        case 'event':
+          Get.toNamed(
+            Routes.eventDetail,
+            arguments: {'eventId': int.parse(message.data['id'])},
+          );
           break;
         case 'ceremony':
-          Get.toNamed(Routes.ceremonyDetail, arguments: int.parse(message.data['id']));
-          break;*/
+          Get.toNamed(
+            Routes.ceremonyDetail,
+            arguments: {'ceremonyId': int.parse(message.data['id'])},
+          );
+          break;
         default:
           break;
       }
@@ -96,6 +109,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    _checkInitialMessage();
   }
 
   @override
@@ -104,14 +118,18 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(create: (context) => ColorNotifire()),
         ChangeNotifierProvider(create: (context) => Auth()),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => Church()),
         ChangeNotifierProvider(create: (context) => PostProvider()),
         ChangeNotifierProvider(create: (context) => Forum()),
+        ChangeNotifierProvider(create: (context) => Quiz()),
         ChangeNotifierProvider(create: (context) => Event()),
         ChangeNotifierProvider(create: (context) => News()),
         ChangeNotifierProvider(create: (context) => Servant()),
         ChangeNotifierProvider(create: (context) => Singer()),
-        ChangeNotifierProvider(create: (context) => Testimony())
+        ChangeNotifierProvider(create: (context) => Testimony()),
+        ChangeNotifierProvider(create: (context) => Ceremonies()),
+        ChangeNotifierProvider(create: (context) => ProgramProvider()),
       ],
       child: GetMaterialApp(
         locale: const Locale('fr', 'FR'),
