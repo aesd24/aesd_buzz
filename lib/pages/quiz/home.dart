@@ -17,11 +17,28 @@ class QuizHome extends StatefulWidget {
 
 class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool _isLoadingQuizzes = false;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _loadQuizzes(); // Charger les quiz au démarrage
+  }
+
+  // Fonction pour charger les quiz
+  Future<void> _loadQuizzes() async {
+    if (!mounted) return;
+    setState(() => _isLoadingQuizzes = true);
+    try {
+      await Provider.of<Quiz>(context, listen: false).getAll();
+    } catch (e) {
+      print('Erreur lors du chargement des quiz: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingQuizzes = false);
+      }
+    }
   }
 
   @override
@@ -193,6 +210,29 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
   }
 
   Widget _buildQuizList() {
+    // Afficher le loader pendant le chargement initial
+    if (_isLoadingQuizzes) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation(Colors.purple.shade400),
+              strokeWidth: 3,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Chargement des quiz...',
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return Consumer<Quiz>(
       builder: (context, quizProvider, child) {
         if (quizProvider.allQuizzes.isEmpty) {
@@ -209,9 +249,7 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
             // Liste des quiz
             Expanded(
               child: RefreshIndicator(
-                onRefresh: () async {
-                  await quizProvider.getAll();
-                },
+                onRefresh: _loadQuizzes,
                 child: ListView.builder(
                   padding: EdgeInsets.all(16),
                   itemCount: quizProvider.allQuizzes.length,
