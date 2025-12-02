@@ -316,7 +316,7 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
   }
 
   Widget _buildModernQuizCard(dynamic quiz, int index) {
-    // Couleurs basées sur l'index
+    // Couleurs basées sur l'index pour varier les styles
     final gradients = [
       [Colors.purple.shade400, Colors.pink.shade400],
       [Colors.blue.shade400, Colors.cyan.shade400],
@@ -325,8 +325,21 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
     ];
     final gradient = gradients[index % gradients.length];
 
+    // Icônes variées basées sur l'index
     final icons = ['📖', '⛪', '✨', '🕊️', '📿', '⚡'];
     final icon = icons[index % icons.length];
+    
+    // Calcul simple de difficulté basé sur le nombre de questions
+    String getDifficulty() {
+      if (quiz.questionCount <= 15) return 'Facile';
+      if (quiz.questionCount <= 25) return 'Moyen';
+      return 'Difficile';
+    }
+    
+    // Calcul du temps estimé basé sur le nombre de questions
+    int getEstimatedTime() {
+      return (quiz.questionCount * 0.5).ceil(); // ~30 secondes par question
+    }
 
     return Container(
       margin: EdgeInsets.only(bottom: 16),
@@ -400,7 +413,7 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              quiz.isAvailable ? 'Disponible' : 'Terminé',
+                              getDifficulty(),
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 11,
@@ -429,7 +442,7 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
                     Expanded(
                       child: _buildQuizStat(
                         FontAwesomeIcons.clock,
-                        'Quiz rapide',
+                        '${getEstimatedTime()} min',
                         Colors.blue.shade400,
                       ),
                     ),
@@ -441,7 +454,7 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
                     Expanded(
                       child: _buildQuizStat(
                         FontAwesomeIcons.userGroup,
-                        '${index * 50 + 150} joueurs',
+                        '${(index + 1) * 50 + 100} joueurs',
                         Colors.orange.shade400,
                       ),
                     ),
