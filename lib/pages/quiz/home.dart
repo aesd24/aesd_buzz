@@ -1,7 +1,5 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
-import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/not_found.dart';
-import 'package:aesd/components/placeholders.dart';
 import 'package:aesd/pages/quiz/ranking.dart';
 import 'package:aesd/provider/quiz.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +21,7 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _loadQuizzes(); // Charger les quiz au démarrage
+    _loadQuizzes();
   }
 
   // Fonction pour charger les quiz
@@ -255,7 +253,7 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
                   itemCount: quizProvider.allQuizzes.length,
                   itemBuilder: (context, index) {
                     final quiz = quizProvider.allQuizzes[index];
-                    return _buildModernQuizCard(quiz, index);
+                    return quiz.buildModernCard(index);
                   },
                 ),
               ),
@@ -350,240 +348,6 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildModernQuizCard(dynamic quiz, int index) {
-    // Couleurs basées sur l'index pour varier les styles
-    final gradients = [
-      [Colors.purple.shade400, Colors.pink.shade400],
-      [Colors.blue.shade400, Colors.cyan.shade400],
-      [Colors.orange.shade400, Colors.red.shade400],
-      [Colors.green.shade400, Colors.teal.shade400],
-    ];
-    final gradient = gradients[index % gradients.length];
-
-    // Icônes variées basées sur l'index
-    final icons = ['📖', '⛪', '✨', '🕊️', '📿', '⚡'];
-    final icon = icons[index % icons.length];
-    
-    // Calcul simple de difficulté basé sur le nombre de questions
-    String getDifficulty() {
-      if (quiz.questionCount <= 15) return 'Facile';
-      if (quiz.questionCount <= 25) return 'Moyen';
-      return 'Difficile';
-    }
-    
-    // Calcul du temps estimé basé sur le nombre de questions
-    int getEstimatedTime() {
-      return (quiz.questionCount * 0.5).ceil(); // ~30 secondes par question
-    }
-
-    return Container(
-      margin: EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: gradient[0].withOpacity(0.2),
-            blurRadius: 20,
-            offset: Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => quiz.navigateToDetail(context),
-          borderRadius: BorderRadius.circular(24),
-          child: Container(
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                Row(
-                  children: [
-                    // Icon avec gradient
-                    Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: gradient),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: gradient[0].withOpacity(0.3),
-                            blurRadius: 12,
-                            offset: Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          icon,
-                          style: TextStyle(fontSize: 32),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            quiz.title,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: notifire.getMainText,
-                            ),
-                          ),
-                          SizedBox(height: 4),
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(colors: gradient),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              getDifficulty(),
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: 16),
-
-                // Stats Grid
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildQuizStat(
-                        FontAwesomeIcons.solidCircleQuestion,
-                        '${quiz.questionCount} questions',
-                        Colors.purple.shade400,
-                      ),
-                    ),
-                    Expanded(
-                      child: _buildQuizStat(
-                        FontAwesomeIcons.clock,
-                        '${getEstimatedTime()} min',
-                        Colors.blue.shade400,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildQuizStat(
-                        FontAwesomeIcons.userGroup,
-                        '${(index + 1) * 50 + 100} joueurs',
-                        Colors.orange.shade400,
-                      ),
-                    ),
-                    Expanded(
-                      child: _buildQuizStat(
-                        FontAwesomeIcons.award,
-                        '${quiz.questionCount * 4} pts',
-                        Colors.yellow.shade600,
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: 16),
-
-                // Bouton d'action
-                Container(
-                  width: double.infinity,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: gradient),
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: gradient[0].withOpacity(0.4),
-                        blurRadius: 12,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: quiz.hasPlayed || !quiz.isAvailable
-                          ? null
-                          : () => quiz.navigateToDetail(context),
-                      borderRadius: BorderRadius.circular(14),
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              quiz.hasPlayed
-                                  ? FontAwesomeIcons.check
-                                  : FontAwesomeIcons.play,
-                              color: Colors.white,
-                              size: 18,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              quiz.hasPlayed
-                                  ? 'Terminé'
-                                  : !quiz.isAvailable
-                                      ? 'Non disponible'
-                                      : 'Commencer',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuizStat(IconData icon, String text, Color color) {
-    return Row(
-      children: [
-        Icon(icon, size: 14, color: color),
-        SizedBox(width: 6),
-        Flexible(
-          child: Text(
-            text,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade600,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
     );
   }
 }

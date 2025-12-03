@@ -1,6 +1,4 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
-import 'package:aesd/components/buttons.dart';
-import 'package:aesd/components/icon.dart';
 import 'package:aesd/pages/quiz/ranking.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
