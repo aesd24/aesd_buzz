@@ -28,89 +28,154 @@ class TestimonyModel {
 
   Widget buildWidget(BuildContext context) {
     Color boxColor = mediaType == 'audio' ? Colors.blue : Colors.purple;
-    final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
     return GestureDetector(
       onTap: () => Get.toNamed(Routes.testimonyDetail, arguments: {'id': id}),
       child: Container(
-        margin: EdgeInsets.all(10),
-        padding: EdgeInsets.all(10),
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: notifire.getContainer,
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: boxColor.withAlpha(50),
-              blurRadius: 5,
-              spreadRadius: 2,
-              offset: Offset(0, 3),
+              color: notifire.getMainColor.withOpacity(0.08),
+              blurRadius: 20,
+              spreadRadius: 0,
+              offset: Offset(0, 4),
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              spreadRadius: 0,
+              offset: Offset(0, 2),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // audio / vidéo
+            // Header avec badge audio/vidéo
             Container(
-              padding: EdgeInsets.all(10),
-              margin: EdgeInsets.only(bottom: 10),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                border: Border.all(color: boxColor, width: 1),
-                borderRadius: BorderRadius.circular(10),
-                color: boxColor.withAlpha(30),
+                gradient: LinearGradient(
+                  colors: [
+                    boxColor.withOpacity(0.15),
+                    boxColor.withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: boxColor,
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: boxColor,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: boxColor.withOpacity(0.3),
+                          blurRadius: 8,
+                          spreadRadius: 0,
+                        ),
+                      ],
+                    ),
                     child: cusFaIcon(
                       mediaType == 'audio'
                           ? FontAwesomeIcons.music
                           : FontAwesomeIcons.film,
                       color: Colors.white,
+                      size: 20,
                     ),
                   ),
-                  SizedBox(width: 15),
-                  Text(
-                    mediaType == 'audio' ? 'Témoignage audio' : 'Témoignage vidéo',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium!.copyWith(color: boxColor),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          mediaType == 'audio' ? 'Témoignage audio' : 'Témoignage vidéo',
+                          style: textTheme.titleSmall!.copyWith(
+                            color: boxColor,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: notifire.getbgcolor,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            getPostFormattedDate(date),
+                            style: textTheme.bodySmall!.copyWith(
+                              color: notifire.getMainText.withOpacity(0.6),
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
 
-            // Poster par... / à la date du...
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                user != null
-                    ? user!.buildTile()
-                    : Text(
-                      "Anonyme",
-                      style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                Text(
-                  getPostFormattedDate(date),
-                  style: textTheme.bodySmall!.copyWith(
-                    color: scheme.onSurface.withAlpha(100),
-                  ),
-                ),
-              ],
-            ),
-
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 5),
-              child: Text(
-                title,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w600),
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Titre
+                  Text(
+                    title,
+                    style: textTheme.titleMedium!.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: notifire.getMainText,
+                      height: 1.3,
+                    ),
+                  ),
+
+                  SizedBox(height: 16),
+
+                  // Auteur ou Anonyme
+                  Row(
+                    children: [
+                      if (user != null)
+                        user!.buildTile()
+                      else
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: notifire.getbgcolor,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              cusFaIcon(
+                                FontAwesomeIcons.userSecret,
+                                size: 12,
+                                color: notifire.getMainText.withOpacity(0.6),
+                              ),
+                              SizedBox(width: 6),
+                              Text(
+                                "Anonyme",
+                                style: textTheme.bodySmall!.copyWith(
+                                  color: notifire.getMainText.withOpacity(0.6),
+                                  fontStyle: FontStyle.italic,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],

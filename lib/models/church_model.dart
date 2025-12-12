@@ -3,7 +3,6 @@ import 'package:aesd/components/certification_banner.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/image_viewer.dart';
 import 'package:aesd/components/placeholders.dart';
-import 'package:aesd/components/tiles.dart';
 import 'package:aesd/models/day_program.dart';
 import 'package:aesd/models/servant_model.dart';
 import 'package:aesd/models/user_model.dart';
@@ -56,20 +55,27 @@ class ChurchModel {
       onTap:
           () => Get.to(() => ChurchDetailPage(), arguments: {'churchId': id}),
       child: Container(
-        margin: EdgeInsets.all(10),
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: notifire.getContainer,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: notifire.getMaingey.withAlpha(75),
-              spreadRadius: 2,
-              blurRadius: 5,
+              color: notifire.getMainColor.withOpacity(0.08),
+              blurRadius: 20,
+              spreadRadius: 0,
+              offset: Offset(0, 4),
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              spreadRadius: 0,
               offset: Offset(0, 2),
             ),
           ],
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // image box
             GestureDetector(
@@ -77,49 +83,85 @@ class ChurchModel {
               child: Hero(
                 tag: logo ?? "",
                 child: ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-                  child: FastCachedImage(
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    url: logo ?? "",
-                    loadingBuilder: (context, progress) {
-                      return imageShimmerPlaceholder(height: 200);
-                    },
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  child: Stack(
+                    children: [
+                      FastCachedImage(
+                        height: 220,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        url: logo ?? "",
+                        loadingBuilder: (context, progress) {
+                          return imageShimmerPlaceholder(height: 220);
+                        },
+                      ),
+                      // Overlay gradient pour un effet moderne
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          height: 80,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withOpacity(0.5),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Nom de l'église sur l'image
+                      Positioned(
+                        bottom: 16,
+                        left: 20,
+                        right: 20,
+                        child: Text(
+                          name,
+                          style: textTheme.titleLarge!.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black.withOpacity(0.5),
+                                blurRadius: 8,
+                              ),
+                            ],
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
 
             Padding(
-              padding: EdgeInsets.all(15),
+              padding: EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Contenu du post
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: Text(
-                      name,
-                      style: textTheme.titleMedium!.copyWith(
-                        color: notifire.getMainText,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-
-                  //mainServant.buildTile(),
+                  // Informations de contact avec style moderne
                   Wrap(
-                    spacing: 5,
-                    runSpacing: 5,
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
-                      textIconTile(
+                      _buildInfoChip(
                         context,
                         FontAwesomeIcons.phone,
                         "(+225) $phone",
                       ),
-                      textIconTile(context, FontAwesomeIcons.at, email),
-                      textIconTile(
+                      _buildInfoChip(
+                        context,
+                        FontAwesomeIcons.at,
+                        email,
+                      ),
+                      _buildInfoChip(
                         context,
                         FontAwesomeIcons.locationDot,
                         address,
@@ -131,6 +173,42 @@ class ChurchModel {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(BuildContext context, IconData icon, String text) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: notifire.getMainColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: notifire.getMainColor.withOpacity(0.2),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          cusFaIcon(
+            icon,
+            size: 12,
+            color: notifire.getMainColor,
+          ),
+          SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              text,
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: notifire.getMainText,
+                fontSize: 11,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       ),
     );
   }

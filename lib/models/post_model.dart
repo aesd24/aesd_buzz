@@ -37,25 +37,31 @@ class PostModel {
     BuildContext context, {
      void Function(PostModel post)? onLike,
   }) {
-    final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return GestureDetector(
       onTap: () => Get.toNamed(Routes.postDetail, arguments: {'postId': id}),
       child: Container(
-        margin: EdgeInsets.all(10),
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: notifire.getContainer,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withAlpha(30),
-              spreadRadius: 2,
-              blurRadius: 3,
-              offset: Offset(2, 3),
+              color: notifire.getMainColor.withOpacity(0.08),
+              blurRadius: 20,
+              spreadRadius: 0,
+              offset: Offset(0, 4),
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              spreadRadius: 0,
+              offset: Offset(0, 2),
             ),
           ],
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // image box
             if (image != null)
@@ -65,27 +71,52 @@ class PostModel {
                   tag: image!,
                   child: ClipRRect(
                     borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(10),
+                      top: Radius.circular(20),
                     ),
-                    child: FastCachedImage(
-                      fit: BoxFit.cover,
-                      url: image!,
-                      loadingBuilder: (context, progress) {
-                        return imageShimmerPlaceholder(height: 200);
-                      },
+                    child: Stack(
+                      children: [
+                        FastCachedImage(
+                          height: 220,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          url: image!,
+                          loadingBuilder: (context, progress) {
+                            return imageShimmerPlaceholder(height: 220);
+                          },
+                        ),
+                        // Overlay gradient pour un effet moderne
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            height: 60,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.3),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
 
             Padding(
-              padding: EdgeInsets.all(15),
+              padding: EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Contenu du post
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
+                    padding: const EdgeInsets.only(bottom: 16),
                     child:
                         content.length > 150
                             ? RichText(
@@ -93,19 +124,44 @@ class PostModel {
                                 children: [
                                   TextSpan(
                                     text: '${content.substring(0, 150)}... ',
-                                    style: textTheme.bodyMedium,
+                                    style: textTheme.bodyMedium!.copyWith(
+                                      color: notifire.getMainText.withOpacity(0.8),
+                                      height: 1.5,
+                                    ),
                                   ),
                                   TextSpan(
                                     text: 'Lire la suite',
                                     style: TextStyle(
-                                      color: Colors.blue,
+                                      color: notifire.getMainColor,
+                                      fontWeight: FontWeight.w600,
                                       decoration: TextDecoration.underline,
                                     ),
                                   ),
                                 ],
                               ),
                             )
-                            : Text(content, style: textTheme.bodyMedium),
+                            : Text(
+                              content,
+                              style: textTheme.bodyMedium!.copyWith(
+                                color: notifire.getMainText.withOpacity(0.8),
+                                height: 1.5,
+                              ),
+                            ),
+                  ),
+
+                  // Divider élégant
+                  Container(
+                    height: 1,
+                    margin: EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          notifire.getMainColor.withOpacity(0.2),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
                   ),
 
                   // Poster par... / le ...
@@ -113,49 +169,71 @@ class PostModel {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       if (author != null) author!.buildTile(),
-                      Text(
-                        getPostFormattedDate(date),
-                        style: textTheme.bodySmall!.copyWith(
-                          color: scheme.onSurface.withAlpha(100),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: notifire.getbgcolor,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          getPostFormattedDate(date),
+                          style: textTheme.bodySmall!.copyWith(
+                            color: notifire.getMainText.withOpacity(0.6),
+                            fontSize: 11,
+                          ),
                         ),
                       ),
                     ],
                   ),
 
-                  SizedBox(height: 20),
+                  SizedBox(height: 16),
 
-                  // likes / comments (actions)
-                  if (onLike != null) Row(
-                    //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      customActionButton(
-                        onPressed: () => onLike(this),
-                        cusFaIcon(
-                          liked
-                              ? FontAwesomeIcons.solidHeart
-                              : FontAwesomeIcons.heart,
-                          color: liked ? Colors.red : notifire.getMainText,
-                        ),
-                        likes == 0 ? "J'aime" : likes.toString(),
-                      ),
-                      SizedBox(width: 15),
-                      customActionButton(
-                        cusFaIcon(
-                          FontAwesomeIcons.comment,
-                          color: notifire.getMainText,
-                        ),
-                        comments == 0 ? "Commenter" : comments.toString(),
-                        onPressed:
-                            () => showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              builder: (context) {
-                                return CommentPages(postId: id);
-                              },
+                  // likes / comments (actions) avec style moderne
+                  if (onLike != null) Container(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: notifire.getbgcolor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: customActionButton(
+                            onPressed: () => onLike(this),
+                            cusFaIcon(
+                              liked
+                                  ? FontAwesomeIcons.solidHeart
+                                  : FontAwesomeIcons.heart,
+                              color: liked ? Colors.red : notifire.getMainColor,
                             ),
-                      ),
-                    ],
+                            likes == 0 ? "J'aime" : likes.toString(),
+                          ),
+                        ),
+                        Container(
+                          width: 1,
+                          height: 24,
+                          color: notifire.getMaingey.withOpacity(0.3),
+                        ),
+                        Expanded(
+                          child: customActionButton(
+                            cusFaIcon(
+                              FontAwesomeIcons.comment,
+                              color: notifire.getMainColor,
+                            ),
+                            comments == 0 ? "Commenter" : comments.toString(),
+                            onPressed:
+                                () => showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (context) {
+                                    return CommentPages(postId: id);
+                                  },
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
