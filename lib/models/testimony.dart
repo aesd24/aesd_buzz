@@ -20,7 +20,13 @@ class TestimonyModel {
     id = json['id'];
     title = json['title'];
     isAnonymous = json['is_anonymous'] == 1;
-    mediaUrl = json['confession_file_path'];
+    // Construire l'URL complète si ce n'est qu'un chemin relatif
+    String path = json['confession_file_path'] ?? '';
+    if (path.isNotEmpty && !path.startsWith('http')) {
+      mediaUrl = 'https://monapi.eglisesetserviteursdedieu.com/$path';
+    } else {
+      mediaUrl = path;
+    }
     mediaType = json['type'];
     user = json['user'] == null ? null : UserModel.fromJson(json['user']);
     date = DateTime.parse(json['published_at']);

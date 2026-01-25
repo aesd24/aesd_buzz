@@ -93,7 +93,7 @@ class _TestimoniesListState extends State<TestimoniesList> {
                 borderRadius: BorderRadius.circular(100),
               ),
               elevation: 3,
-              child: cusFaIcon(FontAwesomeIcons.feather, color: Colors.white),
+              child: Icon(Icons.add, color: Colors.white, size: 28),
             ),
           ),
         ),

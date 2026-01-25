@@ -23,15 +23,25 @@ class _AuthMiddlewareState extends State<AuthMiddleware> {
       setState(() {
         _isLoading = true;
       });
-      await Provider.of<Auth>(context, listen: false).isLoggedIn();
+      bool isLoggedIn = await Provider.of<Auth>(context, listen: false).isLoggedIn();
+      if (isLoggedIn) {
+        // Charger les données utilisateur
+        try {
+          await Provider.of<Auth>(context, listen: false).getUserData();
+        } catch (e) {
+          print("Erreur lors du chargement des données utilisateur: $e");
+        }
+      }
     } catch (e) {
       e.printError();
       MessageService.showInfoMessage("Connectez-vous pour continuer !");
       Get.offAllNamed(Routes.auth);
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 

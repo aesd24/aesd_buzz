@@ -164,6 +164,14 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
                                   style: mediumBlackTextStyle,
                                 ),
                               ),
+                              ListTile(
+                                onTap: () => Get.toNamed(Routes.live),
+                                leading: cusFaIcon(FontAwesomeIcons.video),
+                                title: Text(
+                                  "Retransmission en direct",
+                                  style: mediumBlackTextStyle,
+                                ),
+                              ),
                               /*ListTile(
                                 leading: cusFaIcon(
                                   FontAwesomeIcons.moneyBillTransfer,

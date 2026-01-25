@@ -209,127 +209,86 @@ class _DashboardState extends State<Dashboard> {
 
   Widget churchCard({required ChurchModel church}) {
     return Container(
-      padding: EdgeInsets.all(18),
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
+      margin: EdgeInsets.symmetric(vertical: 7, horizontal: 15),
       decoration: BoxDecoration(
         color: notifire.getContainer,
-        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: notifire.getMainColor.withOpacity(0.08),
-            blurRadius: 20,
-            spreadRadius: 0,
-            offset: Offset(0, 4),
-          ),
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            spreadRadius: 0,
-            offset: Offset(0, 2),
+            color: notifire.getMaingey.withAlpha(75),
+            blurRadius: 5,
+            spreadRadius: 1,
           ),
         ],
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: notifire.getMainColor.withOpacity(0.3),
-                    width: 2.5,
+          ListTile(
+            leading: CircleAvatar(
+              radius: 25,
+              backgroundImage: FastCachedImageProvider(
+                church.logo ?? church.image,
+              ),
+              backgroundColor: notifire.getMaingey.withAlpha(200),
+            ),
+            title: Text(church.name),
+            trailing: PopupMenuButton(
+              onSelected: (value) {
+                if (value == "profil") {
+                  Get.to(
+                    () => ChurchDetailPage(),
+                    arguments: {"churchId": church.id},
+                  );
+                } else if (value == "update") {
+                  Get.to(
+                    () => MainChurchCreationPage(
+                      editMode: true,
+                      churchId: church.id,
+                    ),
+                  );
+                } else if (value == "delete") {
+                  MessageService.showInfoMessage("Bientôt disponible...");
+                }
+              },
+              itemBuilder: (context) {
+                return [
+                  PopupMenuItem(
+                    value: "profil",
+                    child: Text("Consulter le profil"),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: notifire.getMainColor.withOpacity(0.2),
-                      blurRadius: 8,
-                      spreadRadius: 0,
+                  PopupMenuItem(
+                    value: "update",
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text("Modifier l'église"),
+                        SizedBox(width: 10),
+                        cusFaIcon(
+                          FontAwesomeIcons.pen,
+                          color: notifire.warning,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: CircleAvatar(
-                  radius: 30,
-                  backgroundImage: FastCachedImageProvider(
-                    church.logo ?? church.image,
                   ),
-                  backgroundColor: notifire.getMainColor.withOpacity(0.1),
-                ),
-              ),
-              SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      church.name,
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: notifire.getMainText,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                  PopupMenuItem(
+                    value: "delete",
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text("Fermer l'église"),
+                        SizedBox(width: 10),
+                        cusFaIcon(
+                          FontAwesomeIcons.xmark,
+                          color: notifire.danger,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              PopupMenuButton(
-                onSelected: (value) {
-                  if (value == "profil") {
-                    Get.to(
-                      () => ChurchDetailPage(),
-                      arguments: {"churchId": church.id},
-                    );
-                  } else if (value == "update") {
-                    Get.to(
-                      () => MainChurchCreationPage(
-                        editMode: true,
-                        churchId: church.id,
-                      ),
-                    );
-                  } else if (value == "delete") {
-                    MessageService.showInfoMessage("Bientôt disponible...");
-                  }
-                },
-                itemBuilder: (context) {
-                  return [
-                    PopupMenuItem(
-                      value: "profil",
-                      child: Text("Consulter le profil"),
-                    ),
-                    PopupMenuItem(
-                      value: "update",
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text("Modifier l'église"),
-                          SizedBox(width: 10),
-                          cusFaIcon(
-                            FontAwesomeIcons.pen,
-                            color: notifire.warning,
-                          ),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: "delete",
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text("Fermer l'église"),
-                          SizedBox(width: 10),
-                          cusFaIcon(
-                            FontAwesomeIcons.xmark,
-                            color: notifire.danger,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ];
-                },
-              ),
-            ],
+                  ),
+                ];
+              },
+            ),
           ),
 
           if (church.validationState != 'approved')

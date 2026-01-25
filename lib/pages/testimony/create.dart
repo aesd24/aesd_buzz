@@ -314,7 +314,7 @@ class _CreateTestimonyState extends State<CreateTestimony> {
                         : CustomTextButton(
                           label: "Envoyer",
                           disabled: _file == null,
-                          onPressed: () async => await _submitData(user.id!),
+                          onPressed: () async => await _submitData(user.id),
                         ),
               ),
             ],
@@ -323,33 +323,150 @@ class _CreateTestimonyState extends State<CreateTestimony> {
             padding: EdgeInsets.all(15),
             child: Column(
               children: [
-                // formulaire
+                // Formulaire moderne avec tabs
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10),
+                  padding: EdgeInsets.all(16),
                   child: Form(
                     key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Tabs Audio/Vidéo
+                        Container(
+                          decoration: BoxDecoration(
+                            color: notifire.getbgcolor,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.08),
+                                blurRadius: 8,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setState(() => _recordAudio = true),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(vertical: 12),
+                                    decoration: BoxDecoration(
+                                      color: _recordAudio
+                                          ? Color(0xFF43A047)
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.horizontal(
+                                        left: Radius.circular(12),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          FontAwesomeIcons.music,
+                                          size: 16,
+                                          color: _recordAudio
+                                              ? Colors.white
+                                              : notifire.getMainText,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Audio',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: _recordAudio
+                                                ? Colors.white
+                                                : notifire.getMainText,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setState(() => _recordAudio = false),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(vertical: 12),
+                                    decoration: BoxDecoration(
+                                      color: !_recordAudio
+                                          ? Color(0xFF43A047)
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.horizontal(
+                                        right: Radius.circular(12),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          FontAwesomeIcons.video,
+                                          size: 16,
+                                          color: !_recordAudio
+                                              ? Colors.white
+                                              : notifire.getMainText,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Vidéo',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: !_recordAudio
+                                                ? Colors.white
+                                                : notifire.getMainText,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        
+                        // Titre
                         CustomFormTextField(
                           controller: _titleController,
                           label: "Titre du témoignage",
                           validate: true,
                         ),
-                        CheckboxListTile(
-                          controlAffinity: ListTileControlAffinity.leading,
-                          activeColor: notifire.getMainColor,
-                          checkColor: Colors.white,
-                          side: BorderSide(color: notifire.getMainText),
-                          value: isAnonymous,
-                          onChanged:
-                              (value) =>
-                                  setState(() => isAnonymous = !isAnonymous),
-                          title: Text(
-                            isAnonymous
-                                ? "Témoignage anonyme"
-                                : "Dévoiler mon identité",
-                            style: Theme.of(context).textTheme.bodyMedium,
+                        SizedBox(height: 16),
+
+                        // Checkbox "Masquer mon identité"
+                        Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Color(0xFF43A047).withOpacity(0.1),
+                            border: Border.all(
+                              color: Color(0xFF43A047).withOpacity(0.3),
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Checkbox(
+                                value: isAnonymous,
+                                onChanged: (value) =>
+                                    setState(() => isAnonymous = !isAnonymous),
+                                activeColor: Color(0xFF43A047),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  'Masquer mon identité',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -357,8 +474,10 @@ class _CreateTestimonyState extends State<CreateTestimony> {
                   ),
                 ),
 
-                // Partie de l'enregistrement du fichier
-                _recordAudio ? _buildRecordAudio() : _buildRecordVideo(),
+                // Partie d'enregistrement
+                Expanded(
+                  child: _recordAudio ? _buildRecordAudio() : _buildRecordVideo(),
+                ),
               ],
             ),
           ),

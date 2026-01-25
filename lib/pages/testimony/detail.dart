@@ -249,14 +249,104 @@ class _TestimonyDetailState extends State<TestimonyDetail> {
               ),
               body: Padding(
                 padding: EdgeInsets.all(15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: ListView(
                   children: [
-                    Text(testimony.title, style: mainTextStyle),
-                    testimony.isAnonymous
-                        ? Text("Anonyme")
-                        : Text(testimony.user!.name),
-                    SizedBox(height: 25),
+                    // Header avec badge du type média
+                    Container(
+                      margin: EdgeInsets.only(bottom: 24),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            mainColor.withOpacity(0.9),
+                            mainColor.withOpacity(0.7),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      padding: EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.3),
+                              ),
+                            ),
+                            child: cusFaIcon(
+                              testimony.mediaType == 'audio'
+                                  ? FontAwesomeIcons.music
+                                  : FontAwesomeIcons.film,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                          SizedBox(height: 16),
+                          Text(
+                            testimony.mediaType == 'audio'
+                                ? 'Témoignage audio'
+                                : 'Témoignage vidéo',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            getPostFormattedDate(testimony.date),
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Titre et auteur
+                    Text(
+                      testimony.title,
+                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    if (testimony.isAnonymous)
+                      Row(
+                        children: [
+                          cusFaIcon(
+                            FontAwesomeIcons.userSecret,
+                            size: 14,
+                            color: Colors.grey[600],
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            "Anonyme",
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      Text(
+                        testimony.user?.name ?? "Utilisateur",
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 14,
+                        ),
+                      ),
+
+                    SizedBox(height: 24),
+
+                    // Lecteur média
                     if (testimony.mediaType == 'audio')
                       (_isAudioLoading && !_audioInitialized)
                           ? imageShimmerPlaceholder(height: 70)
@@ -356,8 +446,33 @@ class _TestimonyDetailState extends State<TestimonyDetail> {
                             width: size.width,
                             child: Chewie(controller: _chewieController!),
                           )
-                          : Center(
-                            child: Text("La vidéo n'est pas disponible !"),
+                          : Container(
+                            height: size.height * .3,
+                            width: size.width,
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    FontAwesomeIcons.film,
+                                    size: 48,
+                                    color: Colors.grey[600],
+                                  ),
+                                  SizedBox(height: 12),
+                                  Text(
+                                    "La vidéo n'est pas disponible !",
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                   ],
                 ),

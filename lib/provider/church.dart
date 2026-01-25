@@ -41,10 +41,14 @@ class Church extends ChangeNotifier {
   Future fetchChurches() async {
     final response = await _request.all(page: _currentPage);
     if (response.statusCode == 200) {
-      final churches =
+      final allChurches =
           (response.data['data'] as List)
               .map((e) => ChurchModel.fromJson(e))
               .toList();
+      // Filtrer pour n'afficher que les églises principales (pas les annexes)
+      final churches = allChurches
+          .where((church) => church.isMain || church.mainChurchId == null)
+          .toList();
       //_paginator = ChurchPaginator.fromJson(data);
       if (_churches.isNotEmpty && _currentPage == 0) {
         _churches.clear();

@@ -16,6 +16,7 @@ import 'package:aesd/pages/social/posts/detail.dart';
 import 'package:aesd/pages/testimony/detail.dart';
 import 'package:aesd/pages/wallet/transactions.dart';
 import 'package:aesd/pages/wallet/wallet.dart';
+import 'package:aesd/pages/live_page_simple.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
@@ -34,6 +35,7 @@ class Routes {
   static String wallet = '/wallet';
   static String transactions = '/transactions';
   static String updateUser = '/user/update';
+  static String live = '/live';
 
   // Socials
   static String postDetail = '/post';
@@ -74,6 +76,10 @@ final getPage = [
   GetPage(
     name: Routes.ceremonyDetail,
     page: _buildLoggedPage(CeremonyViewer()),
+  ),
+  GetPage(
+    name: Routes.live,
+    page: _buildLoggedPage(LivePageSimple()),
   ),
 ];
 
