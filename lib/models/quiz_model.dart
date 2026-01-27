@@ -14,6 +14,8 @@ class QuizModel {
   late int questionCount;
   bool isAvailable = false;
   late bool hasPlayed;
+  int? userScore;
+  String? userTimeRemaining;
   List questions = [];
 
   QuizModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,11 @@ class QuizModel {
     hasPlayed = json['has_played'] ?? false;
     questionCount = json['questions_count'] ?? json['questions'].length;
     isAvailable = DateTime.now().isBefore(expiryDate);
+    // Récupérer les stats de l'utilisateur s'ils existent
+    if (json['user_quiz'] != null) {
+      userScore = int.tryParse(json['user_quiz']['score']?.toString() ?? '0');
+      userTimeRemaining = json['user_quiz']['time_remaining'];
+    }
   }
 
   Widget buildModernCard(int index) {

@@ -1,5 +1,4 @@
 import 'package:aesd/services/dio_service.dart';
-import 'package:dio/src/response.dart';
 
 class QuizRequest extends DioClient {
   final String baseRoute = "quiz";

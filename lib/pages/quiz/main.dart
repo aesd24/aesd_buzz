@@ -345,6 +345,36 @@ class _QuizMainPageState extends State<QuizMainPage> {
             quiz!.hasPlayed ? 'Déjà participé' : 'Pas encore joué',
             quiz!.hasPlayed ? Colors.green.shade400 : Colors.orange.shade400,
           ),
+          // Afficher les stats de l'utilisateur si disponibles
+          if (quiz!.userScore != null) ...[
+            SizedBox(height: 12),
+            Divider(color: Colors.grey.shade200, height: 1),
+            SizedBox(height: 12),
+            Text(
+              'Votre Score',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: notifire.getMainText,
+              ),
+            ),
+            SizedBox(height: 12),
+            _buildInfoRow(
+              FontAwesomeIcons.star,
+              'Votre score',
+              '${quiz!.userScore} points',
+              Colors.amber.shade600,
+            ),
+            if (quiz!.userTimeRemaining != null) ...[
+              SizedBox(height: 12),
+              _buildInfoRow(
+                FontAwesomeIcons.hourglass,
+                'Temps restant',
+                quiz!.userTimeRemaining ?? 'N/A',
+                Colors.blue.shade400,
+              ),
+            ],
+          ],
         ],
       ),
     );
@@ -633,7 +663,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: canStart ? () => Get.to(() => AnswerPage(quiz: quiz!)) : null,
+              onTap: canStart ? () => _showStartQuizWarning() : null,
               borderRadius: BorderRadius.circular(16),
               child: Center(
                 child: Row(
@@ -666,6 +696,119 @@ class _QuizMainPageState extends State<QuizMainPage> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showStartQuizWarning() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                FontAwesomeIcons.exclamation,
+                color: Colors.orange.shade600,
+                size: 24,
+              ),
+              SizedBox(width: 12),
+              Text(
+                'Avertissement',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Une fois que vous aurez démarré ce quiz:',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+              SizedBox(height: 12),
+              _buildWarningPoint('Vous ne pourrez plus quitter sans terminer le quiz'),
+              SizedBox(height: 8),
+              _buildWarningPoint('Le temps de quiz commencera à s\'écouler'),
+              SizedBox(height: 8),
+              _buildWarningPoint('Vous devez completer l\'ensemble des questions'),
+              SizedBox(height: 20),
+              Text(
+                'Êtes-vous sûr(e) de vouloir continuer?',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  color: Colors.red.shade600,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(),
+              style: ButtonStyle(
+                overlayColor: WidgetStatePropertyAll(Colors.grey.shade100),
+              ),
+              child: Text(
+                'Annuler',
+                style: TextStyle(color: Colors.grey.shade700),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Get.back();
+                Get.to(() => AnswerPage(quiz: quiz!));
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple.shade400,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                'Continuer',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildWarningPoint(String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(top: 4),
+          child: Icon(
+            FontAwesomeIcons.circleXmark,
+            size: 16,
+            color: Colors.red.shade400,
+          ),
+        ),
+        SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 13),
+          ),
+        ),
+      ],
     );
   }
 }

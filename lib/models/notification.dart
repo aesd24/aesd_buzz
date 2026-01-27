@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 
 class NotificationModel {
   late int id;
@@ -13,11 +14,168 @@ class NotificationModel {
     id = json['id'];
     title = json['title'];
     content = json['content'];
-    date = json['date'];
+    // Parse date correctly
+    date = json['date'] is String 
+        ? DateTime.parse(json['date']) 
+        : (json['date'] is DateTime ? json['date'] : DateTime.now());
     readed = json['readed'] == 1 ? true : false;
-    type = json['notificationType'];
+    type = json['notificationType'] ?? 'general';
   }
 
+  // Get icon based on notification type
+  IconData _getIconForType() {
+    switch (type) {
+      case 'post':
+        return FontAwesomeIcons.paperclip;
+      case 'event':
+        return FontAwesomeIcons.solidCalendar;
+      case 'ceremony':
+        return FontAwesomeIcons.solidBuilding;
+      case 'quiz':
+        return FontAwesomeIcons.solidCircleQuestion;
+      case 'forum':
+        return FontAwesomeIcons.solidComments;
+      default:
+        return FontAwesomeIcons.solidBell;
+    }
+  }
+
+  // Get color based on notification type
+  Color _getColorForType() {
+    switch (type) {
+      case 'post':
+        return Colors.blue.shade400;
+      case 'event':
+        return Colors.purple.shade400;
+      case 'ceremony':
+        return Colors.amber.shade400;
+      case 'quiz':
+        return Colors.indigo.shade400;
+      case 'forum':
+        return Colors.teal.shade400;
+      default:
+        return Colors.green.shade400;
+    }
+  }
+
+  // Modern card widget for notification list
+  Widget buildModernCard(BuildContext context, {VoidCallback? onTap}) {
+    final color = _getColorForType();
+    return GestureDetector(
+      onTap: onTap ?? () => navigateToDetail(context),
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: !readed 
+              ? Border.all(color: color, width: 2)
+              : Border.all(color: Colors.grey.shade300, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(readed ? 0.05 : 0.15),
+              blurRadius: 12,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Icon badge
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Center(
+                child: FaIcon(
+                  _getIconForType(),
+                  color: color,
+                  size: 24,
+                ),
+              ),
+            ),
+            SizedBox(width: 12),
+            // Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (!readed)
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: color,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    content,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade700,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    _formatDate(date),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Format date in French
+  String _formatDate(DateTime dateTime) {
+    final now = DateTime.now();
+    final difference = now.difference(dateTime);
+
+    if (difference.inMinutes < 1) {
+      return "À l'instant";
+    } else if (difference.inMinutes < 60) {
+      return "Il y a ${difference.inMinutes}m";
+    } else if (difference.inHours < 24) {
+      return "Il y a ${difference.inHours}h";
+    } else if (difference.inDays < 7) {
+      return "Il y a ${difference.inDays}j";
+    } else {
+      return "${dateTime.day}/${dateTime.month}/${dateTime.year}";
+    }
+  }
+
+  // Legacy tile widget (kept for backward compatibility)
   getTile(context) => Card(
         elevation: 0,
         color: readed ? Colors.grey.shade100 : Colors.green.shade200,
@@ -27,7 +185,7 @@ class NotificationModel {
                 side: BorderSide(color: Colors.green.shade700, width: 2))
             : null,
         child: ListTile(
-          onTap: () {}, // => NavigationService.push(NotificationDetail(notification: this)),
+          onTap: () => navigateToDetail(context),
           leading: CircleAvatar(
               backgroundColor: readed ? Colors.grey.shade400 : Colors.white,
               child: const FaIcon(FontAwesomeIcons.solidBell)),
@@ -38,4 +196,28 @@ class NotificationModel {
           subtitle: Text("${date.day}/${date.month}/${date.year}"),
         ),
       );
+
+  // Navigate to detail page based on notification type
+  void navigateToDetail(BuildContext context) {
+    switch (type) {
+      case 'post':
+        Get.toNamed('/post-detail', arguments: {'id': id});
+        break;
+      case 'event':
+        Get.toNamed('/event-detail', arguments: {'id': id});
+        break;
+      case 'ceremony':
+        Get.toNamed('/ceremony-detail', arguments: {'id': id});
+        break;
+      case 'quiz':
+        Get.toNamed('/quiz-detail', arguments: {'id': id});
+        break;
+      case 'forum':
+        Get.toNamed('/forum-detail', arguments: {'id': id});
+        break;
+      default:
+        Get.snackbar('Notification', content);
+        break;
+    }
+  }
 }

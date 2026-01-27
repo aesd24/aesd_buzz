@@ -305,51 +305,64 @@ class _TestimonyDetailState extends State<TestimonyDetail> {
                               fontSize: 12,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-
-                    // Titre et auteur
-                    Text(
-                      testimony.title,
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    if (testimony.isAnonymous)
-                      Row(
-                        children: [
-                          cusFaIcon(
-                            FontAwesomeIcons.userSecret,
-                            size: 14,
-                            color: Colors.grey[600],
-                          ),
-                          SizedBox(width: 6),
+                          SizedBox(height: 16),
+                          Divider(color: Colors.white.withOpacity(0.3)),
+                          SizedBox(height: 16),
+                          // Titre du témoignage
                           Text(
-                            "Anonyme",
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 14,
-                            ),
+                            testimony.title,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
+                          SizedBox(height: 12),
+                          // Auteur ou Anonyme
+                          if (testimony.isAnonymous)
+                            Row(
+                              children: [
+                                cusFaIcon(
+                                  FontAwesomeIcons.userSecret,
+                                  size: 14,
+                                  color: Colors.white.withOpacity(0.8),
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  "Anonyme",
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.8),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            )
+                          else
+                            Text(
+                              testimony.user?.name ?? "Utilisateur",
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 12,
+                              ),
+                            ),
                         ],
-                      )
-                    else
-                      Text(
-                        testimony.user?.name ?? "Utilisateur",
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
                       ),
-
-                    SizedBox(height: 24),
+                    ),
 
                     // Lecteur média
                     if (testimony.mediaType == 'audio')
                       (_isAudioLoading && !_audioInitialized)
-                          ? imageShimmerPlaceholder(height: 70)
+                          ? Center(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 40),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                              ),
+                            ),
+                          )
                           : Container(
                             padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
@@ -439,16 +452,33 @@ class _TestimonyDetailState extends State<TestimonyDetail> {
                           ),
                     if (testimony.mediaType == 'video')
                       _isVideoLoading
-                          ? imageShimmerPlaceholder(height: size.height * .3)
+                          ? Container(
+                            height: size.height * .35,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(mainColor),
+                              ),
+                            ),
+                          )
                           : _chewieController != null
-                          ? SizedBox(
-                            height: size.height * .3,
-                            width: size.width,
-                            child: Chewie(controller: _chewieController!),
+                          ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              height: size.height * .35,
+                              width: double.infinity,
+                              color: Colors.black,
+                              child: Chewie(controller: _chewieController!),
+                            ),
                           )
                           : Container(
-                            height: size.height * .3,
-                            width: size.width,
+                            height: size.height * .35,
+                            width: double.infinity,
                             decoration: BoxDecoration(
                               color: Colors.black,
                               borderRadius: BorderRadius.circular(12),
