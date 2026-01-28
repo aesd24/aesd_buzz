@@ -1,3 +1,4 @@
+import 'package:aesd/appstaticdata/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,8 @@ class NotificationModel {
   late DateTime date;
   late bool readed;
   late String type;
+  late int? servantId;  // ID du serviteur qui a déclenché la notification
+  late int? postId;     // ID du post si applicable
 
   NotificationModel.fromJson(json) {
     id = json['id'];
@@ -20,6 +23,8 @@ class NotificationModel {
         : (json['date'] is DateTime ? json['date'] : DateTime.now());
     readed = json['readed'] == 1 ? true : false;
     type = json['notificationType'] ?? 'general';
+    servantId = json['servant_id'];
+    postId = json['post_id'];
   }
 
   // Get icon based on notification type
@@ -201,19 +206,19 @@ class NotificationModel {
   void navigateToDetail(BuildContext context) {
     switch (type) {
       case 'post':
-        Get.toNamed('/post-detail', arguments: {'id': id});
+        Get.toNamed(Routes.postDetail, arguments: {'postId': postId ?? id});
         break;
       case 'event':
-        Get.toNamed('/event-detail', arguments: {'id': id});
+        Get.toNamed(Routes.eventDetail, arguments: {'eventId': postId ?? id});
         break;
       case 'ceremony':
-        Get.toNamed('/ceremony-detail', arguments: {'id': id});
+        Get.toNamed(Routes.ceremonyDetail, arguments: {'ceremonyId': postId ?? id});
         break;
       case 'quiz':
-        Get.toNamed('/quiz-detail', arguments: {'id': id});
+        Get.toNamed(Routes.postDetail, arguments: {'postId': postId ?? id});
         break;
       case 'forum':
-        Get.toNamed('/forum-detail', arguments: {'id': id});
+        Get.toNamed(Routes.subject, arguments: {'subjectId': postId ?? id});
         break;
       default:
         Get.snackbar('Notification', content);

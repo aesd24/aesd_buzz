@@ -33,6 +33,18 @@ class _AnswerPageState extends State<AnswerPage> {
   @override
   void initState() {
     super.initState();
+    
+    // ✅ NOUVEAU: Vérifier que le quiz n'a pas déjà été joué
+    if (widget.quiz.hasPlayed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        MessageService.showErrorMessage(
+          "Vous avez déjà joué ce quiz ce mois-ci",
+        );
+        Future.delayed(Duration(milliseconds: 500), () => Get.back());
+      });
+      return;
+    }
+    
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       if (mounted) {
         setState(() {

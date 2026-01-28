@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 class OptionModel {
   late int id;
   late String label;
+  late bool isCorrect;           // ✅ NOUVEAU: Parsé depuis "exact"
 
   OptionModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     label = json['intitule'];
+    isCorrect = json['exact'] ?? json['is_correct'] ?? false;  // ✅ Support exact ET is_correct
   }
 
   Widget toTile({

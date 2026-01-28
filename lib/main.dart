@@ -4,6 +4,7 @@ import 'package:aesd/provider/church.dart';
 import 'package:aesd/provider/event.dart';
 import 'package:aesd/provider/forum.dart';
 import 'package:aesd/provider/news.dart';
+import 'package:aesd/provider/notification.dart';
 import 'package:aesd/provider/post.dart';
 import 'package:aesd/provider/program.dart';
 import 'package:aesd/provider/proviercolors.dart';
@@ -58,6 +59,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final scaffoldMessengerKey = MessageService.getScaffoldMessengerKey();
 
+  // Cache pour éviter les doublons de notifications
+  final Set<String> _notificationIds = {};
+
   void _checkInitialMessage() async {
     RemoteMessage? initialMessage =
         await FirebaseMessaging.instance.getInitialMessage();
@@ -66,31 +70,97 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  void _handleMessage(RemoteMessage message) async {
-    if (message.data.containsKey('id')) {
-      switch (message.data['type']) {
+  /// Handler pour les messages Firebase
+  /// - message : Message Firebase reçu
+  /// - isFromNotification : true si vient d'une notification (clic), false si message en app
+  void _handleMessage(RemoteMessage message, {bool isFromNotification = false}) async {
+    print('Notification reçue: ${message.data}');
+    
+    // Éviter les doublons (vérifier l'ID de notification)
+    String notificationId = message.messageId ?? message.sentTime.toString();
+    if (_notificationIds.contains(notificationId) && isFromNotification) {
+      print('Notification déjà traitée: $notificationId');
+      return;
+    }
+    _notificationIds.add(notificationId);
+
+    // Vider le cache après 5 secondes pour éviter les énormes fuites mémoire
+    Future.delayed(Duration(seconds: 5), () {
+      _notificationIds.remove(notificationId);
+    });
+
+    if (message.data.isEmpty) {
+      return;
+    }
+
+    try {
+      final type = message.data['type'] as String?;
+      final id = message.data['id'] as String?;
+
+      if (id == null || type == null) {
+        return;
+      }
+
+      // Redirection vers la page appropriée
+      switch (type) {
         case 'post':
           Get.toNamed(
             Routes.postDetail,
-            arguments: {'postId': int.parse(message.data['id'])},
+            arguments: {'postId': int.parse(id)},
           );
           break;
         case 'event':
           Get.toNamed(
             Routes.eventDetail,
-            arguments: {'eventId': int.parse(message.data['id'])},
+            arguments: {'eventId': int.parse(id)},
           );
           break;
         case 'ceremony':
           Get.toNamed(
             Routes.ceremonyDetail,
-            arguments: {'ceremonyId': int.parse(message.data['id'])},
+            arguments: {'ceremonyId': int.parse(id)},
+          );
+          break;
+        case 'quiz':
+          Get.toNamed(
+            Routes.postDetail,
+            arguments: {'postId': int.parse(id)},
+          );
+          break;
+        case 'forum':
+          Get.toNamed(
+            Routes.subject,
+            arguments: {'subjectId': int.parse(id)},
           );
           break;
         default:
+          print('Type de notification inconnu: $type');
           break;
       }
+    } catch (e) {
+      print('Erreur lors du traitement de la notification: $e');
     }
+  }
+
+  /// Initialiser les listeners Firebase Messaging
+  void _initializeFirebaseMessaging() {
+    // 1. Message reçu en foreground (app au premier plan)
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Message en foreground: ${message.data}');
+      _handleMessage(message, isFromNotification: false);
+      
+      // Optionnel: Afficher une snackbar pour les notifications en avant-plan
+      // MessageService.showInfoMessage(message.notification?.title ?? 'Nouvelle notification');
+    });
+
+    // 2. Notification cliquée (app en arrière-plan ou fermée, puis clic sur notif)
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('App ouvert via notification: ${message.data}');
+      _handleMessage(message, isFromNotification: true);
+    });
+
+    // 3. Message initial au lancement de l'app
+    _checkInitialMessage();
   }
 
   OpenedByNotificationResponse appOpenedByNotification() {
@@ -109,7 +179,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _checkInitialMessage();
+    _initializeFirebaseMessaging();
   }
 
   @override
@@ -125,6 +195,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => Quiz()),
         ChangeNotifierProvider(create: (context) => Event()),
         ChangeNotifierProvider(create: (context) => News()),
+        ChangeNotifierProvider(create: (context) => NotificationProvider()),
         ChangeNotifierProvider(create: (context) => Servant()),
         ChangeNotifierProvider(create: (context) => Singer()),
         ChangeNotifierProvider(create: (context) => Testimony()),

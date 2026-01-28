@@ -4,6 +4,7 @@ import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/not_found.dart';
 import 'package:aesd/functions/formatteurs.dart';
+import 'package:aesd/models/quiz_result_model.dart';
 import 'package:aesd/provider/quiz.dart';
 import 'package:aesd/services/message.dart';
 import 'package:dio/dio.dart';
@@ -31,7 +32,7 @@ class QuizResultPage extends StatefulWidget {
 class _QuizResultPageState extends State<QuizResultPage> {
   bool isLoading = false;
   bool isSucceeded = false;
-  final resultData = {};
+  QuizResultModel? resultData;
 
   Future<void> sendResponses() async {
     try {
@@ -44,9 +45,8 @@ class _QuizResultPageState extends State<QuizResultPage> {
           )
           .then((value) {
             setState(() {
-              resultData['score'] = value['score'];
-              resultData['time_remaining'] = value['time_remaining'];
-              resultData['success_rate'] = value['pourcentage'];
+              // ✅ Créer le modèle de résultat avec tous les détails
+              resultData = QuizResultModel.fromJson(value);
               isSucceeded = true;
             });
           });
@@ -75,13 +75,14 @@ class _QuizResultPageState extends State<QuizResultPage> {
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (!isSucceeded) {
+    if (!isSucceeded || resultData == null) {
       return SafeArea(
         child: Center(
           child: notFoundTile(text: "Impossible d'envoyer les réponses"),
         ),
       );
     }
+    
     return SafeArea(
       child: Scaffold(
         body: Padding(
@@ -102,9 +103,9 @@ class _QuizResultPageState extends State<QuizResultPage> {
                     Padding(
                       padding: EdgeInsets.only(top: 10),
                       child: Text(
-                        "Quiz terminée !",
+                        resultData!.getPerformanceMessage(),
                         style: Theme.of(context).textTheme.titleMedium!
-                            .copyWith(color: notifire.getMainColor),
+                            .copyWith(color: notifire.getMainColor, fontSize: 24),
                       ),
                     ),
                   ],
@@ -115,22 +116,72 @@ class _QuizResultPageState extends State<QuizResultPage> {
               SingleChildScrollView(
                 child: Column(
                   children: [
+                    // ✅ NOUVEAU: Afficher les points gagnés
                     _buildResultTile(
-                      "Points obtenus",
-                      resultData['score'].toString(),
+                      "Points",
+                      "${resultData!.pointsEarned} / ${resultData!.totalPoints}",
+                      color: Colors.amber,
+                      icon: Icon(Icons.stars, color: Colors.white),
                     ),
+                    
+                    // Score final
+                    _buildResultTile(
+                      "Score Final",
+                      resultData!.score.toString(),
+                      color: notifire.getMainColor,
+                      icon: Icon(FontAwesomeIcons.trophy, color: Colors.white, size: 20),
+                    ),
+                    
+                    // ✅ NOUVEAU: Afficher le facteur temps
+                    _buildResultTile(
+                      "Facteur Temps",
+                      "${resultData!.timeFactor.toStringAsFixed(2)}x",
+                      color: Colors.blue,
+                      icon: Icon(FontAwesomeIcons.clock, color: Colors.white, size: 20),
+                    ),
+                    
+                    // ✅ NOUVEAU: Afficher réponses correctes/incorrectes
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildResultTile(
+                            "Correctes",
+                            resultData!.correctCount.toString(),
+                            color: Colors.green,
+                            icon: Icon(Icons.check_circle, color: Colors.white),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: _buildResultTile(
+                            "Incorrectes",
+                            resultData!.wrongCount.toString(),
+                            color: Colors.red,
+                            icon: Icon(Icons.cancel, color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    // Taux de réussite
                     _buildResultTile(
                       "Taux de réussite",
-                      "${resultData["success_rate"]}%",
+                      "${resultData!.pourcentage.toStringAsFixed(1)}%",
                       color: Colors.purple,
-                      icon: getIcon('rate.png'),
+                      icon: Icon(FontAwesomeIcons.chartPie, color: Colors.white, size: 20),
                     ),
+                    
+                    // Temps de réponse
                     _buildResultTile(
                       "Temps de réponse",
-                      resultData["time_remaining"],
-                      color: Colors.red,
-                      icon: getIcon('clock.png'),
+                      resultData!.timeRemaining,
+                      color: Colors.orange,
+                      icon: Icon(FontAwesomeIcons.hourglass, color: Colors.white, size: 20),
                     ),
+                    
+                    // ✅ NOUVEAU: Afficher le détail par question si disponible
+                    if (resultData!.questions.isNotEmpty)
+                      _buildQuestionsDetail(),
                   ],
                 ),
               ),
@@ -146,6 +197,67 @@ class _QuizResultPageState extends State<QuizResultPage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  /// ✅ NOUVEAU: Afficher le détail par question
+  Widget _buildQuestionsDetail() {
+    return Padding(
+      padding: EdgeInsets.only(top: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Détail des réponses",
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          SizedBox(height: 10),
+          ...resultData!.questions.asMap().entries.map((entry) {
+            int index = entry.key + 1;
+            QuestionResultDetail q = entry.value;
+            return Container(
+              margin: EdgeInsets.symmetric(vertical: 5),
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: q.isCorrect ? Colors.green : Colors.red,
+                  width: 2,
+                ),
+                color: (q.isCorrect ? Colors.green : Colors.red).withAlpha(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        q.getResultEmoji(),
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          "Q$index: ${q.questionText}",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        "${q.pointsEarned} / ${q.pointsPossible} pts",
+                        style: TextStyle(
+                          color: q.isCorrect ? Colors.green : Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ],
       ),
     );
   }
@@ -170,7 +282,7 @@ class _QuizResultPageState extends State<QuizResultPage> {
             decoration: BoxDecoration(color: color),
             child: Row(
               children: [
-                icon ?? getIcon("target.png"),
+                icon ?? Icon(Icons.info, color: Colors.white),
                 SizedBox(width: 7),
                 Text(
                   title,
@@ -187,20 +299,11 @@ class _QuizResultPageState extends State<QuizResultPage> {
               value,
               style: Theme.of(
                 context,
-              ).textTheme.labelLarge!.copyWith(color: color),
+              ).textTheme.labelLarge!.copyWith(color: color, fontWeight: FontWeight.bold),
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Image getIcon(String imageName) {
-    return Image.asset(
-      "assets/icons/$imageName",
-      fit: BoxFit.cover,
-      width: 20,
-      height: 20,
     );
   }
 }

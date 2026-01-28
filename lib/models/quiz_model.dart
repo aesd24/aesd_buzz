@@ -16,11 +16,12 @@ class QuizModel {
   late bool hasPlayed;
   int? userScore;
   String? userTimeRemaining;
+  late int totalPoints;              // ✅ Points totaux du quiz
   List questions = [];
 
   QuizModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    title = json['theme'];
+    title = json['theme'] ?? json['intitule'] ?? 'Quiz';
     createdAt = DateTime.parse(json['created_at']);
     expiryDate = DateTime.parse(json['date']).add(Duration(days: 1));
     //description = json['description'];
@@ -28,6 +29,12 @@ class QuizModel {
     hasPlayed = json['has_played'] ?? false;
     questionCount = json['questions_count'] ?? json['questions'].length;
     isAvailable = DateTime.now().isBefore(expiryDate);
+    
+    // ✅ NOUVEAU: Parser les points totaux
+    totalPoints = json['points_maximal'] ?? 
+                 json['total_points'] ?? 
+                 (questionCount * 5); // Défaut: 5 points par question
+    
     // Récupérer les stats de l'utilisateur s'ils existent
     if (json['user_quiz'] != null) {
       userScore = int.tryParse(json['user_quiz']['score']?.toString() ?? '0');
@@ -78,14 +85,16 @@ class QuizModel {
         child: InkWell(
           onTap: () => Get.to(() => QuizMainPage(quiz: this)),
           borderRadius: BorderRadius.circular(24),
-          child: Container(
-            padding: EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          child: Stack(
+            children: [
+              Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
                 Row(
@@ -181,7 +190,7 @@ class QuizModel {
                     Expanded(
                       child: _buildQuizStat(
                         FontAwesomeIcons.award,
-                        '${questionCount * 4} pts',
+                        '${totalPoints} pts',  // ✅ Utiliser les vrais points du backend
                         Colors.yellow.shade600,
                       ),
                     ),
@@ -244,6 +253,44 @@ class QuizModel {
                 ),
               ],
             ),
+              ),
+              
+              // ✅ NOUVEAU: Badge "Déjà joué" en haut à droite
+              if (hasPlayed)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.green.withOpacity(0.4),
+                          blurRadius: 8,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(FontAwesomeIcons.check, color: Colors.white, size: 12),
+                        SizedBox(width: 4),
+                        Text(
+                          'Complété',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
