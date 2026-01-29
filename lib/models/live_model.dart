@@ -1,4 +1,8 @@
-/// Model pour les données LiveKit
+/// Model pour les données LiveKit.
+/// Pour que [Room.connect] fonctionne, le backend doit retourner au minimum :
+/// - [accessToken] : JWT LiveKit
+/// - [liveKitServerUrl] : URL WebSocket (wss:// ou ws://)
+/// - [roomName] : identifiant de la room
 class LiveRoom {
   final String roomName;
   final String title;
@@ -8,11 +12,16 @@ class LiveRoom {
   final String startedAt;
   final int participantCount;
   final String shareUrl;
+  /// JWT requis par LiveKit SDK pour Room.connect(url, token).
   final String accessToken;
+  /// URL du serveur LiveKit (wss://...) requise par Room.connect(url, token).
   final String liveKitServerUrl;
   final bool isPublic;
   final String? churchName;
   final String? thumbnail;
+
+  /// Indique si les champs requis pour se connecter au SDK LiveKit sont présents.
+  bool get canConnect => accessToken.isNotEmpty && liveKitServerUrl.isNotEmpty;
 
   LiveRoom({
     required this.roomName,
@@ -30,20 +39,34 @@ class LiveRoom {
     this.thumbnail,
   });
 
+  /// Parse depuis create-room ou join-room.
+  /// Requis pour LiveKit SDK : accessToken, liveKitServerUrl, roomName.
+  /// join-room peut retourner roomInfo (nested) : on fusionne avec la racine.
   factory LiveRoom.fromJson(Map<String, dynamic> json) {
+    final roomInfo = json['roomInfo'] as Map<String, dynamic>?;
+    String getStr(String key) =>
+        json[key] ?? roomInfo?[key] ?? '';
+    int getInt(String key) =>
+        (json[key] ?? roomInfo?[key] ?? 0) is int
+            ? (json[key] ?? roomInfo?[key] ?? 0) as int
+            : int.tryParse((json[key] ?? roomInfo?[key])?.toString() ?? '0') ?? 0;
+    bool getBool(String key) => json[key] ?? roomInfo?[key] ?? true;
+
     return LiveRoom(
-      roomName: json['roomName'] ?? '',
-      title: json['title'] ?? '',
-      description: json['description'] ?? '',
-      hostName: json['hostName'] ?? '',
-      hostId: json['hostId'] ?? 0,
-      startedAt: json['startedAt'] ?? DateTime.now().toIso8601String(),
-      participantCount: json['participantCount'] ?? 0,
-      shareUrl: json['shareUrl'] ?? '',
-      accessToken: json['accessToken'] ?? '',
-      liveKitServerUrl: json['liveKitServerUrl'] ?? '',
-      isPublic: json['isPublic'] ?? true,
-      churchName: json['churchName'],
+      roomName: getStr('roomName'),
+      title: getStr('title'),
+      description: getStr('description'),
+      hostName: getStr('hostName'),
+      hostId: getInt('hostId'),
+      startedAt: getStr('startedAt').isEmpty
+          ? DateTime.now().toIso8601String()
+          : getStr('startedAt'),
+      participantCount: getInt('participantCount'),
+      shareUrl: getStr('shareUrl'),
+      accessToken: json['accessToken']?.toString() ?? '',
+      liveKitServerUrl: json['liveKitServerUrl']?.toString() ?? '',
+      isPublic: getBool('isPublic'),
+      churchName: json['churchName'] ?? json['church']?['name'],
       thumbnail: json['thumbnail'],
     );
   }

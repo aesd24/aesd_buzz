@@ -38,6 +38,9 @@ class Quiz extends ChangeNotifier {
     final response = await _request.getAny(quizId);
     if (response.statusCode == 200) {
       _selectedQuiz = QuizModel.fromJson(response.data['data']);
+      // Garder hasPlayed si déjà marqué en local (au cas où l'API ne renvoie pas has_played)
+      final alreadyPlayed = _allQuizzes.any((q) => q.id == quizId && q.hasPlayed);
+      if (alreadyPlayed) _selectedQuiz!.hasPlayed = true;
     } else {
       throw HttpException('Impossible de charger ce quiz');
     }
@@ -79,6 +82,24 @@ class Quiz extends ChangeNotifier {
           .toList();
     } else {
       throw HttpException("Impossible d'obtenir le classement");
+    }
+  }
+
+  /// Marque un quiz comme déjà joué (après envoi des réponses).
+  /// Met à jour la liste locale pour éviter de pouvoir rejouer avant le prochain getAll().
+  void markQuizAsPlayed(int quizId, {int? score, String? timeRemaining}) {
+    final index = _allQuizzes.indexWhere((q) => q.id == quizId);
+    if (index >= 0) {
+      _allQuizzes[index].hasPlayed = true;
+      if (score != null) _allQuizzes[index].userScore = score;
+      if (timeRemaining != null) _allQuizzes[index].userTimeRemaining = timeRemaining;
+      notifyListeners();
+    }
+    if (_selectedQuiz?.id == quizId) {
+      _selectedQuiz!.hasPlayed = true;
+      if (score != null) _selectedQuiz!.userScore = score;
+      if (timeRemaining != null) _selectedQuiz!.userTimeRemaining = timeRemaining;
+      notifyListeners();
     }
   }
 }

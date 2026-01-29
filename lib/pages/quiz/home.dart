@@ -1,6 +1,9 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/not_found.dart';
+import 'package:aesd/models/quiz_model.dart';
+import 'package:aesd/models/ranking.dart';
 import 'package:aesd/pages/quiz/ranking.dart';
+import 'package:aesd/provider/auth.dart';
 import 'package:aesd/provider/quiz.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -16,6 +19,8 @@ class QuizHome extends StatefulWidget {
 class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _isLoadingQuizzes = false;
+  List<RankingModel> _monthRanking = [];
+  bool _expandHistory = false; // État pour la section historique
 
   @override
   void initState() {
@@ -24,12 +29,18 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
     _loadQuizzes();
   }
 
-  // Fonction pour charger les quiz
   Future<void> _loadQuizzes() async {
     if (!mounted) return;
     setState(() => _isLoadingQuizzes = true);
     try {
-      await Provider.of<Quiz>(context, listen: false).getAll();
+      final quizProvider = Provider.of<Quiz>(context, listen: false);
+      await quizProvider.getAll();
+      try {
+        final ranking = await quizProvider.getMonthRanking();
+        if (mounted) setState(() => _monthRanking = ranking);
+      } catch (_) {
+        if (mounted) setState(() => _monthRanking = []);
+      }
     } catch (e) {
       print('Erreur lors du chargement des quiz: $e');
     } finally {
@@ -239,6 +250,11 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
           );
         }
 
+        // Séparer et trier les quiz
+        final grouped = _getGroupedAndSortedQuizzes(quizProvider.allQuizzes);
+        final availableQuizzes = grouped['available'] ?? [];
+        final playedQuizzes = grouped['played'] ?? [];
+
         return Column(
           children: [
             // Stats Cards
@@ -248,13 +264,82 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
             Expanded(
               child: RefreshIndicator(
                 onRefresh: _loadQuizzes,
-                child: ListView.builder(
-                  padding: EdgeInsets.all(16),
-                  itemCount: quizProvider.allQuizzes.length,
-                  itemBuilder: (context, index) {
-                    final quiz = quizProvider.allQuizzes[index];
-                    return quiz.buildModernCard(index);
-                  },
+                child: ListView(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  children: [
+                    // Section Quiz disponibles
+                    if (availableQuizzes.isNotEmpty) ...[
+                      Padding(
+                        padding: EdgeInsets.only(top: 16, bottom: 8),
+                        child: Text(
+                          'Quiz disponibles',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: notifire.getMainText,
+                          ),
+                        ),
+                      ),
+                      ...availableQuizzes.asMap().entries.map((entry) {
+                        return entry.value.buildModernCard(entry.key);
+                      }).toList(),
+                    ],
+
+                    // Section Historique (repliable)
+                    if (playedQuizzes.isNotEmpty) ...[
+                      SizedBox(height: 16),
+                      Theme(
+                        data: Theme.of(context).copyWith(
+                          dividerColor: Colors.transparent,
+                        ),
+                        child: ExpansionTile(
+                          initiallyExpanded: _expandHistory,
+                          onExpansionChanged: (expanded) {
+                            setState(() {
+                              _expandHistory = expanded;
+                            });
+                          },
+                          tilePadding: EdgeInsets.symmetric(horizontal: 0),
+                          childrenPadding: EdgeInsets.zero,
+                          title: Text(
+                            'Historique des quiz',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: notifire.getMainText,
+                            ),
+                          ),
+                          trailing: Icon(
+                            _expandHistory
+                                ? FontAwesomeIcons.chevronUp
+                                : FontAwesomeIcons.chevronDown,
+                            size: 16,
+                            color: notifire.getMainText.withAlpha(150),
+                          ),
+                          collapsedShape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          children: [
+                            ...playedQuizzes.asMap().entries.map((entry) {
+                              return entry.value.buildModernCard(entry.key);
+                            }).toList(),
+                          ],
+                        ),
+                      ),
+                    ],
+
+                    // Si aucun quiz disponible
+                    if (availableQuizzes.isEmpty && playedQuizzes.isEmpty)
+                      Padding(
+                        padding: EdgeInsets.only(top: 40),
+                        child: Center(
+                          child: notFoundTile(text: "Aucun quiz disponible"),
+                        ),
+                      ),
+                  ],
                 ),
               ),
             ),
@@ -265,6 +350,20 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
   }
 
   Widget _buildStatsCards(Quiz quizProvider) {
+    final currentUserId = Provider.of<Auth>(context, listen: false).user?.id;
+    int? userRank;
+    int userTotalScore = 0;
+    if (currentUserId != null && _monthRanking.isNotEmpty) {
+      final uid = currentUserId;
+      final pos = _monthRanking.indexWhere((r) => r.userId == uid);
+      if (pos >= 0) {
+        userRank = pos + 1;
+        userTotalScore = _monthRanking[pos].score;
+      }
+    }
+    final scoreText = userTotalScore > 0 ? _formatScore(userTotalScore) : '-';
+    final rankText = userRank != null ? '#$userRank' : '-';
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -282,7 +381,7 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
             child: _buildStatCard(
               icon: FontAwesomeIcons.bolt,
               label: 'Score Total',
-              value: '1,850',
+              value: scoreText,
               gradient: [Colors.orange.shade400, Colors.red.shade400],
             ),
           ),
@@ -291,13 +390,46 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
             child: _buildStatCard(
               icon: FontAwesomeIcons.trophy,
               label: 'Rang',
-              value: '#12',
+              value: rankText,
               gradient: [Colors.green.shade400, Colors.teal.shade400],
             ),
           ),
         ],
       ),
     );
+  }
+
+  static String _formatScore(int score) {
+    if (score >= 1000000) return '${(score / 1000000).toStringAsFixed(1)}M';
+    if (score >= 1000) return '${(score / 1000).toStringAsFixed(1)}k';
+    return score.toString();
+  }
+
+  /// Sépare les quiz joués et non joués, puis les trie par date (plus récent d'abord)
+  Map<String, List<QuizModel>> _getGroupedAndSortedQuizzes(List<QuizModel> allQuizzes) {
+    List<QuizModel> availableQuizzes = [];
+    List<QuizModel> playedQuizzes = [];
+
+    for (var quiz in allQuizzes) {
+      if (quiz.hasPlayed) {
+        playedQuizzes.add(quiz);
+      } else {
+        availableQuizzes.add(quiz);
+      }
+    }
+
+    // Trier par date décroissante (plus récent d'abord)
+    availableQuizzes.sort(
+      (a, b) => b.createdAt.compareTo(a.createdAt),
+    );
+    playedQuizzes.sort(
+      (a, b) => b.createdAt.compareTo(a.createdAt),
+    );
+
+    return {
+      'available': availableQuizzes,
+      'played': playedQuizzes,
+    };
   }
 
   Widget _buildStatCard({

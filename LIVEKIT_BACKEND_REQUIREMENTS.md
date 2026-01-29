@@ -5,6 +5,20 @@ Ce document détaille tous les endpoints et données que le **backend doit fourn
 
 ---
 
+## ⚠️ Champs requis pour que LiveKit fonctionne (SDK)
+
+Le SDK LiveKit Flutter appelle `Room.connect(url, token)`. Le backend **doit** donc retourner au minimum :
+
+| Champ | Type | Endpoint | Description |
+|-------|------|----------|-------------|
+| **accessToken** | string | create-room, join-room | JWT LiveKit (généré avec votre API Key/Secret). Obligatoire. |
+| **liveKitServerUrl** | string | create-room, join-room | URL WebSocket du serveur LiveKit (ex: `wss://live.example.com`). Obligatoire. |
+| **roomName** | string | create-room, join-room | Identifiant de la room (cohérent avec le token). Obligatoire. |
+
+Sans `accessToken` et `liveKitServerUrl`, la connexion à la room échouera côté app. Tous les autres champs sont utilisés pour l’affichage (titre, partage, etc.).
+
+---
+
 ## 1️⃣ **Authentication & Room Token Generation**
 
 ### Endpoint: `POST /api/livekit/create-room`
@@ -22,17 +36,27 @@ Ce document détaille tous les endpoints et données que le **backend doit fourn
 }
 ```
 
-**Response**:
+**Response** (tous les champs ci‑dessous pour que le frontend et LiveKit fonctionnent) :
 ```json
 {
   "success": true,
   "data": {
     "roomName": "church-service-1705681200",
-    "accessToken": "string (JWT token pour le participant - HOST)",
+    "accessToken": "string (JWT LiveKit pour le HOST - OBLIGATOIRE)",
+    "liveKitServerUrl": "wss://votre-serveur-livekit.com (OBLIGATOIRE)",
     "shareUrl": "string (lien unique pour rejoindre le live)",
-    "roomId": "string (identifiant unique LiveKit)",
+    "title": "string",
+    "description": "string",
+    "hostName": "string",
+    "hostId": "integer",
+    "startedAt": "ISO 8601 timestamp",
+    "participantCount": 0,
+    "isPublic": true,
+    "churchName": "string (optionnel)",
+    "thumbnail": "string URL (optionnel)",
+    "roomId": "string (identifiant LiveKit, optionnel)",
     "createdAt": "ISO 8601 timestamp",
-    "expiresAt": "ISO 8601 timestamp (durée du live)"
+    "expiresAt": "ISO 8601 timestamp (optionnel)"
   },
   "error": null
 }
@@ -60,24 +84,49 @@ Ce document détaille tous les endpoints et données que le **backend doit fourn
   "roomName": "string",
   "participantName": "string (nom du spectateur)",
   "participantId": "integer (user ID)",
-  "role": "viewer" // ou "moderator"
+  "role": "viewer"
 }
 ```
 
-**Response**:
+**Response** (format plat recommandé ; le frontend accepte aussi `roomInfo` imbriqué) :
 ```json
 {
   "success": true,
   "data": {
-    "accessToken": "string (JWT token pour le spectateur)",
     "roomName": "church-service-1705681200",
-    "liveKitServerUrl": "string (ws://livekit.example.com)",
+    "accessToken": "string (JWT LiveKit pour le spectateur - OBLIGATOIRE)",
+    "liveKitServerUrl": "wss://votre-serveur-livekit.com (OBLIGATOIRE)",
+    "shareUrl": "string",
+    "title": "string",
+    "description": "string",
+    "hostName": "string",
+    "hostId": "integer",
+    "startedAt": "ISO 8601 timestamp",
+    "participantCount": "integer",
+    "isPublic": true,
+    "churchName": "string (optionnel)",
+    "thumbnail": "string URL (optionnel)"
+  },
+  "error": null
+}
+```
+
+**Alternative avec `roomInfo` imbriqué** (le frontend fusionne avec la racine) :
+```json
+{
+  "success": true,
+  "data": {
+    "roomName": "church-service-1705681200",
+    "accessToken": "string (OBLIGATOIRE)",
+    "liveKitServerUrl": "wss://... (OBLIGATOIRE)",
     "roomInfo": {
       "title": "string",
       "description": "string",
       "hostName": "string",
+      "hostId": "integer",
       "participantCount": "integer",
-      "isLive": "boolean"
+      "isLive": "boolean",
+      "shareUrl": "string"
     }
   },
   "error": null
@@ -428,5 +477,18 @@ CREATE TABLE live_viewers (
 
 ---
 
+---
+
+## Récap : champs attendus par le frontend
+
+| Modèle | Source | Champs obligatoires pour LiveKit | Autres champs (affichage) |
+|--------|--------|----------------------------------|----------------------------|
+| **LiveRoom** | create-room, join-room | `accessToken`, `liveKitServerUrl`, `roomName` | title, description, hostName, hostId, startedAt, participantCount, shareUrl, isPublic, churchName, thumbnail |
+| **LiveRoomInfo** | GET /rooms, GET /room-info/{roomName} | — | roomName, title, description, hostName, hostId, startedAt, participantCount, isLive, shareUrl, church.name, church.location |
+
+Convention : **camelCase** pour tous les champs JSON (roomName, accessToken, liveKitServerUrl, participantCount, etc.).
+
+---
+
 **Status**: Ready for Backend Implementation  
-**Last Updated**: 19 Janvier 2026
+**Last Updated**: Janvier 2026

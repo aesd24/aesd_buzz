@@ -1,5 +1,7 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/not_found.dart';
+import 'package:aesd/models/ranking.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -15,14 +17,14 @@ class QuizRankingPage extends StatefulWidget {
 
 class _QuizRankingPageState extends State<QuizRankingPage> {
   bool _isLoading = false;
-  List results = [];
+  List<RankingModel> results = [];
 
   Future getRanking() async {
     try {
       setState(() => _isLoading = true);
       await widget.dataLoader().then((value) {
         setState(() {
-          results = value ?? [];
+          results = value != null ? List<RankingModel>.from(value as List) : [];
         });
       });
     } catch (e) {
@@ -127,7 +129,10 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
 
   Widget _buildPodium() {
     final top3 = results.take(3).toList();
-    
+    final colors = [Colors.amber, Colors.grey, Colors.orange];
+    final emojis = ['🥇', '🥈', '🥉'];
+    final order = [1, 0, 2]; // 2e, 1er, 3e
+
     return Container(
       padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -143,7 +148,6 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
       ),
       child: Column(
         children: [
-          // Titre podium
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -163,28 +167,22 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
               ),
             ],
           ),
-
           SizedBox(height: 32),
-
-          // Podium avec icônes emoji
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              // 2ème place
-              if (top3.length > 1)
-                Expanded(child: _buildPodiumPlace(2, '🥈', Colors.grey)),
-              
-              SizedBox(width: 8),
-
-              // 1ère place
-              if (top3.isNotEmpty)
-                Expanded(child: _buildPodiumPlace(1, '🥇', Colors.amber)),
-              
-              SizedBox(width: 8),
-
-              // 3ème place
-              if (top3.length > 2)
-                Expanded(child: _buildPodiumPlace(3, '🥉', Colors.orange)),
+              for (int i = 0; i < order.length; i++) ...[
+                if (i > 0) SizedBox(width: 8),
+                if (order[i] < top3.length)
+                  Expanded(
+                    child: _buildPodiumPlace(
+                      order[i] + 1,
+                      top3[order[i]],
+                      emojis[order[i]],
+                      colors[order[i]],
+                    ),
+                  ),
+              ],
             ],
           ),
         ],
@@ -192,19 +190,15 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
     );
   }
 
-  Widget _buildPodiumPlace(int rank, String emoji, Color color) {
+  Widget _buildPodiumPlace(int rank, RankingModel player, String emoji, Color color) {
     final heights = {1: 140.0, 2: 110.0, 3: 110.0};
 
     return Column(
       children: [
-        // Emoji
         Text(emoji, style: TextStyle(fontSize: rank == 1 ? 60 : 50)),
-        
         SizedBox(height: 8),
-
-        // Nom (simplifié)
         Text(
-          'Joueur $rank',
+          player.userName,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: rank == 1 ? 14 : 12,
@@ -214,12 +208,9 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        
         SizedBox(height: 8),
-
-        // Container podium
         Container(
-          height: heights[rank],
+          height: heights[rank] ?? 110,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -229,9 +220,7 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
                 color.shade700,
               ],
             ),
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(16),
-            ),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
             boxShadow: [
               BoxShadow(
                 color: color.withOpacity(0.4),
@@ -243,13 +232,8 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Rang
               if (rank == 1)
-                Icon(
-                  FontAwesomeIcons.crown,
-                  color: Colors.white,
-                  size: 32,
-                )
+                Icon(FontAwesomeIcons.crown, color: Colors.white, size: 32)
               else
                 Text(
                   rank.toString(),
@@ -259,12 +243,9 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
                     color: Colors.white,
                   ),
                 ),
-              
               SizedBox(height: 8),
-
-              // Score simulé
               Text(
-                '${2500 - (rank - 1) * 100}',
+                '${player.score}',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -285,8 +266,7 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
     );
   }
 
-  Widget _buildModernRankingCard(dynamic player, int rank) {
-    // Couleurs selon le rang
+  Widget _buildModernRankingCard(RankingModel player, int rank) {
     Color getRankColor() {
       if (rank == 1) return Colors.amber.shade400;
       if (rank == 2) return Colors.grey.shade400;
@@ -295,10 +275,6 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
     }
 
     final isTopThree = rank <= 3;
-    
-    // Génération de tendance simulée (à remplacer par données backend)
-    final trend = rank % 2 == 0 ? '+${5 - rank % 5}' : '-${rank % 5}';
-    final isPositive = trend.startsWith('+');
 
     return Container(
       margin: EdgeInsets.only(bottom: 12),
@@ -307,7 +283,7 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: isTopThree 
+            color: isTopThree
                 ? getRankColor().withOpacity(0.2)
                 : Colors.black.withOpacity(0.05),
             blurRadius: 10,
@@ -318,15 +294,12 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
-            // Navigation vers profil si nécessaire
-          },
+          onTap: () {},
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: EdgeInsets.all(16),
             child: Row(
               children: [
-                // Badge de rang
                 Container(
                   width: 48,
                   height: 48,
@@ -359,34 +332,32 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
                           ),
                   ),
                 ),
-
                 SizedBox(width: 16),
-
-                // Avatar emoji générique
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      ['🧑', '👨', '👩', '🧔', '👴', '👵'][rank % 6],
-                      style: TextStyle(fontSize: 24),
-                    ),
-                  ),
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: Colors.grey.shade200,
+                  backgroundImage: player.userPicUrl.isNotEmpty
+                      ? FastCachedImageProvider(player.userPicUrl)
+                      : null,
+                  child: player.userPicUrl.isEmpty
+                      ? Text(
+                          player.userName.isNotEmpty
+                              ? player.userName[0].toUpperCase()
+                              : '?',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade700,
+                          ),
+                        )
+                      : null,
                 ),
-
                 SizedBox(width: 12),
-
-                // Informations joueur
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Joueur $rank',
+                        player.userName,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -405,48 +376,25 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
                           ),
                           SizedBox(width: 6),
                           Text(
-                            '${2500 - (rank * 50)} points',
+                            '${player.score} points',
                             style: TextStyle(
                               color: Colors.grey.shade600,
                               fontSize: 14,
                             ),
                           ),
+                          if (player.timeElapsed != null) ...[
+                            SizedBox(width: 8),
+                            Icon(FontAwesomeIcons.clock, size: 12, color: Colors.grey.shade600),
+                            SizedBox(width: 4),
+                            Text(
+                              player.timeElapsed!,
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Indicateur de tendance
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: isPositive
-                        ? Colors.green.shade50
-                        : Colors.red.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        isPositive 
-                            ? FontAwesomeIcons.arrowTrendUp
-                            : FontAwesomeIcons.arrowTrendDown,
-                        size: 12,
-                        color: isPositive
-                            ? Colors.green.shade600
-                            : Colors.red.shade600,
-                      ),
-                      SizedBox(width: 4),
-                      Text(
-                        trend,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          color: isPositive
-                              ? Colors.green.shade600
-                              : Colors.red.shade600,
-                        ),
                       ),
                     ],
                   ),
@@ -458,10 +406,4 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
       ),
     );
   }
-}
-
-extension on Color {
-  get shade700 => null;
-  
-  get shade400 => null;
 }

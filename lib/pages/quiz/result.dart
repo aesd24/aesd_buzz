@@ -45,10 +45,16 @@ class _QuizResultPageState extends State<QuizResultPage> {
           )
           .then((value) {
             setState(() {
-              // ✅ Créer le modèle de résultat avec tous les détails
               resultData = QuizResultModel.fromJson(value);
               isSucceeded = true;
             });
+            final quizProvider = Provider.of<Quiz>(context, listen: false);
+            quizProvider.markQuizAsPlayed(
+              widget.quizId,
+              score: value['score'] is int ? value['score'] : int.tryParse(value['score']?.toString() ?? '0'),
+              timeRemaining: value['time_remaining']?.toString(),
+            );
+            quizProvider.getAll();
           });
     } on HttpException catch (e) {
       MessageService.showErrorMessage(e.message);
