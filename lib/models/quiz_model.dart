@@ -22,11 +22,31 @@ class QuizModel {
   QuizModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     title = json['theme'] ?? json['intitule'] ?? 'Quiz';
-    createdAt = DateTime.parse(json['created_at']);
-    expiryDate = DateTime.parse(json['date']).add(Duration(days: 1));
+    
+    // ✅ Fallback pour createdAt si pas fourni
+    try {
+      createdAt = json['created_at'] != null 
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(); // Défaut: maintenant si absent
+    } catch (e) {
+      createdAt = DateTime.now();
+    }
+    
+    // ✅ Fallback pour expiryDate
+    try {
+      expiryDate = json['date'] != null
+          ? DateTime.parse(json['date']).add(Duration(days: 1))
+          : DateTime.now().add(Duration(days: 365)); // 1 an par défaut
+    } catch (e) {
+      expiryDate = DateTime.now().add(Duration(days: 365));
+    }
+    
     //description = json['description'];
     questions = json['questions'] ?? [];
+    
+    // ✅ Fallback pour hasPlayed - défaut à false si absent
     hasPlayed = json['has_played'] ?? false;
+    
     questionCount = json['questions_count'] ?? json['questions'].length;
     isAvailable = DateTime.now().isBefore(expiryDate);
     

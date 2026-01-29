@@ -16,12 +16,25 @@ class QuizResultModel {
     pourcentage = (json['pourcentage'] ?? json['percentage'] ?? 0).toDouble();
     timeRemaining = json['time_remaining'] ?? '00:00:00';
     
-    // ✅ Nouveaux champs (depuis backend)
-    totalPoints = json['total_points'] ?? 0;
-    pointsEarned = json['points_earned'] ?? 0;
+    // ✅ Champs de points - avec fallbacks si backend n'envoie pas
+    totalPoints = json['total_points'] ?? 
+                 json['points_maximal'] ?? 
+                 0;
+    
+    pointsEarned = json['points_earned'] ?? 
+                  json['user_points'] ?? 
+                  0;
+    
     timeFactor = (json['time_factor'] ?? 1.0).toDouble();
-    correctCount = json['correct_count'] ?? 0;
-    wrongCount = json['wrong_count'] ?? 0;
+    
+    // ✅ Calcul du correctCount/wrongCount si pas fourni par backend
+    correctCount = json['correct_count'] ?? 
+                  json['correct_answers_count'] ??
+                  ((pourcentage / 100 * (json['total_questions'] ?? 1)).toInt());
+    
+    wrongCount = json['wrong_count'] ?? 
+                json['wrong_answers_count'] ?? 
+                ((json['total_questions'] ?? 0) - correctCount);
     
     // Parser le détail par question si disponible
     if (json['questions'] != null) {

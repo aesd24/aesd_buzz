@@ -166,7 +166,7 @@ class _QuizResultPageState extends State<QuizResultPage> {
                     // Taux de réussite
                     _buildResultTile(
                       "Taux de réussite",
-                      "${resultData!.pourcentage.toStringAsFixed(1)}%",
+                      "${(resultData!.totalPoints > 0 ? (resultData!.pointsEarned / resultData!.totalPoints * 100) : resultData!.pourcentage).toStringAsFixed(1)}%",
                       color: Colors.purple,
                       icon: Icon(FontAwesomeIcons.chartPie, color: Colors.white, size: 20),
                     ),
