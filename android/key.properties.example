@@ -1,0 +1,11 @@
+# Copiez ce fichier en key.properties et remplissez les valeurs.
+# NE COMMITEZ JAMAIS key.properties ni votre fichier .jks (ils sont dans .gitignore).
+
+storePassword=votre_mot_de_passe_keystore
+keyPassword=votre_mot_de_passe_cle
+keyAlias=upload
+storeFile=../upload-keystore.jks
+
+# storeFile : chemin du fichier .jks ou .keystore
+#   - Soit relatif au dossier android/ (ex: upload-keystore.jks si le fichier est dans android/)
+#   - Soit relatif (ex: ../upload-keystore.jks si le keystore est à la racine du projet)

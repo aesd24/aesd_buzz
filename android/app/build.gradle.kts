@@ -14,6 +14,12 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+val hasValidSigningConfig = keystorePropertiesFile.exists() &&
+    keystoreProperties.getProperty("storeFile") != null &&
+    keystoreProperties.getProperty("storePassword") != null &&
+    keystoreProperties.getProperty("keyAlias") != null &&
+    keystoreProperties.getProperty("keyPassword") != null
+
 android {
     namespace = "com.aesd.buzz"
     compileSdk = flutter.compileSdkVersion
@@ -21,8 +27,8 @@ android {
 
     signingConfigs {
         create("release") {
-            if (keystorePropertiesFile.exists()) {
-                storeFile = file(keystoreProperties.getProperty("storeFile"))
+            if (hasValidSigningConfig) {
+                storeFile = file(keystoreProperties.getProperty("storeFile")!!)
                 storePassword = keystoreProperties.getProperty("storePassword")
                 keyAlias = keystoreProperties.getProperty("keyAlias")
                 keyPassword = keystoreProperties.getProperty("keyPassword")
@@ -49,9 +55,11 @@ android {
 
     buildTypes {
         getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = true      // Recommandé pour la release
-            isShrinkResources = true  // Recommandé pour la release
+            if (hasValidSigningConfig) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+            isMinifyEnabled = true
+            isShrinkResources = true
         }
     }
 }

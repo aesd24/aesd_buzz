@@ -190,7 +190,7 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
     );
   }
 
-  Widget _buildPodiumPlace(int rank, RankingModel player, String emoji, Color color) {
+Widget _buildPodiumPlace(int rank, RankingModel player, String emoji, MaterialColor color) {
     final heights = {1: 140.0, 2: 110.0, 3: 110.0};
 
     return Column(
