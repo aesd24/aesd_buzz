@@ -201,7 +201,7 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
     bool subscribed = churchId == user.church?.id;
 
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         body:
             _isLoading

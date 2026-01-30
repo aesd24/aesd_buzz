@@ -14,7 +14,7 @@ class LivePage extends StatefulWidget {
 }
 
 class _LivePageState extends State<LivePage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late TabController _tabController;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;

@@ -165,6 +165,17 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
                                 ),
                               ),
                               ListTile(
+                                onTap: () => Get.toNamed(Routes.notifications),
+                                leading: cusFaIcon(
+                                  FontAwesomeIcons.bell,
+                                  color: notifire.getMainText,
+                                ),
+                                title: Text(
+                                  "Notifications",
+                                  style: mediumBlackTextStyle,
+                                ),
+                              ),
+                              ListTile(
                                 onTap: () => Get.toNamed(Routes.live),
                                 leading: cusFaIcon(FontAwesomeIcons.video),
                                 title: Text(

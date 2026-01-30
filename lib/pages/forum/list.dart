@@ -33,8 +33,6 @@ class _ForumMainState extends State<ForumMain> {
       MessageService.showErrorMessage(
         "Erreur réseau. Vérifiez votre connexion internet",
       );
-    } catch (e) {
-      MessageService.showErrorMessage("Une erreur inattendu s'est produite !");
     } finally {
       setState(() {
         isLoading = false;

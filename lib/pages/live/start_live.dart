@@ -160,7 +160,7 @@ class _StartLivePageState extends State<StartLivePage>
                 controller: _titleController,
                 label: 'Titre du Live',
                 hint: 'Ex: Service du dimanche, Prière du soir...',
-                icon: FontAwesomeIcons.heading,
+                icon: FontAwesomeIcons.broadcastTower,
                 maxLines: 1,
               ),
               const SizedBox(height: 20),

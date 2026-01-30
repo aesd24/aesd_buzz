@@ -3,6 +3,7 @@ import 'package:aesd/provider/ceremonies.dart';
 import 'package:aesd/provider/church.dart';
 import 'package:aesd/provider/event.dart';
 import 'package:aesd/provider/forum.dart';
+import 'package:aesd/provider/live_provider.dart';
 import 'package:aesd/provider/news.dart';
 import 'package:aesd/provider/notification.dart';
 import 'package:aesd/provider/post.dart';
@@ -13,7 +14,9 @@ import 'package:aesd/provider/servant.dart';
 import 'package:aesd/provider/singer.dart';
 import 'package:aesd/provider/testimony.dart';
 import 'package:aesd/provider/user.dart';
+import 'package:aesd/services/livekit_service.dart';
 import 'package:aesd/services/message.dart';
+import 'package:dio/dio.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -196,6 +199,16 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => Event()),
         ChangeNotifierProvider(create: (context) => News()),
         ChangeNotifierProvider(create: (context) => NotificationProvider()),
+        ChangeNotifierProvider(
+          create: (context) => LiveProvider(
+            liveKitService: LiveKitService(
+              dio: Dio(BaseOptions(
+                baseUrl: "https://monapi.eglisesetserviteursdedieu.com/api/",
+              )),
+              baseUrl: 'https://monapi.eglisesetserviteursdedieu.com',
+            ),
+          ),
+        ),
         ChangeNotifierProvider(create: (context) => Servant()),
         ChangeNotifierProvider(create: (context) => Singer()),
         ChangeNotifierProvider(create: (context) => Testimony()),

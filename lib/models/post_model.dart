@@ -68,10 +68,12 @@ class PostModel {
                       top: Radius.circular(10),
                     ),
                     child: FastCachedImage(
+                      height: 250,
+                      width: double.infinity,
                       fit: BoxFit.cover,
                       url: image!,
                       loadingBuilder: (context, progress) {
-                        return imageShimmerPlaceholder(height: 200);
+                        return imageShimmerPlaceholder(height: 250);
                       },
                     ),
                   ),
