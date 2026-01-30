@@ -24,6 +24,8 @@ class PostProvider extends ChangeNotifier {
     if (response.statusCode != 201) {
       throw HttpException(response.data['message']);
     }
+    // Actualiser la liste des posts après la création
+    await getPosts();
   }
 
   Future likePost(int id) async {

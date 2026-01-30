@@ -257,8 +257,7 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
 
         return Column(
           children: [
-            // Stats Cards
-            _buildStatsCards(quizProvider),
+
 
             // Liste des quiz
             Expanded(
@@ -267,6 +266,12 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
                 child: ListView(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   children: [
+                    // Stats Cards déplacés ici pour scroller avec le contenu
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: _buildStatsCards(quizProvider),
+                    ),
+
                     // Section Quiz disponibles
                     if (availableQuizzes.isNotEmpty) ...[
                       Padding(

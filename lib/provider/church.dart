@@ -26,12 +26,18 @@ class Church extends ChangeNotifier {
     if (response.statusCode == 200) {
       final mainChurches = response.data['data']['main_churches'];
       final secondaries = response.data['data']['secondary_churches'];
+      final subscribed = response.data['data']['subscribed_church'];
+
       _userChurches.clear();
       for (var church in mainChurches) {
         _userChurches.add(ChurchModel.fromJson(church));
       }
       for (var church in secondaries) {
         _userChurches.add(ChurchModel.fromJson(church));
+      }
+      // Ajouter l'église assignée (annexe) si elle existe
+      if (subscribed != null) {
+        _userChurches.add(ChurchModel.fromJson(subscribed));
       }
     } else {
       throw HttpException("erreur : ${response.data['message']}");

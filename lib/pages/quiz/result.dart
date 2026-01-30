@@ -119,85 +119,87 @@ class _QuizResultPageState extends State<QuizResultPage> {
               ),
 
               // Afficher les résultats
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    // ✅ NOUVEAU: Afficher les points gagnés
-                    _buildResultTile(
-                      "Points",
-                      "${resultData!.pointsEarned} / ${resultData!.totalPoints}",
-                      color: Colors.amber,
-                      icon: Icon(Icons.stars, color: Colors.white),
-                    ),
-                    
-                    // Score final
-                    _buildResultTile(
-                      "Score Final",
-                      resultData!.score.toString(),
-                      color: notifire.getMainColor,
-                      icon: Icon(FontAwesomeIcons.trophy, color: Colors.white, size: 20),
-                    ),
-                    
-                    // ✅ NOUVEAU: Afficher le facteur temps
-                    _buildResultTile(
-                      "Facteur Temps",
-                      "${resultData!.timeFactor.toStringAsFixed(2)}x",
-                      color: Colors.blue,
-                      icon: Icon(FontAwesomeIcons.clock, color: Colors.white, size: 20),
-                    ),
-                    
-                    // ✅ NOUVEAU: Afficher réponses correctes/incorrectes
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildResultTile(
-                            "Correctes",
-                            resultData!.correctCount.toString(),
-                            color: Colors.green,
-                            icon: Icon(Icons.check_circle, color: Colors.white),
+              Expanded( // ✅ Fix Overflow: Wrap scrollable in Expanded
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      // ✅ NOUVEAU: Afficher les points gagnés
+                      _buildResultTile(
+                        "Points",
+                        "${resultData!.pointsEarned} / ${resultData!.totalPoints}",
+                        color: Colors.amber,
+                        icon: Icon(Icons.stars, color: Colors.white),
+                      ),
+                      
+                      // Score final
+                      _buildResultTile(
+                        "Score Final",
+                        resultData!.score.toString(),
+                        color: notifire.getMainColor,
+                        icon: Icon(FontAwesomeIcons.trophy, color: Colors.white, size: 20),
+                      ),
+                      
+                      // ✅ NOUVEAU: Afficher le facteur temps
+                      _buildResultTile(
+                        "Facteur Temps",
+                        "${resultData!.timeFactor.toStringAsFixed(2)}x",
+                        color: Colors.blue,
+                        icon: Icon(FontAwesomeIcons.clock, color: Colors.white, size: 20),
+                      ),
+                      
+                      // ✅ NOUVEAU: Afficher réponses correctes/incorrectes
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildResultTile(
+                              "Correctes",
+                              resultData!.correctCount.toString(),
+                              color: Colors.green,
+                              icon: Icon(Icons.check_circle, color: Colors.white),
+                            ),
                           ),
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: _buildResultTile(
-                            "Incorrectes",
-                            resultData!.wrongCount.toString(),
-                            color: Colors.red,
-                            icon: Icon(Icons.cancel, color: Colors.white),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: _buildResultTile(
+                              "Incorrectes",
+                              resultData!.wrongCount.toString(),
+                              color: Colors.red,
+                              icon: Icon(Icons.cancel, color: Colors.white),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    
-                    // Taux de réussite
-                    _buildResultTile(
-                      "Taux de réussite",
-                      "${(resultData!.totalPoints > 0 ? (resultData!.pointsEarned / resultData!.totalPoints * 100) : resultData!.pourcentage).toStringAsFixed(1)}%",
-                      color: Colors.purple,
-                      icon: Icon(FontAwesomeIcons.chartPie, color: Colors.white, size: 20),
-                    ),
-                    
-                    // Temps de réponse
-                    _buildResultTile(
-                      "Temps de réponse",
-                      resultData!.timeRemaining,
-                      color: Colors.orange,
-                      icon: Icon(FontAwesomeIcons.hourglass, color: Colors.white, size: 20),
-                    ),
-                    
-                    // ✅ NOUVEAU: Afficher le détail par question si disponible
-                    if (resultData!.questions.isNotEmpty)
-                      _buildQuestionsDetail(),
-                  ],
+                        ],
+                      ),
+                      
+                      // Taux de réussite
+                      _buildResultTile(
+                        "Taux de réussite",
+                        "${(resultData!.totalPoints > 0 ? (resultData!.pointsEarned / resultData!.totalPoints * 100) : resultData!.pourcentage).toStringAsFixed(1)}%",
+                        color: Colors.purple,
+                        icon: Icon(FontAwesomeIcons.chartPie, color: Colors.white, size: 20),
+                      ),
+                      
+                      // Temps de réponse
+                      _buildResultTile(
+                        "Temps de réponse",
+                        resultData!.timeRemaining,
+                        color: Colors.orange,
+                        icon: Icon(FontAwesomeIcons.hourglass, color: Colors.white, size: 20),
+                      ),
+                      
+                      // ✅ NOUVEAU: Afficher le détail par question si disponible
+                      if (resultData!.questions.isNotEmpty)
+                        _buildQuestionsDetail(),
+                    ],
+                  ),
                 ),
               ),
 
               // Bouton pour retourner à l'accueil
               Padding(
-                padding: const EdgeInsets.only(top: 40, bottom: 20),
+                padding: const EdgeInsets.only(top: 20, bottom: 20),
                 child: CustomElevatedButton(
                   text: "Retourner à l'accueil",
-                  onPressed: () => Get.back(),
+                  onPressed: () => Get.back(), // Get.back() suffit souvent si la stack est propre
                 ),
               ),
             ],

@@ -77,10 +77,6 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
       child: ListView(
         padding: EdgeInsets.all(16),
         children: [
-          // Podium Top 3
-          if (results.length >= 3) _buildPodium(),
-
-          SizedBox(height: 24),
 
           // Titre classement général
           Container(
@@ -103,7 +99,7 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
                 ),
                 SizedBox(width: 12),
                 Text(
-                  'Classement Général',
+                  'Classement',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -116,7 +112,7 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
 
           SizedBox(height: 16),
 
-          // Liste complète - utilise directement buildWidget du modèle
+          // Liste complète
           ...results.asMap().entries.map((entry) {
             final index = entry.key;
             final player = entry.value;
@@ -127,144 +123,7 @@ class _QuizRankingPageState extends State<QuizRankingPage> {
     );
   }
 
-  Widget _buildPodium() {
-    final top3 = results.take(3).toList();
-    final colors = [Colors.amber, Colors.grey, Colors.orange];
-    final emojis = ['🥇', '🥈', '🥉'];
-    final order = [1, 0, 2]; // 2e, 1er, 3e
 
-    return Container(
-      padding: EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.purple.withOpacity(0.1),
-            blurRadius: 20,
-            offset: Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                FontAwesomeIcons.trophy,
-                color: Colors.amber.shade600,
-                size: 24,
-              ),
-              SizedBox(width: 12),
-              Text(
-                'Top 3 du mois',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: notifire.getMainText,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 32),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              for (int i = 0; i < order.length; i++) ...[
-                if (i > 0) SizedBox(width: 8),
-                if (order[i] < top3.length)
-                  Expanded(
-                    child: _buildPodiumPlace(
-                      order[i] + 1,
-                      top3[order[i]],
-                      emojis[order[i]],
-                      colors[order[i]],
-                    ),
-                  ),
-              ],
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-Widget _buildPodiumPlace(int rank, RankingModel player, String emoji, MaterialColor color) {
-    final heights = {1: 140.0, 2: 110.0, 3: 110.0};
-
-    return Column(
-      children: [
-        Text(emoji, style: TextStyle(fontSize: rank == 1 ? 60 : 50)),
-        SizedBox(height: 8),
-        Text(
-          player.userName,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: rank == 1 ? 14 : 12,
-            color: notifire.getMainText,
-          ),
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        SizedBox(height: 8),
-        Container(
-          height: heights[rank] ?? 110,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                color.shade400,
-                color.shade700,
-              ],
-            ),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-            boxShadow: [
-              BoxShadow(
-                color: color.withOpacity(0.4),
-                blurRadius: 12,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (rank == 1)
-                Icon(FontAwesomeIcons.crown, color: Colors.white, size: 32)
-              else
-                Text(
-                  rank.toString(),
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              SizedBox(height: 8),
-              Text(
-                '${player.score}',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: rank == 1 ? 18 : 16,
-                ),
-              ),
-              Text(
-                'pts',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildModernRankingCard(RankingModel player, int rank) {
     Color getRankColor() {
@@ -333,23 +192,44 @@ Widget _buildPodiumPlace(int rank, RankingModel player, String emoji, MaterialCo
                   ),
                 ),
                 SizedBox(width: 16),
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Colors.grey.shade200,
-                  backgroundImage: player.userPicUrl.isNotEmpty
-                      ? FastCachedImageProvider(player.userPicUrl)
-                      : null,
-                  child: player.userPicUrl.isEmpty
-                      ? Text(
-                          player.userName.isNotEmpty
-                              ? player.userName[0].toUpperCase()
-                              : '?',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey.shade700,
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.grey.shade200,
+                  ),
+                  child: ClipOval(
+                    child: player.userPicUrl.isNotEmpty
+                        ? Image.network(
+                            player.userPicUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Center(
+                                child: Text(
+                                  player.userName.isNotEmpty
+                                      ? player.userName[0].toUpperCase()
+                                      : '?',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey.shade700,
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        : Center(
+                            child: Text(
+                              player.userName.isNotEmpty
+                                  ? player.userName[0].toUpperCase()
+                                  : '?',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade700,
+                              ),
+                            ),
                           ),
-                        )
-                      : null,
+                  ),
                 ),
                 SizedBox(width: 12),
                 Expanded(

@@ -20,8 +20,9 @@ class QuizModel {
   List questions = [];
 
   QuizModel.fromJson(Map<String, dynamic> json) {
+    print("DEBUG: Parsing QuizModel: ID=${json['id']} | user_score=${json['user_score']} | has_played=${json['has_played']}");
     id = json['id'];
-    title = json['theme'] ?? json['intitule'] ?? 'Quiz';
+    title = json['titre'] ?? json['intitule'] ?? 'Quiz';
     
     // ✅ Fallback pour createdAt si pas fourni
     try {

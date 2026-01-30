@@ -73,18 +73,30 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
                       children: [
                         Hero(
                           tag: "avatar",
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundImage:
-                                user.photo != null
-                                    ? FastCachedImageProvider(user.photo!)
-                                    : null,
-                            child:
-                                user.photo != null
-                                    ? null
-                                    : SvgPicture.asset(
+                          child: Container(
+                            width: 100, // 2 * radius 50
+                            height: 100,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.grey.shade200,
+                            ),
+                            child: ClipOval(
+                              child: user.photo != null
+                                  ? Image.network(
+                                      user.photo!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return SvgPicture.asset(
+                                          "assets/illustrations/user-avatar.svg",
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    )
+                                  : SvgPicture.asset(
                                       "assets/illustrations/user-avatar.svg",
+                                      fit: BoxFit.cover,
                                     ),
+                            ),
                           ),
                         ),
                         SizedBox(height: 30),

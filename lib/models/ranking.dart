@@ -11,19 +11,21 @@ class RankingModel {
   String? timeElapsed;
 
   RankingModel.globalFromJson(Map<String, dynamic> json) {
+    print("DEBUG: Parsing Global Ranking: $json");
     userId = json['user_id'];
     userName = json['name'];
     userPicUrl = json['profile_photo_url'];
-    rank = json['rang'];
-    score = int.parse(json['total_score']);
+    rank = int.tryParse(json['rang']?.toString() ?? '0') ?? 0;
+    score = int.tryParse(json['points_obtenus']?.toString() ?? '0') ?? 0;
   }
 
   RankingModel.singleFromJson(Map<String, dynamic> json) {
+    print("DEBUG: Parsing Single Quiz Ranking: $json");
     userId = json['user_id'];
     userName = json['name'];
     userPicUrl = json['profile_photo_url'];
-    rank = json['rang'];
-    score = int.parse(json['score']);
+    rank = int.tryParse(json['rang']?.toString() ?? '0') ?? 0;
+    score = int.tryParse(json['score']?.toString() ?? '0') ?? 0;
     timeElapsed = json['time_remaining'];
   }
 

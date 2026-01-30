@@ -1,4 +1,9 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
+import 'package:aesd/provider/auth.dart'; // Add this import
+
+// ... (existing imports)
+
+
 import 'package:aesd/pages/quiz/ranking.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -29,8 +34,37 @@ class _QuizMainPageState extends State<QuizMainPage> {
   Future<void> loadQuiz() async {
     try {
       setState(() => isLoading = true);
-      await Provider.of<Quiz>(context, listen: false).getAny(widget.quiz.id);
-      quiz = Provider.of<Quiz>(context, listen: false).selectedQuiz;
+      final quizProvider = Provider.of<Quiz>(context, listen: false);
+      
+      // 1. Charger les détails du quiz
+      await quizProvider.getAny(widget.quiz.id);
+      quiz = quizProvider.selectedQuiz;
+
+      // 2. Tenter de récupérer le classement pour voir si l'user a joué
+      // (Car l'API getAny renvoie parfois null pour user_score)
+      try {
+        final ranking = await quizProvider.getQuizRanking(widget.quiz.id);
+        if (ranking != null && quiz != null) {
+          final currentUser = Provider.of<Auth>(context, listen: false).user;
+          if (currentUser != null) {
+             // Chercher l'user dans le classement
+             final userRank = (ranking as List).firstWhereOrNull(
+               (r) => r.userId == currentUser.id,
+             );
+             
+             if (userRank != null) {
+               print("DEBUG: Found user in ranking! Score=${userRank.score}");
+               // Patch les données manquantes
+               quiz!.hasPlayed = true;
+               quiz!.userScore = userRank.score;
+               quiz!.userTimeRemaining = userRank.timeElapsed;
+             }
+          }
+        }
+      } catch (e) {
+        print("DEBUG: Error checking ranking for user stats: $e");
+      }
+
     } on HttpException catch (e) {
       MessageService.showErrorMessage(e.message);
     } on DioException {
@@ -48,6 +82,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
   @override
   void initState() {
     super.initState();
+    quiz = widget.quiz; // Initialize with passed data
     loadQuiz();
   }
 
@@ -332,8 +367,10 @@ class _QuizMainPageState extends State<QuizMainPage> {
           SizedBox(height: 12),
           _buildInfoRow(
             FontAwesomeIcons.trophy,
-            'Récompense',
-            '${quiz!.questionCount * 4} points',
+            quiz!.hasPlayed ? 'Points Gagnés' : 'Récompense',
+            quiz!.hasPlayed && quiz!.userScore != null 
+                ? '${quiz!.userScore} points' 
+                : '${quiz!.questionCount * 4} points',
             Colors.amber.shade600,
           ),
           SizedBox(height: 12),
@@ -345,36 +382,6 @@ class _QuizMainPageState extends State<QuizMainPage> {
             quiz!.hasPlayed ? 'Déjà participé' : 'Pas encore joué',
             quiz!.hasPlayed ? Colors.green.shade400 : Colors.orange.shade400,
           ),
-          // Afficher les stats de l'utilisateur si disponibles
-          if (quiz!.userScore != null) ...[
-            SizedBox(height: 12),
-            Divider(color: Colors.grey.shade200, height: 1),
-            SizedBox(height: 12),
-            Text(
-              'Votre Score',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: notifire.getMainText,
-              ),
-            ),
-            SizedBox(height: 12),
-            _buildInfoRow(
-              FontAwesomeIcons.star,
-              'Votre score',
-              '${quiz!.userScore} points',
-              Colors.amber.shade600,
-            ),
-            if (quiz!.userTimeRemaining != null) ...[
-              SizedBox(height: 12),
-              _buildInfoRow(
-                FontAwesomeIcons.hourglass,
-                'Temps restant',
-                quiz!.userTimeRemaining ?? 'N/A',
-                Colors.blue.shade400,
-              ),
-            ],
-          ],
         ],
       ),
     );
@@ -438,7 +445,9 @@ class _QuizMainPageState extends State<QuizMainPage> {
               child: _buildStatCard(
                 '🎯',
                 'Précision',
-                '85%',
+                quiz!.userScore != null && quiz!.totalPoints > 0
+                    ? '${((quiz!.userScore! / quiz!.totalPoints) * 100).toStringAsFixed(0)}%'
+                    : '-',
                 Colors.blue.shade400,
               ),
             ),
@@ -447,7 +456,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
               child: _buildStatCard(
                 '⚡',
                 'Rapidité',
-                'Moyen',
+                quiz!.userTimeRemaining ?? '-',
                 Colors.orange.shade400,
               ),
             ),
@@ -663,7 +672,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: canStart ? () => _showStartQuizWarning() : null,
+              onTap: canStart ? () => Get.to(() => AnswerPage(quiz: quiz!)) : null,
               borderRadius: BorderRadius.circular(16),
               child: Center(
                 child: Row(
@@ -699,116 +708,6 @@ class _QuizMainPageState extends State<QuizMainPage> {
     );
   }
 
-  void _showStartQuizWarning() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: Row(
-            children: [
-              Icon(
-                FontAwesomeIcons.exclamation,
-                color: Colors.orange.shade600,
-                size: 24,
-              ),
-              SizedBox(width: 12),
-              Text(
-                'Avertissement',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Une fois que vous aurez démarré ce quiz:',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
-              SizedBox(height: 12),
-              _buildWarningPoint('Vous ne pourrez plus quitter sans terminer le quiz'),
-              SizedBox(height: 8),
-              _buildWarningPoint('Le temps de quiz commencera à s\'écouler'),
-              SizedBox(height: 8),
-              _buildWarningPoint('Vous devez completer l\'ensemble des questions'),
-              SizedBox(height: 20),
-              Text(
-                'Êtes-vous sûr(e) de vouloir continuer?',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                  color: Colors.red.shade600,
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Get.back(),
-              style: ButtonStyle(
-                overlayColor: WidgetStatePropertyAll(Colors.grey.shade100),
-              ),
-              child: Text(
-                'Annuler',
-                style: TextStyle(color: Colors.grey.shade700),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Get.back();
-                Get.to(() => AnswerPage(quiz: quiz!));
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple.shade400,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: Text(
-                'Continuer',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
-  Widget _buildWarningPoint(String text) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(top: 4),
-          child: Icon(
-            FontAwesomeIcons.circleXmark,
-            size: 16,
-            color: Colors.red.shade400,
-          ),
-        ),
-        SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            text,
-            style: TextStyle(fontSize: 13),
-          ),
-        ),
-      ],
-    );
-  }
+
 }

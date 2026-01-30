@@ -1,7 +1,7 @@
 import 'package:aesd/services/dio_service.dart';
 
 class NotificationRequest extends DioClient {
-  final String baseRoute = "notifications";
+  final String baseRoute = "user/notifications";
 
   /// Récupérer toutes les notifications
   Future getAll({int? page}) async {

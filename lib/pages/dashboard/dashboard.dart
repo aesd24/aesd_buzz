@@ -99,13 +99,11 @@ class _DashboardState extends State<Dashboard> {
               padding: const EdgeInsets.all(10),
               child: Consumer<Church>(
                 builder: (context, churchProvider, child) {
-                  // Un serviteur associé à une église secondaire (is_main = false) ne peut pas créer d'église
-                  bool isSecondaryServant = 
-                      widget.user.servant != null && 
-                      widget.user.servant!.church != null && 
-                      !widget.user.servant!.isMain;
+                  // Un serviteur associé à une église secondaire (annexe) ne peut pas créer d'église
+                  // On vérifie si parmis ses églises, il y en a une qui n'est pas principale (donc une annexe)
+                  bool managesAnAnnex = churchProvider.userChurches.any((c) => !c.isMain);
 
-                  if (isSecondaryServant) {
+                  if (managesAnAnnex) {
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
