@@ -13,6 +13,7 @@ class Church extends ChangeNotifier {
   final ChurchRequest _request = ChurchRequest();
   final List<ChurchModel> _churches = [];
   final List<ChurchModel> _userChurches = [];
+  final List<ChurchModel> _allChurchesRaw = []; // Liste interne complete pour les scans
   ChurchModel? _selectedChurch;
 
   ChurchModel? get selectedChurch => _selectedChurch;
@@ -45,28 +46,51 @@ class Church extends ChangeNotifier {
           (response.data['data'] as List)
               .map((e) => ChurchModel.fromJson(e))
               .toList();
-      // Filtrer pour n'afficher que les églises principales (pas les annexes)
-      final churches = allChurches
-          .where((church) => church.isMain || church.mainChurchId == null)
-          .toList();
-      //_paginator = ChurchPaginator.fromJson(data);
+      
+      _allChurchesRaw.clear();
+      _allChurchesRaw.addAll(allChurches);
+      
+      // On garde TOUTES les églises dans la liste brute, mais on filtre pour l'affichage
       if (_churches.isNotEmpty && _currentPage == 0) {
         _churches.clear();
       }
-      _churches.addAll(churches);
-
+      
+      // On ne garde que les églises principales pour l'affichage de la liste globale
+      final mainChurches = allChurches
+          .where((church) => church.isMain || church.mainChurchId == null)
+          .toList();
+          
+      _churches.addAll(mainChurches);
+      
+      print("Global church list updated: ${_churches.length} main churches displayed. Total raw: ${_allChurchesRaw.length}");
       notifyListeners();
     }
   }
 
   Future fetchChurch(int id) async {
     final response = await _request.one(id);
+    print("CHURCH DEBUG - ID: $id, Response: ${response.data}");
+    
     if (response.statusCode == 200) {
       final data = response.data['data'];
       _selectedChurch = ChurchModel.fromJson(data['church']);
+      
+      // LOGIQUE DE SCAN GLOBALE: On cherche l'annexe Bimbresso partout !
+      print("CHURCH DEBUG - Scanning internal raw list for annexes of $id...");
+      final allSubChurches = _allChurchesRaw.where((c) => c.mainChurchId == id).toList();
+      
+      // Fusionner les annexes de l'API avec celles trouvées localement
+      for (var sub in allSubChurches) {
+        if (!_selectedChurch!.annexes.any((a) => a.id == sub.id)) {
+          _selectedChurch!.annexes.add(sub);
+        }
+      }
+
+      print("CHURCH DEBUG - Total annexes after scan: ${_selectedChurch!.annexes.length}");
       _selectedChurch!.owner = ServantModel.fromJson(data['owner']);
       _selectedChurch!.members =
           (data['members'] as List).map((e) => UserModel.fromJson(e)).toList();
+      notifyListeners();
       return true;
     } else {
       throw Exception("Impossible de récupérer l'église");

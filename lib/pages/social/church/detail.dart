@@ -486,128 +486,118 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
       itemCount: church.annexes.length,
       itemBuilder: (context, index) {
         final annexe = church.annexes[index];
-        return GestureDetector(
-          onTap: () => Get.to(
-            () => ChurchDetailPage(),
-            arguments: {'churchId': annexe.id},
-          ),
-          child: Container(
-            margin: EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              color: notifire.getContainer,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: notifire.getMaingey.withAlpha(75),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Church image
-                ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-                  child: FastCachedImage(
-                    height: 180,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    url: annexe.logo ?? "",
-                    loadingBuilder: (context, progress) {
-                      return imageShimmerPlaceholder(height: 180);
-                    },
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              print("Navigating to annexe ID: ${annexe.id}");
+              Get.to(
+                () => ChurchDetailPage(),
+                arguments: {'churchId': annexe.id},
+                preventDuplicates: false, // Important pour pouvoir empiler les pages de detail
+              );
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              margin: EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                // On retire le color ici car il est pris par le Material/InkWell context
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                boxShadow: [
+                  BoxShadow(
+                    color: notifire.getMaingey.withAlpha(50),
+                    spreadRadius: 1,
+                    blurRadius: 3,
+                    offset: Offset(0, 1),
                   ),
-                ),
-                
-                // Church info
-                Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Church name
-                      Text(
-                        annexe.name,
-                        style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      SizedBox(height: 8),
-                      
-                      // Church type
-                      if (annexe.type != null)
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Color(0xFF43A047).withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(6),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Church image
+                  ClipRRect(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                    child: FastCachedImage(
+                      height: 180,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      url: annexe.logo ?? "",
+                      loadingBuilder: (context, progress) {
+                        return imageShimmerPlaceholder(height: 180);
+                      },
+                    ),
+                  ),
+                  
+                  // Church info
+                  Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Church name
+                        Text(
+                          annexe.name,
+                          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            fontWeight: FontWeight.bold,
                           ),
-                          child: Text(
-                            annexe.type!,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF43A047),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      
-                      SizedBox(height: 12),
-                      
-                      // Address
-                      if (annexe.address.isNotEmpty)
-                        Row(
-                          children: [
-                            Icon(
-                              FontAwesomeIcons.mapPin,
-                              size: 14,
-                              color: Colors.grey[600],
-                            ),
-                            SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                annexe.address,
+                        
+                        SizedBox(height: 12),
+                        
+                        // Address
+                        if (annexe.address.isNotEmpty)
+                          Row(
+                            children: [
+                              Icon(
+                                FontAwesomeIcons.mapPin,
+                                size: 14,
+                                color: Colors.grey[600],
+                              ),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  annexe.address,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        
+                        SizedBox(height: 8),
+                        
+                        // Phone
+                        if (annexe.phone.isNotEmpty)
+                          Row(
+                            children: [
+                              Icon(
+                                FontAwesomeIcons.phone,
+                                size: 14,
+                                color: Colors.grey[600],
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                '(+225) ${annexe.phone}',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey[600],
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
-                        ),
-                      
-                      SizedBox(height: 8),
-                      
-                      // Phone
-                      if (annexe.phone.isNotEmpty)
-                        Row(
-                          children: [
-                            Icon(
-                              FontAwesomeIcons.phone,
-                              size: 14,
-                              color: Colors.grey[600],
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              '(+225) ${annexe.phone}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                    ],
+                            ],
+                          ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

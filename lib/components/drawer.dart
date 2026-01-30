@@ -205,13 +205,13 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
                                     style: mediumBlackTextStyle,
                                   ),
                                 ),
-                              ListTile(
+                              /*ListTile(
                                 leading: cusFaIcon(FontAwesomeIcons.circleInfo),
                                 title: Text(
                                   "Donnez votre avis",
                                   style: mediumBlackTextStyle,
                                 ),
-                              ),
+                              ),*/
                               /*ListTile(
                                 leading: cusFaIcon(FontAwesomeIcons.gears),
                                 title: Text(

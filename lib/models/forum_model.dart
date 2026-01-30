@@ -19,10 +19,10 @@ class ForumModel {
 
   ForumModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    title = json['theme'];
-    body = json['body'];
-    createdAt = DateTime.parse(json['created_at']);
-    expiryDate = DateTime.parse(json['date_expiration']);
+    title = json['theme'] ?? json['titre'] ?? 'Sujet sans titre';
+    body = json['body'] ?? json['description'] ?? '';
+    createdAt = json['created_at'] != null ? DateTime.parse(json['created_at']) : DateTime.now();
+    expiryDate = json['date_expiration'] != null ? DateTime.parse(json['date_expiration']) : DateTime.now().add(const Duration(days: 30));
     isClosed = json['is_closed'];
     isLiked = json['like'] ?? false;
     likes = json['total_likes'] ?? 0;

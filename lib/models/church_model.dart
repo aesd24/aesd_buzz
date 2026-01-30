@@ -50,12 +50,17 @@ class ChurchModel {
     validationState = json['validation_status'];
     isMain = json['is_main'] == 1;
     mainChurchId = json['main_church_id'];
-    json['servants']?.forEach((d) {
-      servants.add(ServantModel.fromJson(d));
-    });
-    json['annexes']?.forEach((d) {
-      annexes.add(ChurchModel.fromJson(d));
-    });
+
+    // Essayer de trouver les annexes sous différents noms possibles dans le JSON
+    var annexesList = json['annexes'] ?? json['sub_churches'] ?? json['secondary_churches'];
+    
+    if (annexesList != null && annexesList is List) {
+      for (var d in annexesList) {
+        annexes.add(ChurchModel.fromJson(d));
+      }
+    }
+    
+    print("Church ${json['id']} parsed with ${annexes.length} annexes. Source keys: ${json.keys.where((k) => k.contains('church') || k.contains('annex'))}");
   }
 
   Widget buildWidget(BuildContext context) {

@@ -97,25 +97,43 @@ class _DashboardState extends State<Dashboard> {
 
             Padding(
               padding: const EdgeInsets.all(10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  textDivider("Liste de vos églises"),
-                  CustomTextButton(
-                    onPressed: () {
-                      if (widget.user.certifStatus !=
-                          CertificationStates.approved) {
-                        return MessageService.showWarningMessage(
-                          "Votre compte n'est pas validé vous n'avez pas les accès requis !",
-                        );
-                      }
+              child: Consumer<Church>(
+                builder: (context, churchProvider, child) {
+                  // Un serviteur associé à une église secondaire (is_main = false) ne peut pas créer d'église
+                  bool isSecondaryServant = 
+                      widget.user.servant != null && 
+                      widget.user.servant!.church != null && 
+                      !widget.user.servant!.isMain;
 
-                      showModalBottomSheet(
-                        context: context,
-                        backgroundColor: Colors.transparent,
-                        isScrollControlled: true,
-                        builder:
-                            (context) => Container(
+                  if (isSecondaryServant) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        textDivider("Liste de vos églises"),
+                      ],
+                    );
+                  }
+
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      textDivider("Liste de vos églises"),
+                      CustomTextButton(
+                        onPressed: () {
+                          if (widget.user.certifStatus !=
+                              CertificationStates.approved) {
+                            return MessageService.showWarningMessage(
+                              "Votre compte n'est pas validé vous n'avez pas les accès requis !",
+                            );
+                          }
+
+                          bool hasMainChurch = churchProvider.userChurches.any((c) => c.isMain);
+
+                          showModalBottomSheet(
+                            context: context,
+                            backgroundColor: Colors.transparent,
+                            isScrollControlled: true,
+                            builder: (context) => Container(
                               height: MediaQuery.of(context).size.height * .45,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.vertical(
@@ -143,18 +161,19 @@ class _DashboardState extends State<Dashboard> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceAround,
                                     children: [
-                                      CustomBottomSheetButtom(
-                                        onPressed:
-                                            () => Get.to(
-                                              () => MainChurchCreationPage(),
-                                            ),
-                                        text: "Eglise principale",
-                                        image: Image.asset(
-                                          "assets/icons/crown.png",
-                                          height: 100,
-                                          width: 100,
+                                      if (!hasMainChurch)
+                                        CustomBottomSheetButtom(
+                                          onPressed:
+                                              () => Get.to(
+                                                () => MainChurchCreationPage(),
+                                              ),
+                                          text: "Eglise principale",
+                                          image: Image.asset(
+                                            "assets/icons/crown.png",
+                                            height: 100,
+                                            width: 100,
+                                          ),
                                         ),
-                                      ),
                                       CustomBottomSheetButtom(
                                         onPressed:
                                             () => Get.to(
@@ -172,11 +191,13 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                             ),
-                      );
-                    },
-                    label: "Créer une église",
-                  ),
-                ],
+                          );
+                        },
+                        label: "Créer une église",
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
             Expanded(

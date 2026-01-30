@@ -242,243 +242,238 @@ class _CreateTestimonyState extends State<CreateTestimony> {
           backgroundColor: Colors.transparent,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-            toolbarHeight: 70,
-            leadingWidth: 100,
-            leading: Row(
-              children: [
-                IconButton(
-                  onPressed: () => Get.back(),
-                  icon: cusFaIcon(FontAwesomeIcons.chevronDown),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 3.0),
-                  child: CircleAvatar(
-                    radius: 17,
-                    backgroundColor: notifire.getMainColor,
-                    backgroundImage:
-                        user.photo != null
-                            ? FastCachedImageProvider(user.photo!)
-                            : null,
-                    child:
-                        user.photo != null
-                            ? null
-                            : cusFaIcon(
-                              FontAwesomeIcons.solidUser,
-                              color: notifire.getbgcolor,
-                            ),
-                  ),
-                ),
-              ],
+            elevation: 0,
+            leading: IconButton(
+              onPressed: () => Get.back(),
+              icon: cusFaIcon(FontAwesomeIcons.chevronDown),
             ),
             actions: [
-              if (!_wantRecordAudio && _file == null) ...[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: cusFaIcon(FontAwesomeIcons.film, size: 15),
-                ),
-
-                Switch(
-                  value: _recordAudio,
-                  inactiveThumbColor: notifire.getMainText,
-                  onChanged: (value) {
-                    setState(() {
-                      _recordAudio = value;
-                    });
-                  },
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: cusFaIcon(FontAwesomeIcons.microphone, size: 15),
-                ),
-              ],
-
               if (_file != null)
                 IconButton(
                   onPressed: () => reInitData(),
                   icon: cusFaIcon(FontAwesomeIcons.arrowRotateLeft),
                 ),
-
               Padding(
-                padding: EdgeInsets.only(right: 10),
-                child:
-                    _isLoading
-                        ? SizedBox(
-                          height: 23,
-                          width: 23,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 1.5,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        )
-                        : CustomTextButton(
-                          label: "Envoyer",
-                          disabled: _file == null,
-                          onPressed: () async => await _submitData(user.id),
-                        ),
+                padding: EdgeInsets.only(right: 15),
+                child: _isLoading
+                    ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : CustomTextButton(
+                        label: "Envoyer",
+                        disabled: _file == null,
+                        onPressed: () async => await _submitData(user.id),
+                      ),
               ),
             ],
           ),
-          body: Padding(
-            padding: EdgeInsets.all(15),
-            child: Column(
-              children: [
-                // Formulaire moderne avec tabs
-                Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Tabs Audio/Vidéo
-                        Container(
-                          decoration: BoxDecoration(
-                            color: notifire.getbgcolor,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.08),
-                                blurRadius: 8,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => setState(() => _recordAudio = true),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(vertical: 12),
-                                    decoration: BoxDecoration(
-                                      color: _recordAudio
-                                          ? Color(0xFF43A047)
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.horizontal(
-                                        left: Radius.circular(12),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          FontAwesomeIcons.music,
-                                          size: 16,
-                                          color: _recordAudio
-                                              ? Colors.white
-                                              : notifire.getMainText,
-                                        ),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          'Audio',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color: _recordAudio
-                                                ? Colors.white
-                                                : notifire.getMainText,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => setState(() => _recordAudio = false),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(vertical: 12),
-                                    decoration: BoxDecoration(
-                                      color: !_recordAudio
-                                          ? Color(0xFF43A047)
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.horizontal(
-                                        right: Radius.circular(12),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          FontAwesomeIcons.video,
-                                          size: 16,
-                                          color: !_recordAudio
-                                              ? Colors.white
-                                              : notifire.getMainText,
-                                        ),
-                                        SizedBox(width: 8),
-                                        Text(
-                                          'Vidéo',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color: !_recordAudio
-                                                ? Colors.white
-                                                : notifire.getMainText,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        
-                        // Titre
-                        CustomFormTextField(
-                          controller: _titleController,
-                          label: "Titre du témoignage",
-                          validate: true,
-                        ),
-                        SizedBox(height: 16),
+          body: SingleChildScrollView(
+            padding: EdgeInsets.all(20),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // User identity header (Avatar already in AppBar leading region in some apps, but let's put it here for modern look)
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 20,
+                        backgroundColor: notifire.getMainColor,
+                        backgroundImage: user.photo != null
+                            ? FastCachedImageProvider(user.photo!)
+                            : null,
+                        child: user.photo != null
+                            ? null
+                            : cusFaIcon(FontAwesomeIcons.solidUser,
+                                color: Colors.white, size: 15),
+                      ),
+                      SizedBox(width: 12),
+                      Text(
+                        user.name,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 25),
 
-                        // Checkbox "Masquer mon identité"
-                        Container(
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Color(0xFF43A047).withOpacity(0.1),
-                            border: Border.all(
-                              color: Color(0xFF43A047).withOpacity(0.3),
-                              width: 1,
+                  // Modern Title Field
+                  CustomFormTextField(
+                    controller: _titleController,
+                    label: "Titre du témoignage",
+                    validate: true,
+                  ),
+                  SizedBox(height: 15),
+
+                  // Anonymous toggle - Keeping the light green look from screenshot
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: Color(0xFF43A047).withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Color(0xFF43A047).withOpacity(0.2)),
+                    ),
+                    child: Row(
+                      children: [
+                        Checkbox(
+                          value: isAnonymous,
+                          onChanged: (v) => setState(() => isAnonymous = v!),
+                          activeColor: Color(0xFF43A047),
+                        ),
+                        Text(
+                          "Masquer mon identité",
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 25),
+
+                  // Tabs Audio/Vidéo - Pill Style
+                  Container(
+                    height: 50,
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setState(() {
+                              _recordAudio = true;
+                              _wantRecordAudio = false;
+                              _file = null;
+                            }),
+                            child: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: _recordAudio ? Color(0xFF43A047) : Colors.transparent,
+                                borderRadius: BorderRadius.circular(21),
+                              ),
+                              child: Text(
+                                "Audio",
+                                style: TextStyle(
+                                  color: _recordAudio ? Colors.white : Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
-                            borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Row(
-                            children: [
-                              Checkbox(
-                                value: isAnonymous,
-                                onChanged: (value) =>
-                                    setState(() => isAnonymous = !isAnonymous),
-                                activeColor: Color(0xFF43A047),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setState(() {
+                              _recordAudio = false;
+                              _wantRecordAudio = false;
+                              _file = null;
+                            }),
+                            child: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: !_recordAudio ? Color(0xFF43A047) : Colors.transparent,
+                                borderRadius: BorderRadius.circular(21),
+                              ),
+                              child: Text(
+                                "Vidéo",
+                                style: TextStyle(
+                                  color: !_recordAudio ? Colors.white : Colors.grey[600],
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Expanded(
-                                child: Text(
-                                  'Masquer mon identité',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                ),
 
-                // Partie d'enregistrement
-                Expanded(
-                  child: _recordAudio ? _buildRecordAudio() : _buildRecordVideo(),
-                ),
-              ],
+                  SizedBox(height: 25),
+
+                  // Media selection - Filtered by tab
+                  if (_file == null && !_wantRecordAudio) ...[
+                    if (_recordAudio)
+                      Row(
+                        children: [
+                          Expanded(child: _customButton(
+                            icon: FontAwesomeIcons.microphone,
+                            label: "Enregistrer Vocal",
+                            iconColor: Colors.blue,
+                            onPressed: () => setState(() {
+                              _wantRecordAudio = true;
+                            }),
+                          )),
+                          SizedBox(width: 15),
+                          Expanded(child: _customButton(
+                            icon: FontAwesomeIcons.fileAudio,
+                            label: "Charger Audio",
+                            iconColor: Colors.amber,
+                            onPressed: () async {
+                              await getAudioFromFiles();
+                              setState(() {});
+                            },
+                          )),
+                        ],
+                      )
+                    else
+                      Row(
+                        children: [
+                          Expanded(child: _customButton(
+                            icon: FontAwesomeIcons.video,
+                            label: "Filmer Vidéo",
+                            iconColor: Colors.red,
+                            onPressed: () async {
+                              try {
+                                _file = await pickVideo(camera: true);
+                                setState(() {});
+                              } catch (e) {
+                                MessageService.showWarningMessage(e.toString());
+                              }
+                            },
+                          )),
+                          SizedBox(width: 15),
+                          Expanded(child: _customButton(
+                            icon: FontAwesomeIcons.fileVideo,
+                            label: "Charger Vidéo",
+                            iconColor: Colors.purple,
+                            onPressed: () async {
+                              try {
+                                _file = await pickVideo();
+                                setState(() {});
+                              } catch (e) {
+                                MessageService.showWarningMessage(e.toString());
+                              }
+                            },
+                          )),
+                        ],
+                      ),
+                  ],
+
+                  // Capture/Review
+                  if (_file != null || _wantRecordAudio)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Container(
+                        padding: EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: notifire.getContainer,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                            )
+                          ],
+                        ),
+                        child: _recordAudio ? _buildRecordAudio() : _buildRecordVideo(),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
@@ -487,171 +482,85 @@ class _CreateTestimonyState extends State<CreateTestimony> {
   }
 
   Widget _buildListenAudio() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 17),
-      decoration: BoxDecoration(
-        color: notifire.getbgcolor,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(color: notifire.getMaingey, blurRadius: 5, spreadRadius: 1),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(right: 10),
-                child: IconButton(
-                  onPressed:
-                      () => _isAudioPlaying ? _pauseAudio() : _playAudio(),
-                  icon: cusFaIcon(
-                    _isAudioPlaying
-                        ? FontAwesomeIcons.pause
-                        : FontAwesomeIcons.play,
-                    color: Colors.white,
-                  ),
-                  style: ButtonStyle(
-                    overlayColor: WidgetStatePropertyAll(
-                      notifire.getbgcolor.withAlpha(50),
-                    ),
-                    backgroundColor: WidgetStatePropertyAll(
-                      notifire.getMainColor,
-                    ),
-                  ),
-                ),
+    return Column(
+      children: [
+        Row(
+          children: [
+            IconButton(
+              onPressed: () => _isAudioPlaying ? _pauseAudio() : _playAudio(),
+              icon: Icon(
+                _isAudioPlaying ? FontAwesomeIcons.pause : FontAwesomeIcons.play,
+                color: Colors.white,
               ),
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    border: Border.all(color: notifire.getMaingey, width: 1),
-                  ),
-                  child: Slider(
-                    min: 0,
-                    max: _duration.inMilliseconds.toDouble(),
-                    value: _position.inMilliseconds.toDouble(),
-                    onChanged: (value) {
-                      _seekAudio(Duration(milliseconds: value.toInt()));
-                    },
-                    activeColor: notifire.getMainColor,
-                    inactiveColor: notifire.getMaingey,
-                    thumbColor: notifire.getMainColor,
-                  ),
-                ),
+              style: IconButton.styleFrom(
+                backgroundColor: notifire.getMainColor,
+                padding: EdgeInsets.all(12),
               ),
-            ],
-          ),
-          SizedBox(height: 20),
-          Text(
-            '${getTimeInString(_position)} / ${getTimeInString(_duration)}',
-            style: TextStyle(color: notifire.getMaingey),
-          ),
-        ],
-      ),
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: Slider(
+                min: 0,
+                max: _duration.inMilliseconds.toDouble(),
+                value: _position.inMilliseconds.toDouble(),
+                onChanged: (value) => _seekAudio(Duration(milliseconds: value.toInt())),
+                activeColor: notifire.getMainColor,
+              ),
+            ),
+          ],
+        ),
+        Text(
+          '${getTimeInString(_position)} / ${getTimeInString(_duration)}',
+          style: TextStyle(color: notifire.getMaingey, fontSize: 12),
+        ),
+      ],
     );
   }
 
   Widget _buildAudioRecording() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (_isRecording) ...[
-                Text(
-                  getTimeInString(_timeLeft),
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
+        if (_isRecording) ...[
+          Text(
+            getTimeInString(_timeLeft),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red),
+          ),
+          SizedBox(height: 15),
+        ],
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (_isRecording) ...[
+              IconButton(
+                onPressed: () => pauseOrUnpauseRecording(),
+                icon: Icon(_isRecordPaused ? FontAwesomeIcons.play : FontAwesomeIcons.pause),
+                color: Colors.amber,
+              ),
+              SizedBox(width: 20),
+              IconButton(
+                onPressed: () => _stopRecording(),
+                icon: Icon(FontAwesomeIcons.stop, color: Colors.red),
+              ),
+            ] else if (_file == null)
+              GestureDetector(
+                onTap: () => _startRecording(),
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFF43A047).withOpacity(0.1),
+                  ),
+                  child: Icon(FontAwesomeIcons.microphone, 
+                    color: Color(0xFF43A047), size: 35),
                 ),
-                SizedBox(height: 20),
-              ],
-              Center(
-                child:
-                    _isRecording
-                        ? Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 15,
-                            vertical: 7,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(100),
-                            color: notifire.getbgcolor,
-                            boxShadow: [
-                              BoxShadow(
-                                color: notifire.getMaingey.withAlpha(70),
-                                blurRadius: 10,
-                                spreadRadius: 5,
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                onPressed: () => pauseOrUnpauseRecording(),
-                                icon: cusFaIcon(
-                                  _isRecordPaused
-                                      ? FontAwesomeIcons.play
-                                      : FontAwesomeIcons.pause,
-                                  color: _isRecordPaused ? null : Colors.red,
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () => _stopRecording(),
-                                icon: cusFaIcon(FontAwesomeIcons.stop),
-                              ),
-                            ],
-                          ),
-                        )
-                        : GestureDetector(
-                          onTap: () => _startRecording(),
-                          child: Container(
-                            padding: EdgeInsets.all(25),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: notifire.getbgcolor,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: notifire.getMaingey,
-                                  blurRadius: 10,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
-                            child: cusFaIcon(
-                              FontAwesomeIcons.microphone,
-                              color: Colors.blue,
-                              size: 25,
-                            ),
-                          ),
-                        ),
               ),
-            ],
-          ),
+          ],
         ),
-        SizedBox(height: 10),
-        if (!_isRecording)
-          TextButton.icon(
-            onPressed: () {
-              setState(() {
-                _wantRecordAudio = false;
-              });
-            },
-            label: Text("Annuler"),
-            style: ButtonStyle(
-              foregroundColor: WidgetStatePropertyAll(notifire.getMainText),
-              overlayColor: WidgetStatePropertyAll(
-                notifire.getMaingey.withAlpha(50),
-              ),
-            ),
-            icon: cusFaIcon(FontAwesomeIcons.chevronLeft),
+        if (!_isRecording && _file == null)
+          TextButton(
+            onPressed: () => setState(() => _wantRecordAudio = false),
+            child: Text("Annuler", style: TextStyle(color: notifire.getMaingey)),
           ),
-        SizedBox(height: 15),
       ],
     );
   }
@@ -660,32 +569,43 @@ class _CreateTestimonyState extends State<CreateTestimony> {
     if (_file != null) {
       return _buildListenAudio();
     }
-    return _wantRecordAudio
-        ? _buildAudioRecording()
-        : Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: _customButton(
-                icon: FontAwesomeIcons.microphone,
-                label: "Enregistrer",
-                onPressed: () {
-                  setState(() {
-                    _wantRecordAudio = true;
-                  });
-                },
-              ),
-            ),
-            SizedBox(width: 15),
-            Expanded(
-              child: _customButton(
-                icon: FontAwesomeIcons.fileAudio,
-                label: "Charger",
-                onPressed: () => getAudioFromFiles(),
-              ),
+    return _buildAudioRecording();
+  }
+
+  Widget _customButton({
+    required IconData icon,
+    required String label,
+    required void Function() onPressed,
+    Color iconColor = Colors.blue,
+  }) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 30),
+        decoration: BoxDecoration(
+          color: notifire.getbgcolor,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 5,
+              spreadRadius: 1,
             ),
           ],
-        );
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: Colors.grey[200]!),
+        ),
+        child: Column(
+          children: [
+            cusFaIcon(icon, size: 30, color: iconColor),
+            const SizedBox(height: 12),
+            Text(label, 
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13), 
+              textAlign: TextAlign.center),
+          ],
+        ),
+      ),
+    );
   }
 
   // video widgets
@@ -757,38 +677,6 @@ class _CreateTestimonyState extends State<CreateTestimony> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _customButton({
-    required IconData icon,
-    required String label,
-    required void Function() onPressed,
-  }) {
-    return InkWell(
-      onTap: () => onPressed(),
-      child: Container(
-        padding: EdgeInsets.all(35),
-        decoration: BoxDecoration(
-          color: notifire.getbgcolor,
-          boxShadow: [
-            BoxShadow(
-              color: notifire.getMaingey,
-              blurRadius: 5,
-              spreadRadius: 1,
-            ),
-          ],
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            cusFaIcon(icon, size: 30),
-            const SizedBox(height: 10),
-            Text(label, textAlign: TextAlign.center),
-          ],
-        ),
-      ),
     );
   }
 }

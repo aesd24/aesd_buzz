@@ -11,13 +11,31 @@ class Forum extends ChangeNotifier {
   ForumModel? get selectedSubject => _selectedSubject;
 
   Future getAll() async {
-    final response = await _requestHandler.getAll();
-    if (response.statusCode == 200) {
-      List subjects = response.data;
-      _subjectsList.clear();
-      subjects.map((e) => _subjectsList.add(ForumModel.fromJson(e))).toList();
-      notifyListeners();
-    } else {
+    try {
+      final response = await _requestHandler.getAll();
+      print("FORUM DEBUG - Status: ${response.statusCode}, Data: ${response.data}");
+      
+      if (response.statusCode == 200) {
+        _subjectsList.clear();
+        dynamic rawData = response.data;
+        
+        // Gérer le format {"data": [...]} ou [...]
+        List listToParse = [];
+        if (rawData is List) {
+          listToParse = rawData;
+        } else if (rawData is Map && rawData['data'] is List) {
+          listToParse = rawData['data'];
+        }
+
+        for (var e in listToParse) {
+          _subjectsList.add(ForumModel.fromJson(e));
+        }
+        
+        print("FORUM DEBUG - Subjects added: ${_subjectsList.length}");
+        notifyListeners();
+      }
+    } catch (e) {
+      print("FORUM ERROR: $e");
       throw HttpException("Impossible de récupérer les sujets.");
     }
   }
