@@ -244,244 +244,230 @@ class _MainChurchCreationPageState extends State<MainChurchCreationPage> {
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Column(
-            children: [
-              Form(
-                key: _formKey,
-                child: Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 40),
-                          child: Center(
-                            child: Column(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    pickModeSelectionBottomSheet(
-                                      context: context,
-                                      setter: setChurchImage,
-                                    );
-                                  },
-                                  child:
-                                      !widget.editMode
-                                          ? idPictureContainer(
-                                            image: _churchImage,
-                                            onPressed: () {
-                                              try {
-                                                pickModeSelectionBottomSheet(
-                                                  context: context,
-                                                  setter: setChurchImage,
-                                                );
-                                              } catch (e) {
-                                                e.printError();
-                                                MessageService.showErrorMessage(
-                                                  e.toString(),
-                                                );
-                                              }
-                                            },
-                                          )
-                                          : CircleAvatar(
-                                            radius: 85,
-                                            backgroundColor:
-                                                notifire.getMaingey,
-                                            backgroundImage:
-                                                church?.logo != null
-                                                    ? FastCachedImageProvider(
-                                                      church!.logo!,
-                                                    )
-                                                    : null,
-                                          ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  child: Text(
-                                    _nameController.text == ""
-                                        ? "Renseignez le nom de l'église"
-                                        : _nameController.text,
-                                    style:
-                                        Theme.of(context).textTheme.titleLarge,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        // bouton pour charger l'attestion d'existence de l'église
-                        if (!widget.editMode) ...[
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 40),
+                    child: Center(
+                      child: Column(
+                        children: [
                           GestureDetector(
-                            onTap: () async => await getAttestation(),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 15,
-                              ),
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border: Border.all(
-                                  color:
-                                      _attestationFile == null
-                                          ? Colors.grey
-                                          : Colors.green,
-                                  width: 1,
-                                ),
-                                borderRadius: BorderRadius.circular(7),
-                              ),
-                              child: Row(
-                                children: [
-                                  _attestationFile == null
-                                      ? const FaIcon(
-                                        FontAwesomeIcons.fileCirclePlus,
-                                      )
-                                      : const FaIcon(
-                                        FontAwesomeIcons.circleCheck,
-                                        color: Colors.green,
-                                      ),
-                                  const SizedBox(width: 20),
-                                  Flexible(
-                                    child: Text(
-                                      _attestationFile == null
-                                          ? "Chargez l'attestation d'existance"
-                                          : "Attestation chargé !",
-                                      style:
-                                          _attestationFile != null
-                                              ? const TextStyle(
-                                                color: Colors.green,
+                            onTap: () {
+                              pickModeSelectionBottomSheet(
+                                context: context,
+                                setter: setChurchImage,
+                              );
+                            },
+                            child:
+                                !widget.editMode
+                                    ? idPictureContainer(
+                                      image: _churchImage,
+                                      onPressed: () {
+                                        try {
+                                          pickModeSelectionBottomSheet(
+                                            context: context,
+                                            setter: setChurchImage,
+                                          );
+                                        } catch (e) {
+                                          e.printError();
+                                          MessageService.showErrorMessage(
+                                            e.toString(),
+                                          );
+                                        }
+                                      },
+                                    )
+                                    : CircleAvatar(
+                                      radius: 85,
+                                      backgroundColor: notifire.getMaingey,
+                                      backgroundImage:
+                                          church?.logo != null
+                                              ? FastCachedImageProvider(
+                                                church!.logo!,
                                               )
                                               : null,
-                                      overflow: TextOverflow.clip,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 5, bottom: 20),
+                            padding: const EdgeInsets.only(top: 20),
                             child: Text(
-                              "Chargez un fichier au format PDF de moins de 2 Go",
-                              style: Theme.of(context).textTheme.bodySmall!
-                                  .copyWith(color: Colors.black87),
+                              _nameController.text == ""
+                                  ? "Renseignez le nom de l'église"
+                                  : _nameController.text,
+                              style: Theme.of(context).textTheme.titleLarge,
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ],
-
-                        // nom de l'église
-                        CustomFormTextField(
-                          label: "Nom de votre église",
-                          prefix: cusIcon(Icons.church_outlined),
-                          controller: _nameController,
-                          validate: true,
-                          onChanged: (value) {
-                            setState(() {});
-                          },
-                        ),
-
-                        // adresse email de l'église
-                        CustomFormTextField(
-                          label: "Adresse email",
-                          type: TextInputType.emailAddress,
-                          prefix: cusIcon(FontAwesomeIcons.at),
-                          validator: (value) {
-                            if (!RegExp(
-                              "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]{2,}?\\.[a-zA-Z]{2,}\$",
-                            ).hasMatch(value!)) {
-                              if (!RegExp(
-                                "^[a-zA-Z0-9._%-]{5,}",
-                              ).hasMatch(value)) {
-                                return "Entrez au moins 5 caractères avant le '@'";
-                              }
-                              if (!RegExp(
-                                "^[.]*.[a-zA-Z0-9]{2,}\$",
-                              ).hasMatch(value)) {
-                                return "Nom de domaine invalide !";
-                              }
-                              return "Adresse email invalide !";
-                            }
-                            return null;
-                          },
-                          controller: _addressController,
-                        ),
-
-                        //contact de l'église
-                        CustomFormTextField(
-                          label: "Contact de l'église",
-                          type: TextInputType.number,
-                          prefix: cusIcon(Icons.phone_outlined),
-                          validate: true,
-                          validator: (value) {
-                            if (!RegExp('^[0-9]{10}\$').hasMatch(value!)) {
-                              return "Entrez un numéro à 10 chiffres";
-                            }
-
-                            if (!RegExp("^(01|07|05)").hasMatch(value)) {
-                              return "Le numéro doit commencer par 01, 05 ou 07";
-                            }
-                            return null;
-                          },
-                          controller: _contactController,
-                        ),
-
-                        // type d'église
-                        CustomDropdownButton(
-                          prefix: cusIcon(Icons.wb_sunny_outlined),
-                          label: "Type d'église",
-                          value: churchType ?? '',
-                          items: List.generate(Dictionnary.churchTypes.length, (
-                            index,
-                          ) {
-                            var current = Dictionnary.churchTypes[index];
-                            return DropdownMenuItem(
-                              value: current.code,
-                              child: Text(current.name),
-                            );
-                          }),
-                          onChanged: (value) {
-                            churchType = value;
-                          },
-                          validate: true,
-                        ),
-
-                        // localisation de l'église
-                        CustomFormTextField(
-                          label: "Localisation",
-                          prefix: cusIcon(Icons.location_on_outlined),
-                          validate: true,
-                          controller: _locationController,
-                        ),
-
-                        // description de l'église
-                        MultilineField(
-                          label: "Description de l'église",
-                          controller: _descriptionController,
-                          validate: true,
-                          validator: (value) {
-                            if (value!.toString().length < 20) {
-                              return "Donnez une description un peu plus concise";
-                            }
-                            return null;
-                          },
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+
+                  // bouton pour charger l'attestion d'existence de l'église
+                  if (!widget.editMode) ...[
+                    GestureDetector(
+                      onTap: () async => await getAttestation(),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 15,
+                        ),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            color:
+                                _attestationFile == null
+                                    ? Colors.grey
+                                    : Colors.green,
+                            width: 1,
+                          ),
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        child: Row(
+                          children: [
+                            _attestationFile == null
+                                ? const FaIcon(FontAwesomeIcons.fileCirclePlus)
+                                : const FaIcon(
+                                  FontAwesomeIcons.circleCheck,
+                                  color: Colors.green,
+                                ),
+                            const SizedBox(width: 20),
+                            Flexible(
+                              child: Text(
+                                _attestationFile == null
+                                    ? "Chargez l'attestation d'existance"
+                                    : "Attestation chargé !",
+                                style:
+                                    _attestationFile != null
+                                        ? const TextStyle(color: Colors.green)
+                                        : null,
+                                overflow: TextOverflow.clip,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5, bottom: 20),
+                      child: Text(
+                        "Chargez un fichier au format PDF de moins de 2 Go",
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ],
+
+                  // nom de l'église
+                  CustomFormTextField(
+                    label: "Nom de votre église",
+                    prefix: cusIcon(Icons.church_outlined),
+                    controller: _nameController,
+                    validate: true,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                  ),
+
+                  // adresse email de l'église
+                  CustomFormTextField(
+                    label: "Adresse email",
+                    type: TextInputType.emailAddress,
+                    prefix: cusIcon(FontAwesomeIcons.at),
+                    validator: (value) {
+                      if (!RegExp(
+                        "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]{2,}?\\.[a-zA-Z]{2,}\$",
+                      ).hasMatch(value!)) {
+                        if (!RegExp("^[a-zA-Z0-9._%-]{5,}").hasMatch(value)) {
+                          return "Entrez au moins 5 caractères avant le '@'";
+                        }
+                        if (!RegExp("^[.]*.[a-zA-Z0-9]{2,}\$").hasMatch(value)) {
+                          return "Nom de domaine invalide !";
+                        }
+                        return "Adresse email invalide !";
+                      }
+                      return null;
+                    },
+                    controller: _addressController,
+                  ),
+
+                  //contact de l'église
+                  CustomFormTextField(
+                    label: "Contact de l'église",
+                    type: TextInputType.number,
+                    prefix: cusIcon(Icons.phone_outlined),
+                    validate: true,
+                    validator: (value) {
+                      if (!RegExp('^[0-9]{10}\$').hasMatch(value!)) {
+                        return "Entrez un numéro à 10 chiffres";
+                      }
+
+                      if (!RegExp("^(01|07|05)").hasMatch(value)) {
+                        return "Le numéro doit commencer par 01, 05 ou 07";
+                      }
+                      return null;
+                    },
+                    controller: _contactController,
+                  ),
+
+                  // type d'église
+                  CustomDropdownButton(
+                    prefix: cusIcon(Icons.wb_sunny_outlined),
+                    label: "Type d'église",
+                    value: churchType ?? '',
+                    items: List.generate(Dictionnary.churchTypes.length, (
+                      index,
+                    ) {
+                      var current = Dictionnary.churchTypes[index];
+                      return DropdownMenuItem(
+                        value: current.code,
+                        child: Text(current.name),
+                      );
+                    }),
+                    onChanged: (value) {
+                      churchType = value;
+                    },
+                    validate: true,
+                  ),
+
+                  // localisation de l'église
+                  CustomFormTextField(
+                    label: "Localisation",
+                    prefix: cusIcon(Icons.location_on_outlined),
+                    validate: true,
+                    controller: _locationController,
+                  ),
+
+                  // description de l'église
+                  MultilineField(
+                    label: "Description de l'église",
+                    controller: _descriptionController,
+                    validate: true,
+                    validator: (value) {
+                      if (value!.toString().length < 20) {
+                        return "Donnez une description un peu plus concise";
+                      }
+                      return null;
+                    },
+                  ),
+
+                  // bouton de validation
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20, top: 10),
+                    child: CustomElevatedButton(
+                      text: "Soumettre",
+                      onPressed:
+                          () =>
+                              widget.editMode ? updateChurch() : createChurch(),
+                    ),
+                  ),
+                ],
               ),
-              // bouton de validation
-              Padding(
-                padding: EdgeInsets.only(bottom: 20),
-                child: CustomElevatedButton(
-                  text: "Soumettre",
-                  onPressed:
-                      () => widget.editMode ? updateChurch() : createChurch(),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

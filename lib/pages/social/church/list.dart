@@ -33,12 +33,12 @@ class _ChurchListState extends State<ChurchList> {
       await Provider.of<Church>(context, listen: false).fetchChurches();
     } on DioException catch (e) {
       e.printError();
-      MessageService.showErrorMessage(
-        "Erreur réseau, vérifiez votre connexion internet",
-      );
+      // MessageService.showErrorMessage(
+      //   "Erreur réseau, vérifiez votre connexion internet",
+      // );
     } on HttpException catch (e) {
       e.printError();
-      MessageService.showErrorMessage(e.message);
+      // MessageService.showErrorMessage(e.message);
     } finally {
       setState(() {
         isLoading = false;

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:aesd/provider/live_provider.dart';
 import 'package:aesd/pages/live/live_room.dart';
+import 'package:aesd/provider/auth.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/services/message.dart';
 
@@ -53,12 +54,14 @@ class _StartLivePageState extends State<StartLivePage>
     setState(() => _isCreating = true);
 
     final liveProvider = context.read<LiveProvider>();
+    final authProvider = context.read<Auth>();
+    final user = authProvider.user;
 
     final room = await liveProvider.createLiveRoom(
       title: _titleController.text,
       description: _descriptionController.text,
-      participantName: 'Utilisateur',
-      participantId: 0,
+      participantName: user?.name ?? 'Utilisateur',
+      participantId: user?.id ?? 0,
       isPublic: _isPublic,
     );
 

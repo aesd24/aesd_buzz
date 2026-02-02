@@ -26,15 +26,17 @@ class _SingersListState extends State<SingersList> {
         isLoading = true;
       });
       await Provider.of<Singer>(context, listen: false).fetchSingers();
-    } on DioException {
-      MessageService.showErrorMessage(
-        "Erreur réseau, vérifiez votre connexion internet",
-      );
-    } on HttpException catch (e) {
-      MessageService.showErrorMessage(e.message);
-    } catch (e) {
-      MessageService.showErrorMessage("Une erreur inattendu est survenu !");
+    } on DioException catch (e) {
       e.printError();
+      // MessageService.showErrorMessage(
+      //   "Erreur réseau, vérifiez votre connexion internet",
+      // );
+    } on HttpException catch (e) {
+      e.printError();
+      // MessageService.showErrorMessage(e.message);
+    } catch (e) {
+      e.printError();
+      // MessageService.showErrorMessage("Une erreur inattendu est survenu !");
     } finally {
       setState(() {
         isLoading = false;

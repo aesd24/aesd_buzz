@@ -95,83 +95,77 @@ class _AnnexeChurchFormState extends State<AnnexeChurchForm> {
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Column(
-            children: [
-              Form(
-                key: _formKey,
-                child: Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // nom de l'église
-                        CustomFormTextField(
-                          label: "Nom de votre église",
-                          prefix: cusIcon(Icons.church_outlined),
-                          controller: _nameController,
-                        ),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // nom de l'église
+                  CustomFormTextField(
+                    label: "Nom de votre église",
+                    prefix: cusIcon(Icons.church_outlined),
+                    controller: _nameController,
+                  ),
 
-                        // adresse email de l'église
-                        CustomFormTextField(
-                          label: "Adresse email",
-                          type: TextInputType.emailAddress,
-                          prefix: cusIcon(FontAwesomeIcons.at),
-                          controller: _addressController,
-                        ),
+                  // adresse email de l'église
+                  CustomFormTextField(
+                    label: "Adresse email",
+                    type: TextInputType.emailAddress,
+                    prefix: cusIcon(FontAwesomeIcons.at),
+                    controller: _addressController,
+                  ),
 
-                        //contact de l'église
-                        CustomFormTextField(
-                          label: "Contact de l'église",
-                          type: TextInputType.number,
-                          prefix: cusIcon(Icons.phone_outlined),
-                          validate: true,
-                          validator: (value) {
-                            if (!RegExp('^[0-9]{10}\$').hasMatch(value!)) {
-                              return "Entrez un numéro à 10 chiffres";
-                            }
+                  //contact de l'église
+                  CustomFormTextField(
+                    label: "Contact de l'église",
+                    type: TextInputType.number,
+                    prefix: cusIcon(Icons.phone_outlined),
+                    validate: true,
+                    validator: (value) {
+                      if (!RegExp('^[0-9]{10}\$').hasMatch(value!)) {
+                        return "Entrez un numéro à 10 chiffres";
+                      }
 
-                            if (!RegExp("^(01|07|05)").hasMatch(value)) {
-                              return "Le numéro doit commencer par 01, 05 ou 07";
-                            }
-                            return null;
-                          },
-                          controller: _contactController,
-                        ),
+                      if (!RegExp("^(01|07|05)").hasMatch(value)) {
+                        return "Le numéro doit commencer par 01, 05 ou 07";
+                      }
+                      return null;
+                    },
+                    controller: _contactController,
+                  ),
 
-                        // localisation de l'église
-                        CustomFormTextField(
-                          label: "Localisation",
-                          prefix: cusIcon(Icons.location_on_outlined),
-                          validate: true,
-                          controller: _locationController,
-                        ),
+                  // localisation de l'église
+                  CustomFormTextField(
+                    label: "Localisation",
+                    prefix: cusIcon(Icons.location_on_outlined),
+                    validate: true,
+                    controller: _locationController,
+                  ),
 
-                        // description de l'église
-                        MultilineField(
-                          label: "Description de l'église",
-                          controller: _descriptionController,
-                          validate: true,
-                          validator: (value) {
-                            if (value!.toString().length < 20) {
-                              return "Donnez une description un peu plus concise";
-                            }
-                            return null;
-                          },
-                        ),
-                      ],
+                  // description de l'église
+                  MultilineField(
+                    label: "Description de l'église",
+                    controller: _descriptionController,
+                    validate: true,
+                    validator: (value) {
+                      if (value!.toString().length < 20) {
+                        return "Donnez une description un peu plus concise";
+                      }
+                      return null;
+                    },
+                  ),
+
+                  // bouton de validation
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 20, top: 10),
+                    child: CustomElevatedButton(
+                      text: "Soumettre",
+                      onPressed: () => createChurch(),
                     ),
                   ),
-                ),
+                ],
               ),
-              // bouton de validation
-              Padding(
-                padding: EdgeInsets.only(bottom: 20),
-                child: CustomElevatedButton(
-                  text: "Soumettre",
-                  onPressed: () => createChurch(),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

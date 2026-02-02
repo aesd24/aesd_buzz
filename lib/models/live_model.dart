@@ -111,8 +111,6 @@ class CreateLiveRoomRequest {
   Map<String, dynamic> toJson() {
     return {
       'roomName': roomName,
-      'participantName': participantName,
-      'participantId': participantId,
       'title': title,
       'description': description,
       'isPublic': isPublic,

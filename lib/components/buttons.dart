@@ -103,7 +103,7 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
           ),
           overlayColor: WidgetStatePropertyAll(Colors.white38),
           elevation: WidgetStatePropertyAll(0),
-          fixedSize: WidgetStatePropertyAll(Size.fromHeight(60)),
+          fixedSize: WidgetStatePropertyAll(Size.fromHeight(45)),
         ),
         label: Text(
           widget.text,

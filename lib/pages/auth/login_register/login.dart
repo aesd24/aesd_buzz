@@ -68,9 +68,9 @@ class _LoginPageState extends State<LoginPage> {
       MessageService.showWarningMessage(e.message);
     } on DioException catch (e) {
       e.printError();
-      MessageService.showErrorMessage(
-        "Une erreur s'est produite, vérifiez la connexion internet et rééssayez",
-      );
+      // MessageService.showErrorMessage(
+      //   "Une erreur s'est produite, vérifiez la connexion internet et rééssayez",
+      // );
     } catch (e) {
       e.printError();
       MessageService.showErrorMessage("Une erreur s'est produite");
