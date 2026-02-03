@@ -40,9 +40,11 @@ class _ChurchListState extends State<ChurchList> {
       e.printError();
       // MessageService.showErrorMessage(e.message);
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 

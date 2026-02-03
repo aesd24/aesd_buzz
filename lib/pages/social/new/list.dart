@@ -34,9 +34,11 @@ class _NewsListState extends State<NewsList> {
     } catch (e) {
       MessageService.showErrorMessage("Une erreur inattendu s'est produite.");
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 

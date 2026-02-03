@@ -13,7 +13,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   // 🚀 MODE DÉVELOPPEMENT : Bypass l'authentification
-  final bool BYPASS_AUTH = true; // Mets à false pour réactiver l'auth
+  final bool BYPASS_AUTH = false; // Mets à false pour réactiver l'auth
 
   void init() async {
     try {

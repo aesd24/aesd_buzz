@@ -124,9 +124,9 @@ class _DashboardState extends State<Dashboard> {
                               "Votre compte n'est pas validé vous n'avez pas les accès requis !",
                             );
                           }
-
+  
                           bool hasMainChurch = churchProvider.userChurches.any((c) => c.isMain);
-
+  
                           showModalBottomSheet(
                             context: context,
                             backgroundColor: Colors.transparent,

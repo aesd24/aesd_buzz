@@ -38,9 +38,11 @@ class _SingersListState extends State<SingersList> {
       e.printError();
       // MessageService.showErrorMessage("Une erreur inattendu est survenu !");
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 

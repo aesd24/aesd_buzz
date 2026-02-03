@@ -32,9 +32,11 @@ class _ServantsListState extends State<ServantsList> {
       MessageService.showErrorMessage("Une erreur inattendu est survenu !");
       e.printError();
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 

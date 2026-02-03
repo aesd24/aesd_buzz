@@ -87,9 +87,11 @@ class _PostListState extends State<PostList> {
       e.printError();
       MessageService.showErrorMessage("Une erreur s'est produite");
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 

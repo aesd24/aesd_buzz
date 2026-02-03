@@ -460,9 +460,8 @@ class _MainChurchCreationPageState extends State<MainChurchCreationPage> {
                     padding: EdgeInsets.only(bottom: 20, top: 10),
                     child: CustomElevatedButton(
                       text: "Soumettre",
-                      onPressed:
-                          () =>
-                              widget.editMode ? updateChurch() : createChurch(),
+                      onPressed: () =>
+                          widget.editMode ? updateChurch() : createChurch(),
                     ),
                   ),
                 ],

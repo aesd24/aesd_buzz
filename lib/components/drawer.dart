@@ -62,7 +62,10 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
           padding: EdgeInsets.all(15),
           child: Consumer<Auth>(
             builder: (context, provider, child) {
-              final user = provider.user!;
+              final user = provider.user;
+              if (user == null) {
+                return const Center(child: CircularProgressIndicator());
+              }
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -157,11 +160,13 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
                           child: Column(
                             children: [
                               ListTile(
-                                onTap:
-                                    () => Get.toNamed(
-                                      Routes.profil,
-                                      arguments: {'userId': provider.user!.id},
-                                    ),
+                                onTap: () {
+                                  Get.back();
+                                  Get.toNamed(
+                                    Routes.profil,
+                                    arguments: {'userId': provider.user!.id},
+                                  );
+                                },
                                 leading: cusFaIcon(FontAwesomeIcons.solidUser),
                                 title: Text(
                                   "Profil",
@@ -169,7 +174,10 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
                                 ),
                               ),
                               ListTile(
-                                onTap: () => openUserChurch(user),
+                                onTap: () {
+                                  Get.back();
+                                  openUserChurch(user);
+                                },
                                 leading: cusFaIcon(FontAwesomeIcons.church),
                                 title: Text(
                                   "Mon église",
@@ -177,7 +185,10 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
                                 ),
                               ),
                               ListTile(
-                                onTap: () => Get.toNamed(Routes.notifications),
+                                onTap: () {
+                                  Get.back();
+                                  Get.toNamed(Routes.notifications);
+                                },
                                 leading: cusFaIcon(
                                   FontAwesomeIcons.bell,
                                   color: notifire.getMainText,
@@ -188,7 +199,10 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
                                 ),
                               ),
                               ListTile(
-                                onTap: () => Get.toNamed(Routes.live),
+                                onTap: () {
+                                  Get.back();
+                                  Get.toNamed(Routes.live);
+                                },
                                 leading: cusFaIcon(FontAwesomeIcons.video),
                                 title: Text(
                                   "Retransmission en direct",
@@ -211,7 +225,10 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
                                   leading: cusFaIcon(
                                     FontAwesomeIcons.screwdriverWrench,
                                   ),
-                                  onTap: () => Get.to(Dashboard(user: user)),
+                                  onTap: () {
+                                    Get.back();
+                                    Get.to(Dashboard(user: user));
+                                  },
                                   title: Text(
                                     "Administration",
                                     style: mediumBlackTextStyle,

@@ -123,7 +123,10 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
           children: [
             Consumer<Auth>(
               builder: (context, provider, child) {
-                final user = provider.user!;
+                final user = provider.user;
+                if (user == null) {
+                  return const SizedBox.shrink();
+                }
                 return Material(
                   color: Colors.transparent,
                   child: InkWell(
