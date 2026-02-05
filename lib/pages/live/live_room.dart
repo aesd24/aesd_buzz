@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:aesd/provider/live_provider.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:aesd/models/live_model.dart';
@@ -100,6 +101,10 @@ class _LiveRoomPageState extends State<LiveRoomPage>
         // Publish camera and microphone
         await _room!.localParticipant?.setCameraEnabled(true);
         await _room!.localParticipant?.setMicrophoneEnabled(true);
+        
+        // Activer wakelock pour garder l'écran allumé pendant le live
+        await WakelockPlus.enable();
+        print('✅ Wakelock activé - L\'écran restera allumé pendant le live');
       }
 
       if (mounted) setState(() => _isLoading = false);
@@ -138,10 +143,17 @@ class _LiveRoomPageState extends State<LiveRoomPage>
 
   @override
   void dispose() {
-     _room?.disconnect();
+    _room?.disconnect();
     _room?.dispose();
     _messageController.dispose();
     _fadeController.dispose();
+    
+    // Désactiver wakelock lors de la fermeture de la page
+    if (widget.isHost) {
+      WakelockPlus.disable();
+      print('❌ Wakelock désactivé - L\'écran peut s\'éteindre normalement');
+    }
+    
     super.dispose();
   }
 
@@ -190,7 +202,11 @@ class _LiveRoomPageState extends State<LiveRoomPage>
   }
 
   void _performEndLive() async {
-    await _room?.disconnect(); // Disconnect form LiveKit
+    await _room?.disconnect(); // Disconnect from LiveKit
+    
+    // Désactiver wakelock avant de terminer le live
+    await WakelockPlus.disable();
+    print('❌ Wakelock désactivé - Live terminé');
     
     final liveProvider = context.read<LiveProvider>();
     final success = await liveProvider.endLiveRoom();

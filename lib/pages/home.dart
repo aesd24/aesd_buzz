@@ -63,7 +63,11 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
         child: Column(
           children: [
             _buildModernAppBar(context),
-            getCertificationBanner(context) ?? const SizedBox.shrink(),
+            Consumer<Auth>(
+              builder: (context, auth, child) {
+                return getCertificationBanner(context) ?? const SizedBox.shrink();
+              },
+            ),
             Expanded(
               child: ScaleTransition(
                 scale: _scaleAnimation,

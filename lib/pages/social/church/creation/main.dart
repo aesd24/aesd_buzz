@@ -7,6 +7,7 @@ import 'package:aesd/components/fields.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/image_container.dart';
 import 'package:aesd/models/church_model.dart';
+import 'package:aesd/provider/auth.dart';
 import 'package:aesd/provider/church.dart';
 import 'package:aesd/services/message.dart';
 import 'package:dio/dio.dart';
@@ -101,9 +102,12 @@ class _MainChurchCreationPageState extends State<MainChurchCreationPage> {
                 'image': _churchImage,
               },
             )
-            .then((response) {
+            .then((response) async {
               MessageService.showSuccessMessage("Eglise enregistrée !");
-              Navigator.of(context).popUntil((route) => route.isFirst);
+              await Provider.of<Auth>(context, listen: false).getUserData();
+              if (mounted) {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              }
             });
       } on HttpException catch (e) {
         e.printError();
@@ -161,6 +165,9 @@ class _MainChurchCreationPageState extends State<MainChurchCreationPage> {
                 context,
                 listen: false,
               ).getUserChurches();
+              if (mounted) {
+                await Provider.of<Auth>(context, listen: false).getUserData();
+              }
             });
       } on HttpException catch (e) {
         e.printError();

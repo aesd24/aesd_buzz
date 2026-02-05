@@ -313,6 +313,29 @@ class LiveKitService {
     }
   }
 
+  /// Démarrer l'enregistrement d'un livestream
+  Future<Map<String, dynamic>> startRecording({
+    required String roomName,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '$baseUrl/api/livekit/start-recording',
+        data: {
+          'roomName': roomName,
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = _extractData(response);
+        return data is Map<String, dynamic> ? data : {'success': true};
+      } else {
+        throw Exception(_extractError(response));
+      }
+    } on DioException catch (e) {
+      throw Exception('Erreur démarrage enregistrement: ${e.message}');
+    }
+  }
+
   /// Lister les enregistrements disponibles
   Future<List<Map<String, dynamic>>> getRecordings() async {
     try {

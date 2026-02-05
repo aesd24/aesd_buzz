@@ -173,19 +173,30 @@ class ChurchModel {
         }
       },
       child: Container(
-        margin: EdgeInsets.all(10),
+        width: double.infinity,
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          border: Border.all(color: banner!.color),
+          border: Border.all(width: 1.5, color: banner!.color.withOpacity(0.4)),
           borderRadius: BorderRadius.circular(10),
+          color: banner.color.withOpacity(0.05),
         ),
-        child: ListTile(
-          leading: cusFaIcon(banner.icon, color: banner.color),
-          title: Text(
-            banner.text,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium!.copyWith(color: banner.color),
-          ),
+        child: Row(
+          children: [
+            cusFaIcon(banner.icon, color: banner.color, size: 18),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                banner.text,
+                style: (Theme.of(context).textTheme.bodySmall ?? const TextStyle())
+                    .copyWith(
+                      color: banner.color,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
+              ),
+            ),
+          ],
         ),
       ),
     );

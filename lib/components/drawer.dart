@@ -39,7 +39,10 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
         });
       });
     } catch (e) {
-      MessageService.showErrorMessage("Une erreur est survenue !");
+      // Ne pas afficher d'erreur si c'est juste l'absence de données
+      // L'utilisateur verra simplement "0 Abonnements • 0 Abonnés"
+      print('Erreur chargement stats abonnement: $e');
+      // MessageService.showErrorMessage("Une erreur est survenue !");
     }
   }
 

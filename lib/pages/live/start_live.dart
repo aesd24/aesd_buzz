@@ -22,6 +22,7 @@ class _StartLivePageState extends State<StartLivePage>
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   bool _isPublic = true;
+  bool _autoRecord = true; // Enregistrement automatique activé par défaut
   bool _isCreating = false;
 
   @override
@@ -63,6 +64,7 @@ class _StartLivePageState extends State<StartLivePage>
       participantName: user?.name ?? 'Utilisateur',
       participantId: user?.id ?? 0,
       isPublic: _isPublic,
+      autoRecord: _autoRecord, // Passer le paramètre d'enregistrement
     );
 
     setState(() => _isCreating = false);
@@ -246,6 +248,74 @@ class _StartLivePageState extends State<StartLivePage>
                   ],
                 ),
               ),
+              const SizedBox(height: 16),
+
+              // Auto-record switch
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xff3ae700).withOpacity(0.1),
+                      const Color(0xff2a9000).withOpacity(0.05),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xff3ae700).withOpacity(0.2),
+                    width: 1.5,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xff3ae700).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: cusFaIcon(
+                        FontAwesomeIcons.fileVideo,
+                        color: const Color(0xff3ae700),
+                        size: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Enregistrement Automatique',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          Text(
+                            _autoRecord
+                                ? 'Le live sera enregistré'
+                                : 'Le live ne sera pas enregistré',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Switch(
+                      value: _autoRecord,
+                      onChanged: (value) {
+                        setState(() => _autoRecord = value);
+                      },
+                      activeColor: const Color(0xff3ae700),
+                    ),
+                  ],
+                ),
+              ),
               const SizedBox(height: 32),
 
               // Features
@@ -259,12 +329,6 @@ class _StartLivePageState extends State<StartLivePage>
                 icon: FontAwesomeIcons.users,
                 title: 'Communauté Active',
                 subtitle: 'Connectez-vous avec des milliers de croyants',
-              ),
-              const SizedBox(height: 12),
-              _buildFeatureItem(
-                icon: FontAwesomeIcons.fileVideo,
-                title: 'Enregistrement',
-                subtitle: 'Le service est automatiquement enregistré',
               ),
               const SizedBox(height: 40),
 

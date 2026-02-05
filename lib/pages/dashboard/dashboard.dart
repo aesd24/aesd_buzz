@@ -93,7 +93,11 @@ class _DashboardState extends State<Dashboard> {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            getCertificationBanner(context) ?? const SizedBox(),
+            Consumer<Auth>(
+              builder: (context, auth, child) {
+                return getCertificationBanner(context) ?? const SizedBox();
+              },
+            ),
 
             Padding(
               padding: const EdgeInsets.all(10),
@@ -337,18 +341,21 @@ class _DashboardState extends State<Dashboard> {
                 color: Colors.purple,
                 icon: FontAwesomeIcons.calendarWeek,
                 label: "Programme",
+                isEnabled: church.validationState == 'approved',
               ),
               customIconButton(
                 destination: ChurchEvents(churchId: church.id),
                 color: Colors.amber,
                 icon: FontAwesomeIcons.solidCalendarDays,
                 label: "Evènements",
+                isEnabled: church.validationState == 'approved',
               ),
               customIconButton(
                 destination: CeremoniesManagement(churchId: church.id),
                 color: Colors.red,
                 icon: FontAwesomeIcons.film,
                 label: "Cérémonies",
+                isEnabled: church.validationState == 'approved',
               ),
               customIconButton(
                 destination: DashboardCommunityPage(),
@@ -356,6 +363,7 @@ class _DashboardState extends State<Dashboard> {
                 color: Colors.blue,
                 icon: FontAwesomeIcons.peopleGroup,
                 label: "Communauté",
+                isEnabled: church.validationState == 'approved',
               ),
             ],
           ),
@@ -370,19 +378,42 @@ class _DashboardState extends State<Dashboard> {
     Color color = Colors.blue,
     Widget? destination,
     dynamic arg,
+    bool isEnabled = true,
   }) {
     return TextButton.icon(
       onPressed:
-          destination != null
+          destination != null && isEnabled
               ? () => Get.to(() => destination, arguments: arg)
-              : null,
+              : isEnabled
+                  ? null
+                  : () {
+                      MessageService.showWarningMessage(
+                        "Cette fonctionnalité sera disponible après validation de votre église",
+                      );
+                    },
       icon: FaIcon(icon, size: 18),
       label: Text(label),
       style: ButtonStyle(
-        backgroundColor: WidgetStatePropertyAll(color.withAlpha(80)),
-        iconColor: WidgetStatePropertyAll(color),
-        foregroundColor: WidgetStatePropertyAll(color),
-        overlayColor: WidgetStatePropertyAll(color.withAlpha(100)),
+        backgroundColor: WidgetStatePropertyAll(
+          isEnabled 
+            ? color.withAlpha(80) 
+            : Colors.grey.withAlpha(50),
+        ),
+        iconColor: WidgetStatePropertyAll(
+          isEnabled 
+            ? color 
+            : Colors.grey.withAlpha(150),
+        ),
+        foregroundColor: WidgetStatePropertyAll(
+          isEnabled 
+            ? color 
+            : Colors.grey.withAlpha(150),
+        ),
+        overlayColor: WidgetStatePropertyAll(
+          isEnabled 
+            ? color.withAlpha(100) 
+            : Colors.grey.withAlpha(50),
+        ),
       ),
     );
   }

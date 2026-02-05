@@ -28,6 +28,7 @@ class LiveProvider extends ChangeNotifier {
     required String participantName,
     required int participantId,
     required bool isPublic,
+    bool autoRecord = true, // Enregistrement automatique par défaut
   }) async {
     _isLoading = true;
     _error = null;
@@ -47,6 +48,20 @@ class LiveProvider extends ChangeNotifier {
       );
 
       _currentRoom = await liveKitService.createRoom(request);
+      
+      // Démarrer l'enregistrement si activé
+      if (autoRecord && _currentRoom != null) {
+        try {
+          await liveKitService.startRecording(
+            roomName: _currentRoom!.roomName,
+          );
+          print('✅ Enregistrement automatique démarré');
+        } catch (e) {
+          print('⚠️ Erreur démarrage enregistrement: $e');
+          // Ne pas bloquer la création du live si l'enregistrement échoue
+        }
+      }
+      
       _isLoading = false;
       notifyListeners();
       return _currentRoom;

@@ -10,12 +10,12 @@ import 'package:provider/provider.dart';
 
 import 'icon.dart';
 
-BannerType? getBannerType(BuildContext context) {
+BannerType? getCertifBannerType(BuildContext context) {
   final user = Provider.of<Auth>(context, listen: false).user;
 
   if (user == null) return null;
 
-  if (user.accountType == Dictionnary.servant) {
+  if (user.accountType.code == Dictionnary.servant.code) {
     if (user.certifStatus == CertificationStates.pending) {
       return BannerType.waitingBanner;
     } else if (user.certifStatus == CertificationStates.rejected) {
@@ -26,7 +26,7 @@ BannerType? getBannerType(BuildContext context) {
 }
 
 Widget? getCertificationBanner(BuildContext context) {
-  BannerType? banner = getBannerType(context);
+  BannerType? banner = getCertifBannerType(context);
 
   if (banner != null) {
     return GestureDetector(
@@ -37,24 +37,24 @@ Widget? getCertificationBanner(BuildContext context) {
                   : null,
       child: Container(
         width: double.infinity,
-        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          border: Border.all(width: 1, color: banner.color.withOpacity(0.3)),
-          borderRadius: BorderRadius.circular(8),
+          border: Border.all(width: 1.5, color: banner.color.withOpacity(0.4)),
+          borderRadius: BorderRadius.circular(10),
           color: banner.color.withOpacity(0.05),
         ),
         child: Row(
           children: [
             cusFaIcon(banner.icon, color: banner.color, size: 16),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 banner.text,
                 style: (Theme.of(context).textTheme.bodySmall ?? const TextStyle())
                     .copyWith(
                       color: banner.color,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                       fontSize: 11,
                     ),
               ),
@@ -69,7 +69,7 @@ Widget? getCertificationBanner(BuildContext context) {
 }
 
 Widget getCertificationIcon(BuildContext context) {
-  BannerType? banner = getBannerType(context);
+  BannerType? banner = getCertifBannerType(context);
   if (banner == null) return SizedBox();
 
   return GestureDetector(

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:aesd/components/buttons.dart';
 import 'package:aesd/components/fields.dart';
 import 'package:aesd/components/icon.dart';
+import 'package:aesd/provider/auth.dart';
 import 'package:aesd/provider/church.dart';
 import 'package:aesd/services/message.dart';
 import 'package:dio/dio.dart';
@@ -51,9 +52,12 @@ class _AnnexeChurchFormState extends State<AnnexeChurchForm> {
                 'isMain': 1,
               },
             )
-            .then((response) {
+            .then((response) async {
               MessageService.showSuccessMessage("Eglise enregistrée !");
-              Navigator.of(context).popUntil((route) => route.isFirst);
+              await Provider.of<Auth>(context, listen: false).getUserData();
+              if (mounted) {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              }
             });
       } on HttpException catch (e) {
         e.printError();
