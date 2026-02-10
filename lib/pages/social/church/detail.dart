@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:aesd/pages/donations/make_donation_page.dart';
 
 import 'community.dart';
 import 'day_program.dart';
@@ -359,6 +360,45 @@ class _ChurchDetailPageState extends State<ChurchDetailPage> {
                                       text: church.email,
                                     ),
                                   ],
+                                ),
+                                // Bouton "Faire un don"
+                                Padding(
+                                  padding: EdgeInsets.only(top: 20),
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton.icon(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => MakeDonationPage(
+                                              recipientType: 'church',
+                                              recipientId: church.id,
+                                              recipientName: church.name,
+                                              recipientPhoto: church.logo,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      icon: Icon(Icons.favorite, color: Colors.white),
+                                      label: Text(
+                                        'Faire un don',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: appMainColor,
+                                        padding: EdgeInsets.symmetric(vertical: 15),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        elevation: 3,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                                 Padding(
                                   padding: EdgeInsets.only(top: 25),

@@ -8,6 +8,7 @@ import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:aesd/pages/donations/make_donation_page.dart';
 
 class ServantModel {
   late int id;
@@ -109,6 +110,44 @@ class ServantModel {
                   context,
                 ).textTheme.bodyMedium!.copyWith(color: notifire.getMaingey),
               ),
+            
+            // Bouton "Faire un don"
+            SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MakeDonationPage(
+                        recipientType: 'pastor',
+                        recipientId: id,
+                        recipientName: user?.name ?? 'Serviteur',
+                        recipientPhoto: user?.photo,
+                      ),
+                    ),
+                  );
+                },
+                icon: Icon(Icons.favorite, size: 18, color: Colors.white),
+                label: Text(
+                  'Faire un don',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: appMainColor,
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  elevation: 2,
+                ),
+              ),
+            ),
           ],
         ),
       ),
