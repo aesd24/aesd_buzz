@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:aesd/provider/church.dart';
+import 'package:aesd/provider/servant.dart';
+import 'package:aesd/models/church_model.dart';
+import 'package:aesd/models/servant_model.dart';
 
 class SendPage extends StatefulWidget {
   const SendPage({super.key});
@@ -16,9 +21,11 @@ class SendPage extends StatefulWidget {
 class _SendPageState extends State<SendPage> with SingleTickerProviderStateMixin {
   final _amountController = TextEditingController();
   String _receiverType = "church";
-  Object? _selectedRecipient;
+  dynamic _selectedRecipient; // Can be ChurchModel or ServantModel
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  List<dynamic> _recipients = []; // List of churches or servants
+  bool _isLoadingRecipients = false;
 
   @override
   void initState() {
@@ -31,6 +38,36 @@ class _SendPageState extends State<SendPage> with SingleTickerProviderStateMixin
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
     _animationController.forward();
+    _loadRecipients();
+  }
+
+  void _loadRecipients() async {
+    setState(() {
+      _isLoadingRecipients = true;
+    });
+
+    try {
+      if (_receiverType == "church") {
+        final churchProvider = Provider.of<Church>(context, listen: false);
+        await churchProvider.fetchChurches();
+        setState(() {
+          _recipients = churchProvider.churches;
+        });
+      } else {
+        final servantProvider = Provider.of<Servant>(context, listen: false);
+        await servantProvider.fetchServants();
+        setState(() {
+          _recipients = servantProvider.servants;
+        });
+      }
+    } catch (e) {
+      print('Erreur chargement destinataires: $e');
+      MessageService.showErrorMessage('Erreur lors du chargement des destinataires');
+    } finally {
+      setState(() {
+        _isLoadingRecipients = false;
+      });
+    }
   }
 
   @override
@@ -76,68 +113,100 @@ class _SendPageState extends State<SendPage> with SingleTickerProviderStateMixin
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [appMainColor, appMainColor.withOpacity(0.8)],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: appMainColor.withOpacity(0.3),
-                          blurRadius: 8,
-                          spreadRadius: 1,
-                        ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            _selectedRecipient = "Destinataire $index";
-                          });
-                          Navigator.pop(context);
-                        },
-                        borderRadius: BorderRadius.circular(16),
-                        child: ListTile(
-                          leading: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const FaIcon(
-                              FontAwesomeIcons.user,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                          title: Text(
-                            "Destinataire $index",
+              child: _isLoadingRecipients
+                  ? const Center(child: CircularProgressIndicator())
+                  : _recipients.isEmpty
+                      ? Center(
+                          child: Text(
+                            _receiverType == "church"
+                                ? "Aucune église disponible"
+                                : "Aucun serviteur de Dieu disponible",
                             style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[600],
                             ),
                           ),
-                          subtitle: Text(
-                            "Localisation $index",
-                            style: GoogleFonts.poppins(
-                              color: Colors.white.withOpacity(0.8),
-                              fontSize: 12,
-                            ),
-                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: _recipients.length,
+                          itemBuilder: (context, index) {
+                            final recipient = _recipients[index];
+                            final String name;
+                            final String? location;
+                            final IconData icon;
+
+                            if (_receiverType == "church") {
+                              final church = recipient as ChurchModel;
+                              name = church.name ?? "Église sans nom";
+                              location = church.address; // ChurchModel uses 'address'
+                              icon = FontAwesomeIcons.church;
+                            } else {
+                              final servant = recipient as ServantModel;
+                              name = servant.user?.name ?? "Serviteur sans nom"; // ServantModel has user.name
+                              location = servant.church?.address; // Get address from church
+                              icon = FontAwesomeIcons.user;
+                            }
+
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [appMainColor, appMainColor.withOpacity(0.8)],
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: appMainColor.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedRecipient = recipient;
+                                    });
+                                    Navigator.pop(context);
+                                  },
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: ListTile(
+                                    leading: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: FaIcon(
+                                        icon,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                    ),
+                                    title: Text(
+                                      name,
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    subtitle: location != null
+                                        ? Text(
+                                            location,
+                                            style: GoogleFonts.poppins(
+                                              color: Colors.white.withOpacity(0.8),
+                                              fontSize: 12,
+                                            ),
+                                          )
+                                        : null,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      ),
-                    ),
-                  );
-                },
-              ),
             ),
           ],
         ),
@@ -285,6 +354,8 @@ class _SendPageState extends State<SendPage> with SingleTickerProviderStateMixin
                       onChanged: (value) {
                         setState(() {
                           _receiverType = value!;
+                          _selectedRecipient = null; // Reset selection
+                          _loadRecipients(); // Reload recipients
                         });
                       },
                     ),
@@ -342,7 +413,11 @@ class _SendPageState extends State<SendPage> with SingleTickerProviderStateMixin
                             const SizedBox(width: 12),
                             Expanded(
                               child: Text(
-                                _selectedRecipient?.toString() ?? "Choisissez le destinataire",
+                                _selectedRecipient != null
+                                    ? (_receiverType == "church"
+                                        ? (_selectedRecipient as ChurchModel).name ?? "Église"
+                                        : (_selectedRecipient as ServantModel).user?.name ?? "Serviteur")
+                                    : "Choisissez le destinataire",
                                 style: GoogleFonts.poppins(
                                   color: _selectedRecipient != null ? Colors.grey[800] : Colors.grey[400],
                                   fontWeight: _selectedRecipient != null ? FontWeight.w600 : FontWeight.normal,

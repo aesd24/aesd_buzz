@@ -212,16 +212,19 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
                                   style: mediumBlackTextStyle,
                                 ),
                               ),
-                              /*ListTile(
+                              ListTile(
                                 leading: cusFaIcon(
-                                  FontAwesomeIcons.moneyBillTransfer,
+                                  FontAwesomeIcons.wallet,
                                 ),
-                                onTap: () => Get.toNamed(Routes.wallet),
+                                onTap: () {
+                                  Get.back();
+                                  Get.toNamed(Routes.wallet);
+                                },
                                 title: Text(
-                                  "Porte-monnaie",
+                                  "Mon portefeuille",
                                   style: mediumBlackTextStyle,
                                 ),
-                              ),*/
+                              ),
                               if (provider.user!.accountType.code ==
                                   Dictionnary.servant.code)
                                 ListTile(

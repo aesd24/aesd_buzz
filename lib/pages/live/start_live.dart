@@ -22,7 +22,7 @@ class _StartLivePageState extends State<StartLivePage>
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   bool _isPublic = true;
-  bool _autoRecord = true; // Enregistrement automatique activé par défaut
+  bool _autoRecord = true;           // Enregistrement automatique activé par défaut
   bool _isCreating = false;
 
   @override

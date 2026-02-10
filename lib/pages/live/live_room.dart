@@ -55,23 +55,59 @@ class _LiveRoomPageState extends State<LiveRoomPage>
   }
 
   Future<void> _connectToRoom() async {
+    print('🔵 [LiveRoom] Début connexion à la room');
+    print('🏠 [LiveRoom] roomName: ${widget.roomName}');
+    print('👤 [LiveRoom] isHost: ${widget.isHost}');
+    
     final liveProvider = context.read<LiveProvider>();
     LiveRoom? liveRoom = liveProvider.currentRoom;
 
+    print('📋 [LiveRoom] currentRoom: ${liveRoom != null ? "existe" : "null"}');
+    if (liveRoom != null) {
+      print('📋 [LiveRoom] currentRoom.roomName: ${liveRoom.roomName}');
+      print('📋 [LiveRoom] currentRoom.accessToken length: ${liveRoom.accessToken.length}');
+      print('📋 [LiveRoom] currentRoom.liveKitServerUrl: ${liveRoom.liveKitServerUrl}');
+    }
+
     // Si on est pas l'hôte et qu'on n'a pas encore joint la room, on le fait maintenant
     if (!widget.isHost && (liveRoom == null || liveRoom.roomName != widget.roomName)) {
+      print('🔵 [LiveRoom] Spectateur - Tentative de jointure');
       final authProvider = context.read<Auth>();
       final user = authProvider.user;
+
+      print('👤 [LiveRoom] User: ${user?.name} (ID: ${user?.id})');
 
       liveRoom = await liveProvider.joinLiveRoom(
         roomName: widget.roomName,
         participantName: user?.name ?? 'Spectateur',
         participantId: user?.id ?? 0,
       );
+      
+      print('🟢 [LiveRoom] Après jointure - liveRoom: ${liveRoom != null ? "existe" : "null"}');
+      if (liveRoom != null) {
+        print('🔑 [LiveRoom] accessToken length: ${liveRoom.accessToken.length}');
+        print('🌐 [LiveRoom] liveKitServerUrl: ${liveRoom.liveKitServerUrl}');
+      }
     }
 
-    if (liveRoom == null || liveRoom.accessToken.isEmpty) {
-      MessageService.showErrorMessage("Données de connexion manquantes");
+    // DIAGNOSTIC DÉTAILLÉ
+    if (liveRoom == null) {
+      print('❌ [LiveRoom] liveRoom est NULL !');
+      MessageService.showErrorMessage("Données de connexion manquantes (room null)");
+      if (mounted) Navigator.pop(context);
+      return;
+    }
+    
+    print('✅ [LiveRoom] liveRoom existe');
+    print('🔑 [LiveRoom] accessToken vide? ${liveRoom.accessToken.isEmpty}');
+    print('🔑 [LiveRoom] accessToken length: ${liveRoom.accessToken.length}');
+    print('🌐 [LiveRoom] liveKitServerUrl: ${liveRoom.liveKitServerUrl}');
+    print('🏠 [LiveRoom] roomName: ${liveRoom.roomName}');
+    print('✅ [LiveRoom] canConnect: ${liveRoom.canConnect}');
+
+    if (liveRoom.accessToken.isEmpty) {
+      print('❌ [LiveRoom] accessToken est VIDE !');
+      MessageService.showErrorMessage("Données de connexion manquantes (token vide)");
       if (mounted) Navigator.pop(context);
       return;
     }
@@ -82,12 +118,17 @@ class _LiveRoomPageState extends State<LiveRoomPage>
     }
 
     try {
+      print('🔵 [LiveRoom] Création de la Room LiveKit');
       // Connect to LiveKit Room
       _room = Room();
       _listener = _room!.createListener();
 
       _setUpListeners();
 
+      print('🔵 [LiveRoom] Connexion au serveur LiveKit...');
+      print('🌐 [LiveRoom] URL: ${liveRoom.liveKitServerUrl}');
+      print('🔑 [LiveRoom] Token (premiers 50 chars): ${liveRoom.accessToken.substring(0, liveRoom.accessToken.length > 50 ? 50 : liveRoom.accessToken.length)}...');
+      
       await _room!.connect(
         liveRoom.liveKitServerUrl,
         liveRoom.accessToken,
@@ -97,19 +138,30 @@ class _LiveRoomPageState extends State<LiveRoomPage>
         ),
       );
 
+      print('✅ [LiveRoom] Connexion réussie au serveur LiveKit !');
+      print('🏠 [LiveRoom] Room connectée: ${_room!.name}');
+      print('👥 [LiveRoom] Participants: ${_room!.remoteParticipants.length}');
+
       if (widget.isHost) {
+        print('🎥 [LiveRoom] Mode Hôte - Activation caméra et micro');
         // Publish camera and microphone
         await _room!.localParticipant?.setCameraEnabled(true);
         await _room!.localParticipant?.setMicrophoneEnabled(true);
         
+        print('✅ [LiveRoom] Caméra et micro activés');
+        
         // Activer wakelock pour garder l'écran allumé pendant le live
         await WakelockPlus.enable();
-        print('✅ Wakelock activé - L\'écran restera allumé pendant le live');
+        print('✅ [LiveRoom] Wakelock activé - L\'écran restera allumé pendant le live');
+      } else {
+        print('👁️ [LiveRoom] Mode Spectateur');
       }
 
+      print('✅ [LiveRoom] Connexion complète !');
       if (mounted) setState(() => _isLoading = false);
     } catch (e) {
-      print('ERROR CONNECTING: $e');
+      print('❌ [LiveRoom] ERREUR CONNEXION: $e');
+      print('❌ [LiveRoom] Type erreur: ${e.runtimeType}');
       MessageService.showErrorMessage("Erreur de connexion LiveKit: $e");
       if (mounted) setState(() => _isLoading = false);
     }

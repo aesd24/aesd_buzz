@@ -15,6 +15,7 @@ import 'package:aesd/provider/servant.dart';
 import 'package:aesd/provider/singer.dart';
 import 'package:aesd/provider/testimony.dart';
 import 'package:aesd/provider/user.dart';
+import 'package:aesd/provider/wallet_provider.dart';
 import 'package:aesd/services/livekit_service.dart';
 import 'package:aesd/services/message.dart';
 import 'package:dio/dio.dart';
@@ -216,6 +217,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => Ceremonies()),
         ChangeNotifierProvider(create: (context) => ProgramProvider()),
         ChangeNotifierProvider(create: (context) => CinetPay()),
+        ChangeNotifierProvider(create: (context) => WalletProvider()),
       ],
       child: GetMaterialApp(
         locale: const Locale('fr', 'FR'),

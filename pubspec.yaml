@@ -73,6 +73,7 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - assets/images/payment/
     - assets/icons/
     - assets/illustrations/
     - assets/locales/ar.json

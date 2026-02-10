@@ -48,23 +48,58 @@ class LiveKitService {
   /// Créer une nouvelle room livestream
   Future<LiveRoom> createRoom(CreateLiveRoomRequest request) async {
     try {
+      print('🔵 [LiveKit] Envoi requête create-room');
+      print('📤 [LiveKit] URL: $baseUrl/api/livekit/create-room');
+      print('📦 [LiveKit] Data: ${request.toJson()}');
+      
       final response = await _dio.post(
         '$baseUrl/api/livekit/create-room',
         data: request.toJson(),
       );
 
+      print('🟢 [LiveKit] Réponse reçue (status ${response.statusCode})');
+      print('📥 [LiveKit] Response data: ${response.data}');
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = _extractData(response);
+        print('📋 [LiveKit] Data extraite: $data');
+        
         if (data is Map<String, dynamic>) {
+          // Vérifier les champs requis
+          print('✅ [LiveKit] accessToken présent: ${data.containsKey('accessToken')}');
+          print('✅ [LiveKit] liveKitServerUrl présent: ${data.containsKey('liveKitServerUrl')}');
+          print('✅ [LiveKit] roomName présent: ${data.containsKey('roomName')}');
+          
+          if (data['accessToken'] != null && data['accessToken'].toString().isNotEmpty) {
+            final token = data['accessToken'].toString();
+            print('🔑 [LiveKit] accessToken (${token.length} chars): ${token.substring(0, token.length > 50 ? 50 : token.length)}...');
+          } else {
+            print('❌ [LiveKit] accessToken est NULL ou VIDE !');
+          }
+          
+          if (data['liveKitServerUrl'] != null) {
+            print('🌐 [LiveKit] liveKitServerUrl: ${data['liveKitServerUrl']}');
+          } else {
+            print('❌ [LiveKit] liveKitServerUrl est NULL !');
+          }
+          
+          print('🏠 [LiveKit] roomName: ${data['roomName']}');
+          
           return LiveRoom.fromJson(data);
         } else if (data is List && data.isNotEmpty) {
-           return LiveRoom.fromJson(data[0] as Map<String, dynamic>);
+          print('📋 [LiveKit] Data est une liste, prise du premier élément');
+          return LiveRoom.fromJson(data[0] as Map<String, dynamic>);
         }
+        print('❌ [LiveKit] Format de données invalide');
         throw Exception('Format de données invalide pour la création de room');
       } else {
+        print('❌ [LiveKit] Erreur HTTP ${response.statusCode}');
         throw Exception(_extractError(response));
       }
     } on DioException catch (e) {
+      print('❌ [LiveKit] Erreur Dio: ${e.message}');
+      print('❌ [LiveKit] Response: ${e.response?.data}');
+      print('❌ [LiveKit] Status: ${e.response?.statusCode}');
       throw Exception('Erreur création room: ${e.message}');
     }
   }
@@ -72,21 +107,53 @@ class LiveKitService {
   /// Rejoindre une room existante
   Future<LiveRoom> joinRoom(JoinLiveRoomRequest request) async {
     try {
+      print('🔵 [LiveKit] Envoi requête join-room');
+      print('📤 [LiveKit] URL: $baseUrl/api/livekit/join-room');
+      print('📦 [LiveKit] Params: ${request.toJson()}');
+      
       final response = await _dio.post(
         '$baseUrl/api/livekit/join-room',
         queryParameters: request.toJson(),
       );
 
+      print('🟢 [LiveKit] Réponse join-room (status ${response.statusCode})');
+      print('📥 [LiveKit] Response data: ${response.data}');
+
       if (response.statusCode == 200) {
         final data = _extractData(response);
+        print('📋 [LiveKit] Data extraite: $data');
+        
         if (data is Map<String, dynamic>) {
+          // Vérifier les champs requis
+          print('✅ [LiveKit] accessToken présent: ${data.containsKey('accessToken')}');
+          print('✅ [LiveKit] liveKitServerUrl présent: ${data.containsKey('liveKitServerUrl')}');
+          print('✅ [LiveKit] roomName présent: ${data.containsKey('roomName')}');
+          
+          if (data['accessToken'] != null && data['accessToken'].toString().isNotEmpty) {
+            final token = data['accessToken'].toString();
+            print('🔑 [LiveKit] accessToken (${token.length} chars): ${token.substring(0, token.length > 50 ? 50 : token.length)}...');
+          } else {
+            print('❌ [LiveKit] accessToken est NULL ou VIDE !');
+          }
+          
+          if (data['liveKitServerUrl'] != null) {
+            print('🌐 [LiveKit] liveKitServerUrl: ${data['liveKitServerUrl']}');
+          } else {
+            print('❌ [LiveKit] liveKitServerUrl est NULL !');
+          }
+          
           return LiveRoom.fromJson(data);
         }
+        print('❌ [LiveKit] Format de données invalide');
         throw Exception('Format de données invalide pour rejoindre la room');
       } else {
+        print('❌ [LiveKit] Erreur HTTP ${response.statusCode}');
         throw Exception(_extractError(response));
       }
     } on DioException catch (e) {
+      print('❌ [LiveKit] Erreur Dio: ${e.message}');
+      print('❌ [LiveKit] Response: ${e.response?.data}');
+      print('❌ [LiveKit] Status: ${e.response?.statusCode}');
       throw Exception('Erreur connexion room: ${e.message}');
     }
   }

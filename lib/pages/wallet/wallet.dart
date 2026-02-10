@@ -1,6 +1,7 @@
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/components/tiles.dart';
+import 'package:aesd/pages/wallet/deposit.dart';
 import 'package:aesd/pages/wallet/send.dart';
 import 'package:aesd/pages/wallet/transactions.dart';
 import 'package:aesd/pages/wallet/withdrawing.dart';
@@ -234,35 +235,54 @@ class _WalletState extends State<Wallet> with SingleTickerProviderStateMixin {
                             ],
                           ),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              _buildModernActionButton(
-                                icon: FontAwesomeIcons.paperPlane,
-                                label: "Envoyer",
-                                color: const Color(0xff2196f3),
-                                onTap: () => Get.to(() => SendPage()),
+                              Expanded(
+                                child: _buildModernActionButton(
+                                  icon: FontAwesomeIcons.paperPlane,
+                                  label: "Envoyer",
+                                  color: const Color(0xff2196f3),
+                                  onTap: () => Get.to(() => SendPage()),
+                                ),
                               ),
                               Container(
                                 width: 1,
                                 height: 50,
                                 color: Colors.grey[300],
                               ),
-                              _buildModernActionButton(
-                                icon: FontAwesomeIcons.arrowDown,
-                                label: "Retirer",
-                                color: const Color(0xffff9800),
-                                onTap: () => Get.to(() => WithDrawingPage()),
+                              Expanded(
+                                child: _buildModernActionButton(
+                                  icon: FontAwesomeIcons.plus,
+                                  label: "Dépôt",
+                                  color: appMainColor,
+                                  onTap: () => Get.to(() => DepositPage()),
+                                ),
                               ),
                               Container(
                                 width: 1,
                                 height: 50,
                                 color: Colors.grey[300],
                               ),
-                              _buildModernActionButton(
-                                icon: FontAwesomeIcons.clockRotateLeft,
-                                label: "Historique",
-                                color: const Color(0xff9c27b0),
-                                onTap: () => Get.to(() => TransactionsPage()),
+                              Expanded(
+                                child: _buildModernActionButton(
+                                  icon: FontAwesomeIcons.arrowDown,
+                                  label: "Retirer",
+                                  color: const Color(0xffff9800),
+                                  onTap: () => Get.to(() => WithDrawingPage()),
+                                ),
+                              ),
+                              Container(
+                                width: 1,
+                                height: 50,
+                                color: Colors.grey[300],
+                              ),
+                              Expanded(
+                                child: _buildModernActionButton(
+                                  icon: FontAwesomeIcons.clockRotateLeft,
+                                  label: "Historique",
+                                  color: const Color(0xff9c27b0),
+                                  onTap: () => Get.to(() => TransactionsPage()),
+                                ),
                               ),
                             ],
                           ),
@@ -358,12 +378,12 @@ class _WalletState extends State<Wallet> with SingleTickerProviderStateMixin {
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
         child: Column(
           children: [
             Container(
-              width: 56,
-              height: 56,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -386,15 +406,16 @@ class _WalletState extends State<Wallet> with SingleTickerProviderStateMixin {
                 child: FaIcon(
                   icon,
                   color: Colors.white,
-                  size: 24,
+                  size: 20,
                 ),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               label,
+              textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                fontSize: 12,
+                fontSize: 10,
                 fontWeight: FontWeight.w600,
                 color: Colors.grey[700],
               ),
