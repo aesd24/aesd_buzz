@@ -58,6 +58,16 @@ class _StartLivePageState extends State<StartLivePage>
     final authProvider = context.read<Auth>();
     final user = authProvider.user;
 
+    print('🎬 [START_LIVE] ========================================');
+    print('🎬 [START_LIVE] Création du live avec les paramètres:');
+    print('🎬 [START_LIVE] - Titre: ${_titleController.text}');
+    print('🎬 [START_LIVE] - Description: ${_descriptionController.text}');
+    print('🎬 [START_LIVE] - Public: $_isPublic');
+    print('🎬 [START_LIVE] - Auto-Record: $_autoRecord ⬅️ IMPORTANT');
+    print('🎬 [START_LIVE] - Participant: ${user?.name ?? 'Utilisateur'}');
+    print('🎬 [START_LIVE] - Participant ID: ${user?.id ?? 0}');
+    print('🎬 [START_LIVE] ========================================');
+
     final room = await liveProvider.createLiveRoom(
       title: _titleController.text,
       description: _descriptionController.text,
@@ -66,6 +76,16 @@ class _StartLivePageState extends State<StartLivePage>
       isPublic: _isPublic,
       autoRecord: _autoRecord, // Passer le paramètre d'enregistrement
     );
+
+    print('🎬 [START_LIVE] Réponse du backend:');
+    print('🎬 [START_LIVE] - Room créée: ${room != null}');
+    if (room != null) {
+      print('🎬 [START_LIVE] - Room name: ${room.roomName}');
+      print('🎬 [START_LIVE] - Server URL: ${room.liveKitServerUrl}');
+    } else {
+      print('🎬 [START_LIVE] - Erreur: ${liveProvider.error}');
+    }
+    print('🎬 [START_LIVE] ========================================');
 
     setState(() => _isCreating = false);
 
@@ -309,7 +329,11 @@ class _StartLivePageState extends State<StartLivePage>
                     Switch(
                       value: _autoRecord,
                       onChanged: (value) {
+                        print('🎥 [ENREGISTREMENT] Toggle changé: $value');
+                        print('🎥 [ENREGISTREMENT] Ancien état: $_autoRecord');
+                        print('🎥 [ENREGISTREMENT] Nouvel état: $value');
                         setState(() => _autoRecord = value);
+                        print('🎥 [ENREGISTREMENT] État mis à jour dans l\'UI');
                       },
                       activeColor: const Color(0xff3ae700),
                     ),

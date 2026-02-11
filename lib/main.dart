@@ -27,6 +27,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'appstaticdata/routes.dart';
 import 'appstaticdata/staticdata.dart';
 
@@ -46,6 +47,16 @@ class OpenedByNotificationResponse {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Charger les variables d'environnement (optionnel)
+  try {
+    await dotenv.load(fileName: ".env");
+    print('✅ Fichier .env chargé avec succès');
+  } catch (e) {
+    print('⚠️ Impossible de charger .env: $e');
+    print('⚠️ L\'application continuera sans variables d\'environnement');
+  }
+  
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await initializeDateFormatting('fr_FR', null);

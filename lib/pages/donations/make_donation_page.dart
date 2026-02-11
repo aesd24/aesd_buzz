@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cinetpay/cinetpay.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:aesd/appstaticdata/staticdata.dart';
 import 'package:aesd/services/donation_service.dart';
 import 'package:aesd/services/message.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class MakeDonationPage extends StatefulWidget {
   final String recipientType; // 'church' ou 'pastor'
@@ -29,10 +31,15 @@ class _MakeDonationPageState extends State<MakeDonationPage> {
   final _donationService = DonationService();
   bool _isProcessing = false;
 
-  // TODO: Remplacer par vos vraies clés CinetPay
-  static const String CINETPAY_API_KEY = 'YOUR_API_KEY';
-  static const int CINETPAY_SITE_ID = 123456;
-  static const String CINETPAY_NOTIFY_URL = 'https://your-backend.com/api/donations/webhook';
+  // Configuration  // Getters pour les variables d'environnement CinetPay
+  String get cinetpayApiKey => dotenv.env['CINETPAY_API_KEY'] ?? '';
+  
+  int get cinetpaySiteId {
+    final siteIdStr = dotenv.env['CINETPAY_SITE_ID'] ?? '0';
+    return int.tryParse(siteIdStr) ?? 0;
+  }
+  
+  String get cinetpayNotifyUrl => dotenv.env['CINETPAY_NOTIFY_URL'] ?? '';
 
   @override
   void dispose() {
@@ -53,15 +60,26 @@ class _MakeDonationPageState extends State<MakeDonationPage> {
     setState(() => _isProcessing = true);
 
     try {
-      // 1. Préparer la transaction côté backend
-      final initResponse = await _donationService.initDonation(
-        recipientId: widget.recipientId,
-        recipientType: widget.recipientType,
-        amount: amount,
-        message: _messageController.text.isEmpty ? null : _messageController.text,
-      );
-
-      final transactionId = initResponse['transaction_id'];
+      // Générer un transaction_id unique localement
+      // Format: DON_userId_timestamp
+      final transactionId = 'DON_${widget.recipientId}_${DateTime.now().millisecondsSinceEpoch}';
+      
+      print('💰 [DONATION] ========================================');
+      print('💰 [DONATION] Préparation du paiement CinetPay');
+      print('💰 [DONATION] - Transaction ID: $transactionId');
+      print('💰 [DONATION] - Montant: $amount XOF');
+      print('💰 [DONATION] - Destinataire: ${widget.recipientName}');
+      print('💰 [DONATION] - Type: ${widget.recipientType}');
+      print('💰 [DONATION] ========================================');
+      
+      // TODO: Quand le backend sera accessible, décommenter ceci:
+      // final initResponse = await _donationService.initDonation(
+      //   recipientId: widget.recipientId,
+      //   recipientType: widget.recipientType,
+      //   amount: amount,
+      //   message: _messageController.text.isEmpty ? null : _messageController.text,
+      // );
+      // final transactionId = initResponse['transaction_id'];
 
       // 2. Lancer le widget CinetPay
       Navigator.push(
@@ -76,21 +94,31 @@ class _MakeDonationPageState extends State<MakeDonationPage> {
             ),
             titleBackgroundColor: Colors.white,
             configData: {
-              'apikey': CINETPAY_API_KEY,
-              'site_id': CINETPAY_SITE_ID,
-              'notify_url': CINETPAY_NOTIFY_URL,
+              'apikey': cinetpayApiKey,
+              'site_id': cinetpaySiteId,
+              'notify_url': cinetpayNotifyUrl,
             },
             paymentData: {
               'transaction_id': transactionId,
               'amount': amount,
               'currency': 'XOF',
-              'channels': 'MOBILE_MONEY',
+              'channels': 'ALL',
               'description': 'Don à ${widget.recipientName}',
-              'metadata': {
+              'customer_name': 'Donateur',
+              'customer_surname': 'AESD',
+              'customer_email': 'contact@eglisesetserviteursdedieu.com',
+              'customer_phone_number': '0000000000',
+              'customer_address': 'Côte d\'Ivoire',
+              'customer_city': 'Abidjan',
+              'customer_country': 'CI',
+              'customer_state': 'CI',
+              'customer_zip_code': '00000',
+              'metadata': jsonEncode({
                 'recipient_type': widget.recipientType,
                 'recipient_id': widget.recipientId.toString(),
-                'message': _messageController.text,
-              },
+                'recipient_name': widget.recipientName,
+                'message': _messageController.text.isEmpty ? '' : _messageController.text,
+              }),
             },
             waitResponse: (response) {
               setState(() => _isProcessing = false);
