@@ -2,7 +2,7 @@ name: aesd
 description: "New aesd application based on Buzz templates"
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0+20
 
 environment:
   sdk: '>=3.7.0-0 <4.0.0'

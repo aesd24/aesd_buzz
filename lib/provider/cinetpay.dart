@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Provider pour gérer les paiements CinetPay
 /// 
@@ -8,9 +9,14 @@ import 'dart:convert';
 /// via l'API CinetPay pour les donations, achats de jetons, etc.
 class CinetPay extends ChangeNotifier {
   
-  // Configuration CinetPay (à remplacer par vos vraies clés)
-  static const String apiKey = 'YOUR_CINETPAY_API_KEY';
-  static const String siteId = 'YOUR_CINETPAY_SITE_ID';
+  // Configuration CinetPay depuis .env
+  String get apiKey => dotenv.env['CINETPAY_API_KEY'] ?? '';
+  
+  int get siteId {
+    final siteIdStr = dotenv.env['CINETPAY_SITE_ID'] ?? '0';
+    return int.tryParse(siteIdStr) ?? 0;
+  }
+  
   static const String apiUrl = 'https://api-checkout.cinetpay.com/v2/payment';
   
   bool _isProcessing = false;

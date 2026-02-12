@@ -212,19 +212,22 @@ class _AppMenuDrawerState extends State<AppMenuDrawer> {
                                   style: mediumBlackTextStyle,
                                 ),
                               ),
-                              ListTile(
-                                leading: cusFaIcon(
-                                  FontAwesomeIcons.wallet,
+                              // Mon portefeuille - uniquement pour églises et serviteurs validés
+                              if (user.church != null || 
+                                  (user.servant != null && user.certifStatus == CertificationStates.approved))
+                                ListTile(
+                                  leading: cusFaIcon(
+                                    FontAwesomeIcons.wallet,
+                                  ),
+                                  onTap: () {
+                                    Get.back();
+                                    Get.toNamed(Routes.wallet);
+                                  },
+                                  title: Text(
+                                    "Mon portefeuille",
+                                    style: mediumBlackTextStyle,
+                                  ),
                                 ),
-                                onTap: () {
-                                  Get.back();
-                                  Get.toNamed(Routes.wallet);
-                                },
-                                title: Text(
-                                  "Mon portefeuille",
-                                  style: mediumBlackTextStyle,
-                                ),
-                              ),
                               if (provider.user!.accountType.code ==
                                   Dictionnary.servant.code)
                                 ListTile(

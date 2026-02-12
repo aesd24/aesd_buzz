@@ -7,6 +7,8 @@ import 'package:aesd/pages/quiz/home.dart';
 import 'package:aesd/pages/social/social.dart';
 import 'package:aesd/pages/testimony/list.dart';
 import 'package:aesd/provider/auth.dart';
+import 'package:aesd/provider/wallet_provider.dart';
+import 'package:aesd/services/donation_wallet_service.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -203,93 +205,130 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   }
 
   Widget _buildBalanceWidget(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () {
-          Get.toNamed(Routes.wallet);
-        },
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.95),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: appMainColor.withOpacity(0.2),
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: appMainColor.withOpacity(0.15),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.baseline,
-                textBaseline: TextBaseline.alphabetic,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "8.786",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: notifire.getMainText,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    "F",
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: notifire.getMainText.withOpacity(0.6),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 8),
-              Container(
-                width: 28,
-                height: 28,
+    return Consumer<Auth>(builder: (context, auth, child) {
+      final user = auth.user;
+      if (user == null) return const SizedBox.shrink();
+      
+      return FutureBuilder<int>(
+        future: _getBalance(user),
+        builder: (context, snapshot) {
+          final balance = snapshot.data ?? 0;
+          return Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                // Seulement naviguer vers wallet si l'utilisateur est éligible
+                if (user.church != null || (user.servant != null && user.certifStatus == CertificationStates.approved)) {
+                  Get.toNamed(Routes.wallet);
+                }
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      appMainColor,
-                      appMainColor.withOpacity(0.8),
-                    ],
+                  color: Colors.white.withOpacity(0.95),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: appMainColor.withOpacity(0.2),
+                    width: 1.5,
                   ),
-                  shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: appMainColor.withOpacity(0.3),
-                      blurRadius: 6,
-                      spreadRadius: 1,
+                      color: appMainColor.withOpacity(0.15),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                child: const Center(
-                  child: Icon(
-                    Icons.add,
-                    color: Colors.white,
-                    size: 18,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          balance.toString(),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: notifire.getMainText,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          "F",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: notifire.getMainText.withOpacity(0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            appMainColor,
+                            appMainColor.withOpacity(0.8),
+                          ],
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: appMainColor.withOpacity(0.3),
+                            blurRadius: 6,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
+        },
+      );
+    });
+  }
+  
+  Future<int> _getBalance(dynamic user) async {
+    try {
+      // Pour églises et serviteurs validés: utiliser DonationWalletService
+      if (user.church != null || user.servant != null) {
+        final walletType = user.church != null ? 'church' : 'pastor';
+        final walletId = user.church?.id ?? user.servant?.id ?? 0;
+        
+        final donationService = DonationWalletService();
+        final response = await donationService.getBalance(
+          walletType: walletType,
+          walletId: walletId,
+        );
+        return response['balance'] ?? 0;
+      }
+      
+      // Pour utilisateurs standards: retourner 0 (pas de wallet)
+      return 0;
+    } catch (e) {
+      print('Erreur chargement solde: $e');
+      return 0;
+    }
   }
 
   Widget _buildModernBottomNav(BuildContext context) {

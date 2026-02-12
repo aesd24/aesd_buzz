@@ -235,27 +235,31 @@ class _WithDrawingPageState extends State<WithDrawingPage> with SingleTickerProv
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Solde disponible",
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            color: Colors.grey[600],
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Solde disponible",
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "8.786 XOF",
-                          style: GoogleFonts.orbitron(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: appMainColor,
+                          const SizedBox(height: 4),
+                          Consumer<WalletProvider>(
+                            builder: (context, walletProvider, child) {
+                              return Text(
+                                "${walletProvider.balance.toStringAsFixed(0)} XOF",
+                                style: GoogleFonts.orbitron(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: appMainColor,
+                                ),
+                              );
+                            },
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(

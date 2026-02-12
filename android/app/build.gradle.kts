@@ -12,6 +12,14 @@ val keystorePropertiesFile = rootProject.file("key.properties")
 val keystoreProperties = Properties()
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+    println("Loaded key.properties")
+    println("storeFile: " + keystoreProperties.getProperty("storeFile"))
+    println("keyAlias: " + keystoreProperties.getProperty("keyAlias"))
+    // Don't log full passwords
+    println("storePassword exists: " + (keystoreProperties.getProperty("storePassword") != null))
+    println("keyPassword exists: " + (keystoreProperties.getProperty("keyPassword") != null))
+} else {
+    println("key.properties NOT FOUND at " + keystorePropertiesFile.absolutePath)
 }
 
 val hasValidSigningConfig = keystorePropertiesFile.exists() &&
@@ -27,12 +35,10 @@ android {
 
     signingConfigs {
         create("release") {
-            if (hasValidSigningConfig) {
                 storeFile = file(keystoreProperties.getProperty("storeFile")!!)
                 storePassword = keystoreProperties.getProperty("storePassword")
                 keyAlias = keystoreProperties.getProperty("keyAlias")
                 keyPassword = keystoreProperties.getProperty("keyPassword")
-            }
         }
     }
 
@@ -55,11 +61,9 @@ android {
 
     buildTypes {
         getByName("release") {
-            if (hasValidSigningConfig) {
                 signingConfig = signingConfigs.getByName("release")
-            }
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
