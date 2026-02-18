@@ -18,6 +18,7 @@ import 'package:aesd/pages/wallet/transactions.dart';
 import 'package:aesd/pages/wallet/wallet.dart';
 import 'package:aesd/pages/live/main.dart';
 import 'package:aesd/pages/notifications/list.dart';
+import 'package:aesd/pages/dashboard/community/membership_requests.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
@@ -47,6 +48,7 @@ class Routes {
   static String churchDetail = '/church';
   static String eventDetail = '/event';
   static String ceremonyDetail = '/ceremony';
+  static String membershipRequests = '/membership-requests';
 }
 
 final getPage = [
@@ -86,6 +88,10 @@ final getPage = [
   GetPage(
     name: Routes.notifications,
     page: _buildLoggedPage(NotificationListPage()),
+  ),
+  GetPage(
+    name: Routes.membershipRequests,
+    page: _buildLoggedPage(const MembershipRequestsList()),
   ),
 ];
 

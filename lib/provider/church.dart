@@ -206,11 +206,22 @@ class Church extends ChangeNotifier {
   }
 
   Future acceptMembershipRequest(int requestId) async {
-    final response = await _request.acceptMembershipRequest(requestId);
-    if (response.statusCode == 200) {
-      return true;
-    } else {
-      throw HttpException("Impossible d'accepter la demande d'adhésion");
+    try {
+      final response = await _request.acceptMembershipRequest(requestId);
+      print("🔍 [MEMBERSHIP] Accept Request ID: $requestId");
+      print("🔍 [MEMBERSHIP] Status: ${response.statusCode}");
+      print("🔍 [MEMBERSHIP] Body: ${response.data}");
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        throw HttpException(
+          "Erreur (${response.statusCode}): ${response.data['message'] ?? 'Erreur inconnue'}",
+        );
+      }
+    } catch (e) {
+      print("❌ [MEMBERSHIP] Exception accept: $e");
+      rethrow;
     }
   }
 

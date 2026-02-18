@@ -22,6 +22,7 @@ class _MembershipRequestsListState extends State<MembershipRequestsList> {
   List<MembershipRequestModel> requests = [];
 
   Future init() async {
+    print('🔍 [MEMBERSHIP] Chargement des demandes d\'adhésion...');
     try {
       setState(() {
         _isLoading = true;
@@ -30,16 +31,22 @@ class _MembershipRequestsListState extends State<MembershipRequestsList> {
         context,
         listen: false,
       ).getMembershipRequests().then((value) {
+        print('🔍 [MEMBERSHIP] Réponse reçue: $value');
         if (value != null) {
+          print('🔍 [MEMBERSHIP] Nombre de demandes: ${value.length}');
           setState(() => requests = value);
+        } else {
+          print('❌ [MEMBERSHIP] Réponse null');
         }
       });
     } catch (e) {
+      print('❌ [MEMBERSHIP] Erreur: $e');
       e.printError();
     } finally {
       setState(() {
         _isLoading = false;
       });
+      print('🔍 [MEMBERSHIP] Fin du chargement. Total demandes: ${requests.length}');
     }
   }
 
@@ -58,6 +65,14 @@ class _MembershipRequestsListState extends State<MembershipRequestsList> {
         }
       });
     } catch (e) {
+      print('❌ [MEMBERSHIP] Erreur UI: $e');
+      // Afficher l'erreur à l'utilisateur
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Erreur: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
       e.printError();
     } finally {
       setState(() => request.isLoading = false);

@@ -139,11 +139,6 @@ class _QuizMainPageState extends State<QuizMainPage> {
 
                               // Bouton de classement
                               _buildRankingButton(),
-
-                              SizedBox(height: 24),
-
-                              // Warning
-                              _buildWarning(),
                             ],
                           ),
                         ),
@@ -370,7 +365,7 @@ class _QuizMainPageState extends State<QuizMainPage> {
             quiz!.hasPlayed ? 'Points Gagnés' : 'Récompense',
             quiz!.hasPlayed && quiz!.userScore != null 
                 ? '${quiz!.userScore} points' 
-                : '${quiz!.questionCount * 4} points',
+                : '${quiz!.totalPoints} points',
             Colors.amber.shade600,
           ),
           SizedBox(height: 12),

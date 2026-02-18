@@ -7,6 +7,7 @@ import 'package:aesd/pages/quiz/home.dart';
 import 'package:aesd/pages/social/social.dart';
 import 'package:aesd/pages/testimony/list.dart';
 import 'package:aesd/provider/auth.dart';
+import 'package:aesd/provider/notification.dart';
 import 'package:aesd/provider/wallet_provider.dart';
 import 'package:aesd/services/donation_wallet_service.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
@@ -292,7 +293,7 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
                       ),
                       child: const Center(
                         child: Icon(
-                          Icons.add,
+                          Icons.refresh,
                           color: Colors.white,
                           size: 18,
                         ),
@@ -310,20 +311,26 @@ class _MainPageState extends State<MainPage> with TickerProviderStateMixin {
   
   Future<int> _getBalance(dynamic user) async {
     try {
-      // Pour églises et serviteurs validés: utiliser DonationWalletService
-      if (user.church != null || user.servant != null) {
-        final walletType = user.church != null ? 'church' : 'pastor';
-        final walletId = user.church?.id ?? user.servant?.id ?? 0;
-        
+      // Priorité: Afficher le wallet personnel du pasteur si disponible
+      if (user.servant != null) {
         final donationService = DonationWalletService();
         final response = await donationService.getBalance(
-          walletType: walletType,
-          walletId: walletId,
+          walletType: 'pastor',
+          walletId: user.servant.id,
         );
         return response['balance'] ?? 0;
       }
       
-      // Pour utilisateurs standards: retourner 0 (pas de wallet)
+      // Sinon afficher le wallet église
+      if (user.church != null) {
+        final donationService = DonationWalletService();
+        final response = await donationService.getBalance(
+          walletType: 'church',
+          walletId: user.church.id,
+        );
+        return response['balance'] ?? 0;
+      }
+      
       return 0;
     } catch (e) {
       print('Erreur chargement solde: $e');

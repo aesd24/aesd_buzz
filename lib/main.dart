@@ -18,6 +18,7 @@ import 'package:aesd/provider/user.dart';
 import 'package:aesd/provider/wallet_provider.dart';
 import 'package:aesd/services/livekit_service.dart';
 import 'package:aesd/services/message.dart';
+import 'package:aesd/services/fcm_service.dart';
 import 'package:dio/dio.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -59,6 +60,15 @@ void main() async {
   
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  
+  // Initialiser le service de notifications (Token, Canal, Permissions)
+  try {
+    await FCMService().initialize();
+    print('✅ Service FCM initialisé');
+  } catch (e) {
+    print('❌ Erreur initialisation FCM Service: $e');
+  }
+
   await initializeDateFormatting('fr_FR', null);
   await FastCachedImageConfig.init();
 
@@ -195,7 +205,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _initializeFirebaseMessaging();
+    // _initializeFirebaseMessaging(); // Géré par FCMService
   }
 
   @override

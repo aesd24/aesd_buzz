@@ -39,8 +39,20 @@ class _TransactionsPageState extends State<TransactionsPage> {
     }
     
     try {
-      final walletType = user.church != null ? 'church' : 'pastor';
-      final walletId = user.church?.id ?? user.servant?.id ?? 0;
+      // Priorité: afficher wallet personnel du pasteur si disponible
+      String walletType;
+      int walletId;
+      
+      if (user.servant != null) {
+        walletType = 'pastor';
+        walletId = user.servant!.id;
+      } else if (user.church != null) {
+        walletType = 'church';
+        walletId = user.church!.id;
+      } else {
+        setState(() => _isLoading = false);
+        return;
+      }
       
       final donationService = DonationWalletService();
       final response = await donationService.getReceivedDonations(

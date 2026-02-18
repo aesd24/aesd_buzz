@@ -16,7 +16,14 @@ class QuizResultModel {
     pourcentage = (json['pourcentage'] ?? json['percentage'] ?? 0).toDouble();
     timeRemaining = json['time_remaining'] ?? '00:00:00';
     
-    // ✅ Champs de points - avec fallbacks si backend n'envoie pas
+    // Parser le détail par question si disponible
+    if (json['questions'] != null) {
+      questions = (json['questions'] as List)
+          .map((q) => QuestionResultDetail.fromJson(q))
+          .toList();
+    }
+
+    // ✅ Champs de points - avec fallbacks
     totalPoints = json['total_points'] ?? 
                  json['points_maximal'] ?? 
                  0;
@@ -25,22 +32,33 @@ class QuizResultModel {
                   json['user_points'] ?? 
                   0;
     
+    // Fallback: Si pointsEarned est 0 mais on a un score, utiliser le score (si pas de points bonus séparés)
+    if (pointsEarned == 0 && score > 0 && totalPoints > 0) {
+      pointsEarned = score > totalPoints ? totalPoints : score;
+    }
+
     timeFactor = (json['time_factor'] ?? 1.0).toDouble();
     
-    // ✅ Calcul du correctCount/wrongCount si pas fourni par backend
-    correctCount = json['correct_count'] ?? 
-                  json['correct_answers_count'] ??
-                  ((pourcentage / 100 * (json['total_questions'] ?? 1)).toInt());
-    
-    wrongCount = json['wrong_count'] ?? 
-                json['wrong_answers_count'] ?? 
-                ((json['total_questions'] ?? 0) - correctCount);
-    
-    // Parser le détail par question si disponible
-    if (json['questions'] != null) {
-      questions = (json['questions'] as List)
-          .map((q) => QuestionResultDetail.fromJson(q))
-          .toList();
+    // ✅ Calcul robuste des compteurs
+    if (questions.isNotEmpty) {
+      // Priorité 1: Calculer depuis les questions retournées
+      correctCount = questions.where((q) => q.isCorrect).length;
+      wrongCount = questions.where((q) => !q.isCorrect).length;
+    } else {
+      // Priorité 2: Utiliser les champs JSON
+      int totalQs = json['total_questions'] ?? 0;
+      
+      correctCount = json['correct_count'] ?? 
+                    json['correct_answers_count'] ??
+                    ((pourcentage / 100 * (totalQs > 0 ? totalQs : 1)).toInt());
+                    
+      wrongCount = json['wrong_count'] ?? 
+                  json['wrong_answers_count'] ?? 
+                  (totalQs - correctCount);
+                  
+      // Sécurité: Pas de négatifs
+      if (wrongCount < 0) wrongCount = 0;
+      if (correctCount < 0) correctCount = 0;
     }
   }
 

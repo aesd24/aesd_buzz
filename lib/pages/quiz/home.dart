@@ -25,7 +25,7 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _loadQuizzes();
   }
 
@@ -87,6 +87,7 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
                 QuizRankingPage(
                   dataLoader: Provider.of<Quiz>(context, listen: false).getMonthRanking,
                 ),
+                _buildHistoryList(),
               ],
             ),
           ),
@@ -173,6 +174,7 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
       ),
       child: TabBar(
         controller: _tabController,
+        labelPadding: EdgeInsets.zero, // ✅ Zéro padding pour optimiser l'espace
         indicator: BoxDecoration(
           gradient: LinearGradient(
             colors: [Colors.purple.shade400, Colors.pink.shade400],
@@ -190,7 +192,7 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
         unselectedLabelColor: Colors.grey.shade600,
         labelStyle: TextStyle(
           fontWeight: FontWeight.bold,
-          fontSize: 15,
+          fontSize: 13, // ✅ Réduit à 13 pour être sûr que ça passe sur petits écrans
         ),
         tabs: [
           Tab(
@@ -198,7 +200,7 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('🎮'),
-                SizedBox(width: 8),
+                SizedBox(width: 4),
                 Text('Jeux'),
               ],
             ),
@@ -208,8 +210,18 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text('🏆'),
-                SizedBox(width: 8),
+                SizedBox(width: 4),
                 Text('Classement'),
+              ],
+            ),
+          ),
+          Tab(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('📜'),
+                SizedBox(width: 4),
+                Text('Historique'),
               ],
             ),
           ),
@@ -290,54 +302,8 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
                       }).toList(),
                     ],
 
-                    // Section Historique (repliable)
-                    if (playedQuizzes.isNotEmpty) ...[
-                      SizedBox(height: 16),
-                      Theme(
-                        data: Theme.of(context).copyWith(
-                          dividerColor: Colors.transparent,
-                        ),
-                        child: ExpansionTile(
-                          initiallyExpanded: _expandHistory,
-                          onExpansionChanged: (expanded) {
-                            setState(() {
-                              _expandHistory = expanded;
-                            });
-                          },
-                          tilePadding: EdgeInsets.symmetric(horizontal: 0),
-                          childrenPadding: EdgeInsets.zero,
-                          title: Text(
-                            'Historique des quiz',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: notifire.getMainText,
-                            ),
-                          ),
-                          trailing: Icon(
-                            _expandHistory
-                                ? FontAwesomeIcons.chevronUp
-                                : FontAwesomeIcons.chevronDown,
-                            size: 16,
-                            color: notifire.getMainText.withAlpha(150),
-                          ),
-                          collapsedShape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          children: [
-                            ...playedQuizzes.asMap().entries.map((entry) {
-                              return entry.value.buildModernCard(entry.key);
-                            }).toList(),
-                          ],
-                        ),
-                      ),
-                    ],
-
                     // Si aucun quiz disponible
-                    if (availableQuizzes.isEmpty && playedQuizzes.isEmpty)
+                    if (availableQuizzes.isEmpty)
                       Padding(
                         padding: EdgeInsets.only(top: 40),
                         child: Center(
@@ -444,6 +410,7 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
     required List<Color> gradient,
   }) {
     return Container(
+      height: 110, // ✅ Hauteur fixe pour éviter le décalage
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -457,34 +424,90 @@ class _QuizHomeState extends State<QuizHome> with SingleTickerProviderStateMixin
         ],
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center, // Centrer verticalement
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 36, // Un peu plus petit
+            height: 36,
             decoration: BoxDecoration(
               gradient: LinearGradient(colors: gradient),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: Colors.white, size: 20),
+            child: Icon(icon, color: Colors.white, size: 18),
           ),
           SizedBox(height: 8),
           Text(
             label,
             style: TextStyle(
               color: Colors.grey.shade600,
-              fontSize: 11,
+              fontSize: 10,
+              overflow: TextOverflow.ellipsis, // Eviter que le label dépasse
             ),
+            maxLines: 1,
           ),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: notifire.getMainText,
+          SizedBox(height: 4),
+          FittedBox( // ✅ Adapter la taille du texte si trop long
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: notifire.getMainText,
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildHistoryList() {
+    return Consumer<Quiz>(
+      builder: (context, quizProvider, child) {
+        final grouped = _getGroupedAndSortedQuizzes(quizProvider.allQuizzes);
+        final playedQuizzes = grouped['played'] ?? [];
+
+        if (playedQuizzes.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  FontAwesomeIcons.clockRotateLeft,
+                  size: 64,
+                  color: Colors.grey.shade300,
+                ),
+                SizedBox(height: 16),
+                Text(
+                  "Aucun historique",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  "Les quiz que vous avez terminés apparaîtront ici",
+                  style: TextStyle(
+                    color: Colors.grey.shade500,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return ListView.builder(
+          padding: EdgeInsets.all(16),
+          itemCount: playedQuizzes.length,
+          itemBuilder: (context, index) {
+            return playedQuizzes[index].buildModernCard(index);
+          },
+        );
+      },
     );
   }
 }

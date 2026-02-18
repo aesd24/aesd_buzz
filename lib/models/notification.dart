@@ -15,14 +15,27 @@ class NotificationModel {
 
   NotificationModel.fromJson(json) {
     id = json['id'];
-    title = json['title'];
-    content = json['content'];
+    title = json['title'] ?? 'Notification';
+    content = json['content'] ?? '';
     // Parse date correctly
-    date = json['date'] is String 
-        ? DateTime.parse(json['date']) 
-        : (json['date'] is DateTime ? json['date'] : DateTime.now());
-    readed = json['readed'] == 1 ? true : false;
-    type = json['notificationType'] ?? 'general';
+    if (json['date'] != null) {
+      date = json['date'] is String 
+          ? DateTime.parse(json['date']) 
+          : (json['date'] is DateTime ? json['date'] : DateTime.now());
+    } else {
+      date = DateTime.now();
+    }
+    
+    // Handle read/unread status safely
+    if (json['readed'] != null) {
+      readed = json['readed'] == 1 || json['readed'] == true;
+    } else if (json['read_at'] != null) {
+      readed = true; // Laravel convention
+    } else {
+      readed = false;
+    }
+
+    type = json['notificationType'] ?? json['type'] ?? 'general';
     servantId = json['servant_id'];
     postId = json['post_id'];
   }

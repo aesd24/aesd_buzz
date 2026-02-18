@@ -17,6 +17,7 @@ class QuizModel {
   int? userScore;
   String? userTimeRemaining;
   late int totalPoints;              // ✅ Points totaux du quiz
+  int participantsCount = 0;         // ✅ Nombre de participants
   List questions = [];
 
   QuizModel.fromJson(Map<String, dynamic> json) {
@@ -55,6 +56,11 @@ class QuizModel {
     totalPoints = json['points_maximal'] ?? 
                  json['total_points'] ?? 
                  (questionCount * 5); // Défaut: 5 points par question
+
+    // ✅ NOUVEAU: Parser le nombre de participants
+    participantsCount = json['participants_count'] ?? 
+                       json['users_count'] ?? 
+                       0;
     
     // Récupérer les stats de l'utilisateur s'ils existent
     if (json['user_quiz'] != null) {
@@ -204,7 +210,7 @@ class QuizModel {
                     Expanded(
                       child: _buildQuizStat(
                         FontAwesomeIcons.userGroup,
-                        '${(index + 1) * 50 + 100} joueurs',
+                        '${participantsCount} joueurs', // ✅ Utiliser le vrai nombre de participants
                         Colors.orange.shade400,
                       ),
                     ),

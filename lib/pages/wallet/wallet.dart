@@ -16,6 +16,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'dart:ui';
 
+// Enum pour le type de wallet affiché
+enum WalletType { personal, church }
+
 class Wallet extends StatefulWidget {
   const Wallet({super.key});
 
@@ -28,6 +31,10 @@ class _WalletState extends State<Wallet> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+  
+  // Wallet switching
+  WalletType _activeWalletType = WalletType.personal;
+  bool _isRefreshing = false;
   
   // Données de donation
   bool _isLoadingDonations = true;
@@ -56,27 +63,60 @@ class _WalletState extends State<Wallet> with SingleTickerProviderStateMixin {
     
     _animationController.forward();
     
-    // Charger les données de donations
+    // V\u00e9rifier si on doit ouvrir directement le wallet église
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadDonationData();
+      final args = Get.arguments;
+      if (args != null && args['openChurchWallet'] == true) {
+        setState(() => _activeWalletType = WalletType.church);
+      }
+      _loadWalletData();
     });
   }
   
-  Future<void> _loadDonationData() async {
+  Future<void> _loadWalletData() async {
+    setState(() {
+      _isRefreshing = true;
+      _isLoadingDonations = true;
+    });
+    
     final user = Provider.of<Auth>(context, listen: false).user;
     
-    if (user == null) return;
+    if (user == null) {
+      setState(() {
+        _isRefreshing = false;
+        _isLoadingDonations = false;
+      });
+      return;
+    }
     
-    // Seulement pour églises et serviteurs validés
-    if (user.church == null && user.servant == null) {
-      setState(() => _isLoadingDonations = false);
+    // Déterminer le type et ID selon le wallet actif
+    String walletType;
+    int walletId;
+    
+    if (_activeWalletType == WalletType.church && user.church != null) {
+      walletType = 'church';
+      walletId = user.church!.id;
+    } else if (_activeWalletType == WalletType.personal && user.servant != null) {
+      walletType = 'pastor';
+      walletId = user.servant!.id;
+    } else if (user.church != null) {
+      // Fallback: église seule
+      walletType = 'church';
+      walletId = user.church!.id;
+    } else if (user.servant != null) {
+      // Fallback: pasteur seul
+      walletType = 'pastor';
+      walletId = user.servant!.id;
+    } else {
+      // Aucun wallet disponible
+      setState(() {
+        _isRefreshing = false;
+        _isLoadingDonations = false;
+      });
       return;
     }
     
     try {
-      final walletType = user.church != null ? 'church' : 'pastor';
-      final walletId = user.church?.id ?? user.servant?.id ?? 0;
-      
       final donationService = DonationWalletService();
       
       // Charger le solde
@@ -95,11 +135,42 @@ class _WalletState extends State<Wallet> with SingleTickerProviderStateMixin {
         _donationBalance = balanceResponse['balance'] ?? 0;
         _receivedDonations = donationsResponse['data'] ?? [];
         _isLoadingDonations = false;
+        _isRefreshing = false;
       });
     } catch (e) {
-      print('Erreur chargement donations: $e');
-      setState(() => _isLoadingDonations = false);
+      setState(() {
+        _isLoadingDonations = false;
+        _isRefreshing = false;
+      });
     }
+  }
+  
+  Widget _buildToggleOption(String label, WalletType type) {
+    final isActive = _activeWalletType == type;
+    
+    return GestureDetector(
+      onTap: () {
+        if (_activeWalletType != type) {
+          setState(() => _activeWalletType = type);
+          _loadWalletData(); // Recharger avec nouveau type
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+        decoration: BoxDecoration(
+          color: isActive ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.poppins(
+            color: isActive ? appMainColor : Colors.white.withOpacity(0.7),
+            fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
+            fontSize: 14,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -138,6 +209,15 @@ class _WalletState extends State<Wallet> with SingleTickerProviderStateMixin {
             fontSize: 20,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              _isRefreshing ? Icons.hourglass_empty : Icons.refresh_rounded,
+              color: Colors.white,
+            ),
+            onPressed: _isRefreshing ? null : _loadWalletData,
+          ),
+        ],
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -201,6 +281,34 @@ class _WalletState extends State<Wallet> with SingleTickerProviderStateMixin {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Toggle wallet type (Personal / Église)
+                          Consumer<Auth>(builder: (context, auth, _) {
+                            final user = auth.user;
+                            if (user == null) return SizedBox.shrink();
+                            
+                            final hasChurch = user.church != null;
+                            final hasServant = user.servant != null;
+                            
+                            // Si pasteur AVEC église → Afficher toggle
+                            if (hasChurch && hasServant) {
+                              return Container(
+                                margin: EdgeInsets.only(bottom: 16),
+                                padding: EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    _buildToggleOption('Personnel', WalletType.personal),
+                                    _buildToggleOption('Église', WalletType.church),
+                                  ],
+                                ),
+                              );
+                            }
+                            return SizedBox.shrink();
+                          }),
                           Text(
                             "Solde disponible",
                             style: GoogleFonts.poppins(
@@ -223,7 +331,23 @@ class _WalletState extends State<Wallet> with SingleTickerProviderStateMixin {
                                   letterSpacing: 2,
                                 ),
                               ),
-                              const SizedBox(width: 16),
+                              const SizedBox(width: 12),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  SizedBox(height: 20),
+                                  Text(
+                                    "XOF",
+                                    style: GoogleFonts.orbitron(
+                                      fontSize: 16,
+                                      color: Colors.white.withOpacity(0.7),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 8),
                               IconButton(
                                 onPressed: () {
                                   setState(() {
@@ -246,15 +370,6 @@ class _WalletState extends State<Wallet> with SingleTickerProviderStateMixin {
                                 ),
                               ),
                             ],
-                          ),
-                          Text(
-                            "XOF",
-                            style: GoogleFonts.orbitron(
-                              fontSize: 16,
-                              color: Colors.white.withOpacity(0.7),
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 4,
-                            ),
                           ),
                         ],
                       ),
@@ -299,16 +414,34 @@ class _WalletState extends State<Wallet> with SingleTickerProviderStateMixin {
                                   icon: FontAwesomeIcons.arrowDown,
                                   label: "Retirer",
                                   color: const Color(0xffff9800),
-                                  onTap: () async {
-                                    final user = Provider.of<Auth>(context, listen: false).user;
-                                    
-                                    // Vérifier si l'utilisateur est une église ou un serviteur (pasteur)
-                                    if (user?.church != null || user?.servant != null) {
-                                      // L'utilisateur est une église ou un serviteur → demande de retrait avec validation
-                                      final walletType = user?.church != null ? 'church' : 'pastor';
-                                      final walletId = user?.church?.id ?? user?.servant?.id ?? 0;
+                                    onTap: () async {
+                                      final user = Provider.of<Auth>(context, listen: false).user;
                                       
-                                      // Récupérer le solde des dons depuis le backend
+                                      if (user == null) return;
+
+                                      // Cas Utilisateur Standard (Ni église, ni serviteur) -> Retrait Mobile Money direct
+                                      if (user.church == null && user.servant == null) {
+                                        Get.to(() => WithDrawingPage());
+                                        return;
+                                      }
+
+                                      String walletType;
+                                      int walletId;
+                                      
+                                      // Utiliser le wallet ACTIF sélectionné via les boutons toggle
+                                      if (_activeWalletType == WalletType.church && user.church != null) {
+                                        walletType = 'church';
+                                        walletId = user.church!.id;
+                                      } else if (_activeWalletType == WalletType.personal && user.servant != null) {
+                                        walletType = 'pastor';
+                                        walletId = user.servant!.id;
+                                      } else {
+                                        // Fallback par défaut si quelque chose ne va pas
+                                        walletType = user.church != null ? 'church' : 'pastor';
+                                        walletId = user.church?.id ?? user.servant?.id ?? 0;
+                                      }
+                                      
+                                      // Récupérer le solde des dons depuis le backend pour ce wallet spécifique
                                       try {
                                         final donationWalletService = DonationWalletService();
                                         final balanceResponse = await donationWalletService.getBalance(
@@ -325,18 +458,14 @@ class _WalletState extends State<Wallet> with SingleTickerProviderStateMixin {
                                         ));
                                       } catch (e) {
                                         print('Erreur récupération solde donations: $e');
-                                        // En cas d'erreur, utiliser 0 ou afficher un message
+                                        // En cas d'erreur, utiliser le solde local si c'est le même wallet, sinon 0
                                         Get.to(() => WithdrawalRequestPage(
                                           walletType: walletType,
                                           walletId: walletId,
                                           currentBalance: 0,
                                         ));
                                       }
-                                    } else {
-                                      // Utilisateur standard → retrait immédiat
-                                      Get.to(() => WithDrawingPage());
-                                    }
-                                  },
+                                    },
                                 ),
                               ),
                               Container(

@@ -16,6 +16,7 @@ import 'package:aesd/provider/church.dart';
 import 'package:aesd/pages/dashboard/ceremony.dart';
 import 'package:aesd/pages/dashboard/community/main.dart';
 import 'package:aesd/pages/dashboard/events.dart';
+import 'package:aesd/pages/wallet/wallet.dart';
 import 'package:aesd/services/message.dart';
 import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -329,12 +330,14 @@ class _DashboardState extends State<Dashboard> {
             spacing: 10,
             runSpacing: 10,
             children: [
-              /*customIconButton(
-                label: "Porte-feuille",
+              customIconButton(
+                label: "Portefeuille",
                 icon: FontAwesomeIcons.wallet,
                 color: Colors.green,
                 destination: Wallet(),
-              ),*/
+                arg: {'openChurchWallet': true},
+                isEnabled: church.validationState == 'approved',
+              ),
               customIconButton(
                 destination: ProgramListPage(),
                 arg: {"churchId": church.id},

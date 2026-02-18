@@ -14,12 +14,31 @@ class DioClient {
       receiveTimeout: const Duration(minutes: 5),
       sendTimeout: const Duration(minutes: 5),
       validateStatus: (status) {
-        return status! < 500;
+        if (status! >= 500) {
+          print('❌ SERVER ERROR ${status}');
+        }
+        return status < 500;
       },
       headers: {
         'accept': "application/json",
       })
   );
+
+  DioClient() {
+    _dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) {
+        print('🌐 REQUEST: ${options.method} ${options.uri}');
+        return handler.next(options);
+      },
+      onError: (DioException e, handler) {
+        print('❌ ERROR: ${e.message}');
+        if (e.response != null) {
+          print('DATA: ${e.response?.data}');
+        }
+        return handler.next(e);
+      },
+    ));
+  }
 
   Future<Dio> getApiClient({String? contentType}) async {
     final authToken = await UnExpiredCache().get(key: 'access_token');

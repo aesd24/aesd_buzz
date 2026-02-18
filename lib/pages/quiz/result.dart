@@ -277,37 +277,55 @@ class _QuizResultPageState extends State<QuizResultPage> {
     Widget? icon,
   }) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 10), // Un peu plus d'espace vertical
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(width: 3, color: color),
+        borderRadius: BorderRadius.circular(16), // Coins plus ronds
+        border: Border.all(width: 2, color: color.withOpacity(0.5)), // Bordure plus subtile
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.1),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(color: color),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
+            ),
             child: Row(
               children: [
                 icon ?? Icon(Icons.info, color: Colors.white),
-                SizedBox(width: 7),
-                Text(
-                  title,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall!.copyWith(color: Colors.white),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16), // Plus de padding
             child: Text(
               value,
-              style: Theme.of(
-                context,
-              ).textTheme.labelLarge!.copyWith(color: color, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: color,
+                fontWeight: FontWeight.bold,
+                fontSize: 20, // Plus grand, plus lisible
+              ),
             ),
           ),
         ],

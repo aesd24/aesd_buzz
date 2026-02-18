@@ -52,34 +52,36 @@ class _MakeDonationPageState extends State<MakeDonationPage> {
     final amount = int.tryParse(_amountController.text);
     
     // Validation
-    if (amount == null || amount < 100) {
-      MessageService.showErrorMessage('Montant minimum: 100 XOF');
+    if (amount == null || amount < 500) {
+      MessageService.showErrorMessage('Montant minimum: 500 XOF');
       return;
     }
 
     setState(() => _isProcessing = true);
 
     try {
-      // Générer un transaction_id unique localement
-      // Format: DON_userId_timestamp
-      final transactionId = 'DON_${widget.recipientId}_${DateTime.now().millisecondsSinceEpoch}';
-      
+      // 1. Appeler le backend pour initialiser la donation et obtenir un transaction_id
       print('💰 [DONATION] ========================================');
-      print('💰 [DONATION] Préparation du paiement CinetPay');
-      print('💰 [DONATION] - Transaction ID: $transactionId');
+      print('💰 [DONATION] Initialisation de la donation via backend');
       print('💰 [DONATION] - Montant: $amount XOF');
       print('💰 [DONATION] - Destinataire: ${widget.recipientName}');
       print('💰 [DONATION] - Type: ${widget.recipientType}');
       print('💰 [DONATION] ========================================');
       
-      // TODO: Quand le backend sera accessible, décommenter ceci:
-      // final initResponse = await _donationService.initDonation(
-      //   recipientId: widget.recipientId,
-      //   recipientType: widget.recipientType,
-      //   amount: amount,
-      //   message: _messageController.text.isEmpty ? null : _messageController.text,
-      // );
-      // final transactionId = initResponse['transaction_id'];
+      final initResponse = await _donationService.initDonation(
+        recipientId: widget.recipientId,
+        recipientType: widget.recipientType,
+        amount: amount,
+        message: _messageController.text.isEmpty ? null : _messageController.text,
+      );
+      
+      final transactionId = initResponse['transaction_id'];
+      final donationId = initResponse['donation_id'];
+      
+      print('✅ [DONATION] Transaction initialisée:');
+      print('   - transaction_id: $transactionId');
+      print('   - donation_id: $donationId');
+      print('💰 [DONATION] ========================================');
 
       // 2. Lancer le widget CinetPay
       Navigator.push(
@@ -303,7 +305,7 @@ class _MakeDonationPageState extends State<MakeDonationPage> {
               keyboardType: TextInputType.number,
               style: GoogleFonts.poppins(color: notifire.getMainText),
               decoration: InputDecoration(
-                hintText: 'Minimum 100 XOF',
+                hintText: 'Minimum 500 XOF',
                 hintStyle: GoogleFonts.poppins(color: notifire.getMaingey),
                 prefixIcon: Icon(Icons.money, color: appMainColor),
                 suffixText: 'XOF',

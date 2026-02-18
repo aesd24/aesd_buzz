@@ -97,8 +97,16 @@ class UserModel {
     adress = json['adresse'];
     phone = json['phone'];
     photo = json['profile_photo'];
-    servant =
-        json['servant'] != null ? ServantModel.fromJson(json['servant']) : null;
+    
+    // Parse servant from json['servant'] OU json['details']
+    if (json['servant'] != null) {
+      servant = ServantModel.fromJson(json['servant']);
+    } else if (json['details'] != null) {
+      servant = ServantModel.fromJson(json['details']);
+    } else {
+      servant = null;
+    }
+    
     accountType = Dictionnary.accountTypes.firstWhere(
       (element) => element.code == json['account_type'],
     );

@@ -187,6 +187,34 @@ class _WithdrawalRequestPageState extends State<WithdrawalRequestPage> {
               ),
             ),
 
+            SizedBox(height: 20),
+
+            // ⚠️ WARNING: Frais de retrait 13.5%
+            Container(
+              padding: EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: Colors.orange, width: 2),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Des frais de 13,5% seront appliqués sur le montant retiré',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.orange[900],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
             SizedBox(height: 30),
 
             // Bouton de demande
