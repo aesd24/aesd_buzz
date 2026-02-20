@@ -3,7 +3,7 @@ import 'package:aesd/components/certification_banner.dart';
 import 'package:aesd/components/icon.dart';
 import 'package:aesd/pages/dashboard/dashboard.dart';
 import 'package:aesd/pages/social/church/creation/main.dart';
-import 'package:aesd/pages/social/church/list.dart';
+import 'package:aesd/pages/social/social.dart';
 import 'package:aesd/provider/auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -95,7 +95,12 @@ Widget? getChurchIssueBanner(BuildContext context) {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          Get.to(() => ChurchList());
+                          // Revenir à la page principale (MainPage)
+                          Get.until((route) => route.isFirst);
+                          // Demander à SocialPage de naviguer vers l'onglet "Eglises" (index 2)
+                          Future.delayed(const Duration(milliseconds: 350), () {
+                            SocialPage.navigateToTab.value = 2;
+                          });
                         },
                     ),
                   ],

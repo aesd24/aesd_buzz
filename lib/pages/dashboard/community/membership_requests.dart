@@ -118,7 +118,7 @@ class _MembershipRequestsListState extends State<MembershipRequestsList> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
-          leading: customBackButton(icon: FontAwesomeIcons.xmark),
+          leading: CloseButton(),
           title: Text(
             "Demandes d'adhésion",
             style: Theme.of(context).textTheme.titleMedium,

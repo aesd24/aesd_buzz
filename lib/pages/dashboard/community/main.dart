@@ -56,10 +56,7 @@ class _DashboardCommunityPageState extends State<DashboardCommunityPage> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => Get.back(),
-          icon: FaIcon(FontAwesomeIcons.xmark, size: 20),
-        ),
+        leading: CloseButton(),
         title: Text("Communauté"),
         centerTitle: true,
       ),

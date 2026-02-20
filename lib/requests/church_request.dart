@@ -44,7 +44,7 @@ class ChurchRequest extends DioClient {
   Future acceptMembershipRequest(int requestId) async {
     // accepter la demande d'adhésion
     final client = await getApiClient();
-    return await client.post("membership-requests/$requestId/approuve");
+    return await client.post("membership-requests/$requestId/approve");
   }
 
   Future rejectMembershipRequest(int requestId) async {

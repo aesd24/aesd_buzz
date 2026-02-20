@@ -21,12 +21,17 @@ class MembershipRequestModel {
   MembershipRequestModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     state = json['status'] ?? 'pending';
-    churchName = json['church_name'];
-    churchId = json['church_id'];
-    requesterName = json['requester_name'];
-    requesterId = json['requester_id'];
-    requesterEmail = json['requester_email'];
-    requestDate = DateTime.parse(json['created_at']);
+    churchName = json['church_name'] ?? 'Église inconnue';
+    churchId = json['church_id'] ?? 0;
+    requesterName = json['requester_name'] ?? 'Inconnu';
+    requesterId = json['requester_id'] ?? 0;
+    requesterEmail = json['requester_email'] ?? '';
+    
+    if (json['created_at'] != null) {
+      requestDate = DateTime.tryParse(json['created_at']) ?? DateTime.now();
+    } else {
+      requestDate = DateTime.now();
+    }
   }
 
   Widget buildWidget(

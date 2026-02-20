@@ -93,7 +93,7 @@ class _NotificationListPageState extends State<NotificationListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: customBackButton(),
+        leading: BackButton(),
         title: Text(
           "Notifications",
           style: Theme.of(context).textTheme.titleLarge!.copyWith(

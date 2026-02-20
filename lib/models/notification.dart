@@ -18,10 +18,11 @@ class NotificationModel {
     title = json['title'] ?? 'Notification';
     content = json['content'] ?? '';
     // Parse date correctly
-    if (json['date'] != null) {
-      date = json['date'] is String 
-          ? DateTime.parse(json['date']) 
-          : (json['date'] is DateTime ? json['date'] : DateTime.now());
+    var dateData = json['date'] ?? json['created_at'];
+    if (dateData != null) {
+      date = dateData is String 
+          ? DateTime.parse(dateData) 
+          : (dateData is DateTime ? dateData : DateTime.now());
     } else {
       date = DateTime.now();
     }
@@ -53,6 +54,9 @@ class NotificationModel {
         return FontAwesomeIcons.solidCircleQuestion;
       case 'forum':
         return FontAwesomeIcons.solidComments;
+      case 'membership':
+      case 'membership_request':
+        return FontAwesomeIcons.userPlus;
       default:
         return FontAwesomeIcons.solidBell;
     }
@@ -71,6 +75,9 @@ class NotificationModel {
         return Colors.indigo.shade400;
       case 'forum':
         return Colors.teal.shade400;
+      case 'membership':
+      case 'membership_request':
+        return Colors.orange.shade400;
       default:
         return Colors.green.shade400;
     }
@@ -232,6 +239,11 @@ class NotificationModel {
         break;
       case 'forum':
         Get.toNamed(Routes.subject, arguments: {'subjectId': postId ?? id});
+        break;
+      case 'membership':
+      case 'membership_request':
+        // Rediriger vers la liste des demandes
+        Get.toNamed(Routes.membershipRequests);
         break;
       default:
         Get.snackbar('Notification', content);

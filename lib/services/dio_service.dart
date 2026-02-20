@@ -10,7 +10,7 @@ class DioClient {
   final Dio _dio = Dio(
       BaseOptions(
       baseUrl: "https://monapi.eglisesetserviteursdedieu.com/api/",
-      connectTimeout: const Duration(seconds: 10),
+      connectTimeout: const Duration(seconds: 60),
       receiveTimeout: const Duration(minutes: 5),
       sendTimeout: const Duration(minutes: 5),
       validateStatus: (status) {
