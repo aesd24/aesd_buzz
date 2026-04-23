@@ -12,17 +12,29 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  var selected = 0;
+  // 🚀 MODE DÉVELOPPEMENT : Bypass l'authentification
+  final bool BYPASS_AUTH = true; // Mets à false pour réactiver l'auth
 
   void init() async {
     try {
+      // Si mode développement, skip l'authentification
+      if (BYPASS_AUTH) {
+        print("⚠️ MODE DEV : Authentification bypass");
+        Get.offNamed(Routes.homepage);
+        return;
+      }
+
+      // Mode normal : vérifier l'authentification
       await Provider.of<Auth>(context, listen: false).isLoggedIn().then((value) {
         print(value);
         if (value) {
           Get.offNamed(Routes.homepage);
+        } else {
+          Get.offNamed(Routes.auth);
         }
       });
     } catch (e) {
+      print("Erreur auth: $e");
       Get.offNamed(Routes.auth);
     }
   }
@@ -62,10 +74,34 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
           Align(
             alignment: Alignment.center,
-            child: Image.asset(
-              "assets/icons/launcher_icon.png",
-              height: 150,
-              width: 150,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  "assets/icons/launcher_icon.png",
+                  height: 150,
+                  width: 150,
+                ),
+                if (BYPASS_AUTH) ...[
+                  SizedBox(height: 20),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade100,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.orange.shade600),
+                    ),
+                    child: Text(
+                      "🔧 MODE DÉVELOPPEMENT",
+                      style: TextStyle(
+                        color: Colors.orange.shade900,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         ],

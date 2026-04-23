@@ -15,6 +15,7 @@ class Quiz extends ChangeNotifier {
   Future<void> getAll() async {
     final response = await _request.getAll();
     if (response.statusCode == 200) {
+      print(response);
       _allQuizzes.clear();
       (response.data['data'] as List)
           .map((e) => _allQuizzes.add(QuizModel.fromJson(e)))
